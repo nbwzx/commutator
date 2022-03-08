@@ -35,7 +35,7 @@ function commutator() {
   }
   if (flag == 0) {
     text1 = "Not found."
-    text2 = ""
+    text2 = "Not found."
   }
   document.getElementById("result1").innerHTML = text1;
   document.getElementById("result2").innerHTML = text2;
