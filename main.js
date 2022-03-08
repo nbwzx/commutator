@@ -1,6 +1,5 @@
 function commutator() {
   var x = String(document.getElementById("x").value);
-  // var y = String(document.getElementById("y").value);
   var i;
   var j;
   var k;
@@ -9,6 +8,8 @@ function commutator() {
   var len;
   len = x.length;
   arr1 = x.split(" ");
+  part3 = conjugate(arr1);
+  arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
   arr2 = inverse(arr1.concat());
   flag = 0;
   // Maybe j,l,i,k is better for reading.
@@ -24,13 +25,28 @@ function commutator() {
           part2 = simplify(str3.concat(str4));
           arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
           arr = simplify(arrex);
-          if (arr.toString() == arr1.toString() && flag == 0) {
-            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
-            text2 = "[i,j,k,l]=[" + i.toString() + "," + j.toString() + "," + k.toString() + "," + l.toString() + "]"
+          if (arr.toString() == arr1.toString()) {
+            if (part3.length == 0) {
+              text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
+            }
+            if (part3.length > 0) {
+              text1 = part3.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
+            }
+            text2 = "[t,i,j,k,l]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "," + l.toString() + "]"
             flag = 1;
+            break;
           }
         }
+        if (flag == 1) {
+          break;
+        }
       }
+      if (flag == 1) {
+        break;
+      }
+    }
+    if (flag == 1) {
+      break;
     }
   }
   if (flag == 0) {
@@ -41,9 +57,37 @@ function commutator() {
   document.getElementById("result2").innerHTML = text2;
 }
 
+function conjugate(array) {
+  var arr;
+  var i;
+  var arr1;
+  var arr2;
+  var len;
+  var arrtemp;
+  var t;
+  var minlen;
+  arr = array;
+  minlen = arr.length;
+  t = 0;
+  for (i = 1; i < array.length; i++) {
+    arr1 = arr.concat().slice(0, i);
+    arr2 = inverse(arr1.concat());
+    arrtemp = arr.concat();
+    arrtemp = arr2.concat(arrtemp, arr1);
+    arrtemp = simplify(arrtemp);
+    len = simplify(arrtemp).length;
+    if (len < minlen) {
+      t = i;
+      minlen = len;
+    }
+  }
+  return arr.concat().slice(0, t);
+}
+
 function inverse(array) {
   var temp;
   var arr;
+  var i;
   arr = array;
   for (i = 0; i < arr.length / 2; i++) {
     temp = arr[i];
@@ -161,6 +205,5 @@ function inverse_str(str) {
     }
   }
 }
-
 
 document.getElementById("go").addEventListener("click", commutator);

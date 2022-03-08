@@ -1,7 +1,7 @@
 # Commutator
 Given a formula, return the commutator of this formula.
 
-Let <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\J9W6pjRIDj.svg"> be any group. If <!-- $a,b \in G$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\hzGAuZv640.svg">, then the commutator of <!-- $a$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\UhYiFhLcuQ.svg"> and <!-- $b$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\3eUfhUParw.svg"> is the element <!-- $[a,b]=aba^{−1}b^{−1}$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\Ntecnjrojy.svg">.
+Let <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\J9W6pjRIDj.svg"> be any group. If <!-- $a,b \in G$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\hzGAuZv640.svg">, then the commutator of <!-- $a$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\UhYiFhLcuQ.svg"> and <!-- $b$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\3eUfhUParw.svg"> is the element <!-- $[a,b]=aba^{−1}b^{−1}$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\Ntecnjrojy.svg">. The expression <!-- $x\colon a$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\3LN26IAubW.svg"> denotes the conjugate of <!-- $a$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\2gxcQizkRw.svg"> by <!-- $x$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\9iB3HkjVB9.svg">, defined as <!-- $xax^{−1}$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\GL6wwtSHya.svg">. Therefore, <!-- $c\colon[a,b]$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\aeNksYUPvc.svg"> means <!-- $c a b a^{−1} b^{−1} c^{−1}$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\ECU0xU8Yfx.svg">.
 
 In this repository, we assume that <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\Gc1pCvufb5.svg"> is a free group.
 
@@ -37,6 +37,13 @@ Output: "[D F' R U' R' D',R D R' D']"
 ```
 
 Example 4:
+
+```
+Input: s = "R' F' R D' R D R2 F2 R2 D' R' D R' F' R"
+Output: "R' F':[R D' R D R2,F2]"
+```
+
+Example 5:
 
 ```
 Input: s = "R U R'"
