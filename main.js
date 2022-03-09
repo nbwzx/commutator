@@ -7,37 +7,36 @@ function commutator() {
   var flag;
   var len;
   len = x.length;
-  arr1 = x.split(" ");
+  arr1 = simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
   arr2 = inverse(arr1.concat());
   flag = 0;
-  // Maybe j,l,i,k is better for reading.
-  for (j = 0; j <= arr1.length; j++) {
-    for (l = 0; l <= arr1.length; l++) {
-      for (i = 0; i <= arr1.length; i++) {
-        for (k = 0; k <= arr1.length; k++) {
-          str1 = arr1.concat().slice(0, i);
-          str2 = inverse(arr2.concat().slice(0, j));
-          str3 = arr2.concat().slice(0, k);
-          str4 = inverse(arr1.concat().slice(0, l));
-          part1 = simplify(str1.concat(str2));
-          part2 = simplify(str3.concat(str4));
-          arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          arr = simplify(arrex);
-          if (arr.toString() == arr1.toString()) {
-            if (part3.length == 0) {
-              text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
-            }
-            if (part3.length > 0) {
-              text1 = part3.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
-            }
-            text2 = "[t,i,j,k,l]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "," + l.toString() + "]"
-            flag = 1;
-            break;
+  // text1 = score(displace(arr1));
+  // for (i = 0; i <= arr1.length; i++) {
+  //   text1=text1+score(arr1).toString()+",";//+"("+arr1.toString()+")"+",";
+  //   arr1=displace(arr1);
+  // }
+
+  for (i = 0; i <= arr1.length; i++) {
+    str1 = arr1.concat().slice(0, i);
+    for (j = 0; j <= arr1.length - i; j++) {
+      for (k = 0; k <= i; k++) {
+        str2 = arr1.concat().slice(i, i + j);
+        str3 = arr1.concat().slice(i - k, i);
+        part1 = simplify(str1);
+        part2 = simplify(str2.concat(str3));
+        arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+        arr = simplify(arrex);
+        if (arr.toString() == arr1.toString()) {
+          if (part3.length == 0) {
+            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
           }
-        }
-        if (flag == 1) {
+          if (part3.length > 0) {
+            text1 = part3.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
+          }
+          text2 = "[t,i,j,k]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
+          flag = 1;
           break;
         }
       }
@@ -49,12 +48,60 @@ function commutator() {
       break;
     }
   }
+
   if (flag == 0) {
     text1 = "Not found."
     text2 = "Not found."
   }
   document.getElementById("result1").innerHTML = text1;
   document.getElementById("result2").innerHTML = text2;
+}
+
+// R2 D R U' R D' R' U R D R' U R' D' R U' R
+function displace(array) {
+  arr = array;
+  arr1 = arr.concat().slice(0, 1);
+  arr2 = arr.concat().slice(arr.length - 1, arr.length);
+  if (combine_str(arr1[0], arr2[0]).toString() == "0".toString()) {
+    arrtemp = arr.concat();
+    arrtemp = inverse(arr1.concat()).concat(arrtemp, arr1);
+    arrtemp = simplify(arrtemp);
+  } else {
+    arrtemp = arr.concat();
+    arrtemp = arr2.concat(arrtemp, inverse(arr2.concat()));
+    arrtemp = simplify(arrtemp);
+  }
+  return arrtemp;
+}
+
+
+function score(array) {
+  var i;
+  var j;
+  var k;
+  var l;
+  var flag;
+  var len;
+  arr1 = array;
+  arr2 = inverse(arr1.concat());
+  flag = 0;
+  for (i = 0; i <= arr1.length; i++) {
+    str1 = arr1.concat().slice(0, i);
+    for (j = 0; j <= arr1.length - i; j++) {
+      for (k = 0; k <= i; k++) {
+        str2 = arr1.concat().slice(i, i + j);
+        str3 = arr1.concat().slice(i - k, i);
+        part1 = simplify(str1);
+        part2 = simplify(str2.concat(str3));
+        arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+        arr = simplify(arrex);
+        if (arr.toString() == arr1.toString()) {
+           return "[t,i,j,k]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
+        }
+      }
+    }
+  }
+
 }
 
 function conjugate(array) {
@@ -186,7 +233,7 @@ function combine_str(str1, str2) {
       }
     }
   }
-  return 0;
+  return "0";
 }
 
 function inverse_str(str) {
