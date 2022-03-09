@@ -9,7 +9,7 @@ In mathematics, the free group <!-- $F_{S}$ --> <img style="transform: translate
 
 It is worth researching since many 3-cycle formulas in a Rubik's cube can be written as commutators.
 
-Currently, the time complexity of this algorithm is <!-- $O(n^4)$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\bf08R3JoUC.svg">. It is still unknown if there is a faster algorithm or if this algorithm can detect all possible commutators.
+Currently, the time complexity of this algorithm is <!-- $O(n^2)$ --> <img style="transform: translateY(0.1em); background: white;" src="svg\UMMhXBMaRf.svg">. It is still unknown if there is a faster algorithm or if this algorithm can detect all possible commutators.
 
 If you have a better algorithm, please let me know. Thank you.
 
@@ -33,7 +33,8 @@ Example 3:
 
 ```
 Input: s = "D F' R U' R' D' R D U R' F R D' R'"
-Output: "[D F' R U' R' D',R D R' D']"
+Output: "D:[F' R U' R',D' R D R']"
+And "[D F' R U' R' D',R D R' D']" is also a valid answer.
 ```
 
 Example 4:
