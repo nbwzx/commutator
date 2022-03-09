@@ -3,44 +3,63 @@ function commutator() {
   var i;
   var j;
   var k;
-  var l;
   var flag;
-  var len;
-  len = x.length;
+  var arrtemp;
+  var arr1;
+  var arr2;
+  var mini;
+  var minscore;
   arr1 = simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
   arr2 = inverse(arr1.concat());
   flag = 0;
-  // text1 = score(displace(arr1));
-  // for (i = 0; i <= arr1.length; i++) {
-  //   text1=text1+score(arr1).toString()+",";//+"("+arr1.toString()+")"+",";
-  //   arr1=displace(arr1);
-  // }
+  text1 = "";
+  minscore = 1000;
+  arrtemp = arr1.concat();
+  for (i = 0; i <= arrtemp.length; i++) {
+    if (i <= arrtemp.length / 2) {
+      realscore = score(arrtemp) + i / 3;  //penalty factor
+    }
+    if (i > arrtemp.length / 2) {
+      realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
+    }
+    // text1 = text1 + i.toString() + "?" + score(arrtemp).toString() + ","; //+"("+  arrtemp.toString()+")"+",";
+    if (realscore < minscore) {
+      mini = i;
+      minscore = realscore;
+    }
+    arrtemp = displace(arrtemp);
+  }
+  if (mini <= arrtemp.length / 2) {
+    part4 = arr1.concat().slice(0, mini);
+    arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
+  } else {
+    part4 = arr1.concat().slice(mini, arrtemp.length);
+    arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
+  }
+  arr2 = inverse(arr1.concat());
 
+  part5 = simplify(part3.concat(part4));
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
-    for (j = 0; j <= arr1.length - i; j++) {
-      for (k = 0; k <= i; k++) {
-        str2 = arr1.concat().slice(i, i + j);
-        str3 = arr1.concat().slice(i - k, i);
-        part1 = simplify(str1);
-        part2 = simplify(str2.concat(str3));
-        arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-        arr = simplify(arrex);
-        if (arr.toString() == arr1.toString()) {
-          if (part3.length == 0) {
-            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
-          }
-          if (part3.length > 0) {
-            text1 = part3.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
-          }
-          text2 = "[t,i,j,k]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
-          flag = 1;
-          break;
+    for (k = 0; k <= i; k++) {
+      j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+      str2 = arr1.concat().slice(i, i + j);
+      str3 = arr1.concat().slice(i - k, i);
+      part1 = simplify(str1);
+      part2 = simplify(str2.concat(str3));
+      arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+      arr = simplify(arrex);
+      if (arr.toString() == arr1.toString()) {
+        if (part5.length == 0) {
+          text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
         }
-      }
-      if (flag == 1) {
+        if (part5.length > 0) {
+          text1 = part5.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
+        }
+        text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
+        flag = 1;
         break;
       }
     }
@@ -59,6 +78,10 @@ function commutator() {
 
 // R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
+  var arrtemp;
+  var arr;
+  var arr1;
+  var arr2;
   arr = array;
   arr1 = arr.concat().slice(0, 1);
   arr2 = arr.concat().slice(arr.length - 1, arr.length);
@@ -79,29 +102,32 @@ function score(array) {
   var i;
   var j;
   var k;
-  var l;
   var flag;
-  var len;
+  var arr1;
+  var arr2;
+  var str1;
+  var str2;
+  var str3;
+  var arr;
+  var arrex;
   arr1 = array;
   arr2 = inverse(arr1.concat());
   flag = 0;
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
-    for (j = 0; j <= arr1.length - i; j++) {
-      for (k = 0; k <= i; k++) {
-        str2 = arr1.concat().slice(i, i + j);
-        str3 = arr1.concat().slice(i - k, i);
-        part1 = simplify(str1);
-        part2 = simplify(str2.concat(str3));
-        arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-        arr = simplify(arrex);
-        if (arr.toString() == arr1.toString()) {
-           return "[t,i,j,k]=[" + part3.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
-        }
+    for (k = 0; k <= i; k++) {
+      j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+      str2 = arr1.concat().slice(i, i + j);
+      str3 = arr1.concat().slice(i - k, i);
+      part1 = simplify(str1);
+      part2 = simplify(str2.concat(str3));
+      arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+      arr = simplify(arrex);
+      if (arr.toString() == arr1.toString()) {
+        return i + j + k
       }
     }
   }
-
 }
 
 function conjugate(array) {
@@ -151,7 +177,7 @@ function simplify(array) {
   var arr;
   var i;
   arr = array;
-  for (i = 0; i < array.length; i++) {
+  for (i = 0; i <= array.length; i++) {
     arr = simple(arr);
   }
   return arr;
