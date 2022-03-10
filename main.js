@@ -9,6 +9,14 @@ function commutator() {
   var arr2;
   var mini;
   var minscore;
+  var part1;
+  var part2;
+  var part3;
+  var part4;
+  var part5;
+  var len;
+  var len1;
+  var len2;
   arr1 = simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
@@ -19,7 +27,7 @@ function commutator() {
   arrtemp = arr1.concat();
   for (i = 0; i <= arrtemp.length; i++) {
     if (i <= arrtemp.length / 2) {
-      realscore = score(arrtemp) + i / 3;  //penalty factor
+      realscore = score(arrtemp) + i / 3; //penalty factor
     }
     if (i > arrtemp.length / 2) {
       realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
@@ -41,14 +49,37 @@ function commutator() {
   arr2 = inverse(arr1.concat());
 
   part5 = simplify(part3.concat(part4));
+
+  arr1 = simplify(x.split(" "));
+  part3 = conjugate(arr1);
+  arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
+  arr2 = inverse(arr1.concat());
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
     for (k = 0; k <= i; k++) {
       j = conjugate(arr1.concat().slice(i, arr1.length)).length;
       str2 = arr1.concat().slice(i, i + j);
       str3 = arr1.concat().slice(i - k, i);
-      part1 = simplify(str1);
-      part2 = simplify(str2.concat(str3));
+      part1x = simplify(str1);
+      part2x = simplify(str2.concat(str3));
+      part1y = simplify(part1x.concat(inverse(part2x.concat())));
+      part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      part1 = part1x;
+      part2 = part2x;
+      len = part1x.length + part2x.length
+      len1 = part1y.length + part2x.length
+      len2 = part1x.length + part2y.length
+      if (len1 < len2 && len1 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      }
+      // The second one is better.
+      if (len2 <= len1 && len2 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      }
+      // text1=part1
+      // text2=part2
       arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       arr = simplify(arrex);
       if (arr.toString() == arr1.toString()) {
@@ -108,6 +139,12 @@ function score(array) {
   var str1;
   var str2;
   var str3;
+  var part1;
+  var part2;
+  var part1x;
+  var part1y;
+  var part2x;
+  var part2y;
   var arr;
   var arrex;
   arr1 = array;
@@ -119,12 +156,28 @@ function score(array) {
       j = conjugate(arr1.concat().slice(i, arr1.length)).length;
       str2 = arr1.concat().slice(i, i + j);
       str3 = arr1.concat().slice(i - k, i);
-      part1 = simplify(str1);
-      part2 = simplify(str2.concat(str3));
+      part1x = simplify(str1);
+      part2x = simplify(str2.concat(str3));
+      part1y = simplify(part1x.concat(inverse(part2x.concat())));
+      part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      part1 = part1x;
+      part2 = part2x;
+      len = part1x.length + part2x.length
+      len1 = part1y.length + part2x.length
+      len2 = part1x.length + part2y.length
+      if (len1 < len2 && len1 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      }
+      // The second one is better.
+      if (len2 <= len1 && len2 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      }
       arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       arr = simplify(arrex);
       if (arr.toString() == arr1.toString()) {
-        return i + j + k
+        return part1.length + part2.length
       }
     }
   }
