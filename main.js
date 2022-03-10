@@ -25,14 +25,14 @@ function commutator() {
   text1 = "";
   minscore = 1000;
   arrtemp = arr1.concat();
-  for (i = 0; i <= arrtemp.length; i++) {
+  for (i = 0; i < arrtemp.length; i++) {
     if (i <= arrtemp.length / 2) {
       realscore = score(arrtemp) + i / 3; //penalty factor
     }
     if (i > arrtemp.length / 2) {
       realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
     }
-    // text1 = text1 + i.toString() + "?" + score(arrtemp).toString() + ","; //+"("+  arrtemp.toString()+")"+",";
+    // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
     if (realscore < minscore) {
       mini = i;
       minscore = realscore;
@@ -47,13 +47,7 @@ function commutator() {
     arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
   }
   arr2 = inverse(arr1.concat());
-
   part5 = simplify(part3.concat(part4));
-
-  arr1 = simplify(x.split(" "));
-  part3 = conjugate(arr1);
-  arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
-  arr2 = inverse(arr1.concat());
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
     for (k = 0; k <= i; k++) {
