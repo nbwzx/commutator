@@ -245,8 +245,12 @@
        arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
        arr = simplify(arrex);
        if (arr.toString() == arr1.toString()) {
-         return part1.length + part2.length
-       }
+        if (part1.length < part2.length) {
+          return 2 * part1.length + part2.length;
+        } else {
+          return part1.length + 2 * part2.length;
+        }
+      }
      }
    }
    return 1000;
