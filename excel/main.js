@@ -300,8 +300,10 @@
   function simplify(array) {
     var arr;
     var i;
+    var len;
+    len = array.length;
     arr = array;
-    for (i = 0; i <= array.length; i++) {
+    for (i = 0; i <= len; i++) {
       arr = simple(arr);
     }
     return arr;

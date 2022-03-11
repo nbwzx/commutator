@@ -6,7 +6,6 @@ function commutator() {
   var flag;
   var arrtemp;
   var arr1;
-  var arr2;
   var mini;
   var minscore;
   var part1;
@@ -127,9 +126,7 @@ function score(array) {
   var i;
   var j;
   var k;
-  var flag;
   var arr1;
-  var arr2;
   var str1;
   var str2;
   var str3;
@@ -224,8 +221,10 @@ function inverse(array) {
 function simplify(array) {
   var arr;
   var i;
+  var len;
+  len = array.length;
   arr = array;
-  for (i = 0; i <= array.length; i++) {
+  for (i = 0; i <= len; i++) {
     arr = simple(arr);
   }
   return arr;
