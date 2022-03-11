@@ -175,6 +175,7 @@ function score(array) {
       }
     }
   }
+  return 1000;
 }
 
 function conjugate(array) {
