@@ -199,6 +199,13 @@ function conjugate(array) {
       minlen = len;
     }
   }
+  if (t > 0) {
+    if (arr[t - 1].length > 1) {
+      if (arr[t - 1][1].toString() == "2".toString()) {
+        return simplify(arr.concat().slice(0, t - 1).concat(inverse(arr.concat().slice(arr.length - t, arr.length - (t - 1)))));
+      }
+    }
+  }
   return arr.concat().slice(0, t);
 }
 
