@@ -1,5 +1,62 @@
 function commutator() {
+  var locationud = new Array();
+  var scoreud = new Array();
+  var arrtemp
   var x = String(document.getElementById("x").value);
+  arr1 = simplify(x.split(" "));
+  count = 0;
+  minscoreall = 10000;
+  for (i = 0; i < arr1.length - 1; i++) {
+    if (arr1[i][0].toString() == "U".toString() && arr1[i + 1][0].toString() == "D".toString()) {
+      locationud[count] = i;
+      count = count + 1;
+    }
+    if (arr1[i][0].toString() == "D".toString() && arr1[i + 1][0].toString() == "U".toString()) {
+      locationud[count] = i;
+      count = count + 1;
+    }
+  }
+  var number = Math.pow(2, count);
+  text1 = ""
+  for (i = 0; i <= number - 1; i++) {
+    text = String(i.toString(2));
+    arrex = arr1.concat();
+    for (j = 0; j < text.length; j++) {
+      if (text[text.length - 1 - j].toString() == "1".toString()) {
+        arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+      }
+    }
+    part3 = conjugate(arrex);
+    arr2 = simplify(inverse(part3.concat()).concat(arrex, part3));
+
+    arrtemp = arr2.concat();
+    minscore = 1000;
+    for (j = 0; j < arrtemp.length; j++) {
+      if (j <= arrtemp.length / 2) {
+        realscore = score(arrtemp) + j / 3; //penalty factor
+      }
+      if (j > arrtemp.length / 2) {
+        realscore = score(arrtemp) + 2 * (arrtemp.length - j) / 3; //penalty factor
+      }
+      // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
+      if (realscore < minscore) {
+        minscore = realscore;
+      }
+      arrtemp = displace(arrtemp);
+    }
+
+    // text1 = text1 + minscore;
+    if (minscore < minscoreall) {
+      minarr = arrex;
+      minscoreall = minscore;
+    }
+  }
+  commutatormain(minarr);
+  // document.getElementById("result1").innerHTML = text1;
+}
+
+function commutatormain(array) {
+  // var x = String(document.getElementById("x").value);
   var i;
   var j;
   var k;
@@ -16,7 +73,7 @@ function commutator() {
   var len;
   var len1;
   var len2;
-  arr1 = simplify(x.split(" "));
+  arr1 = array //simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
   arr2 = inverse(arr1.concat());
@@ -47,6 +104,11 @@ function commutator() {
   }
   arr2 = inverse(arr1.concat());
   part5 = simplify(part3.concat(part4));
+  for (i = 0; i < part5.length - 1; i++) {
+    if (part5[i][0].toString() == "D".toString() && part5[i + 1][0].toString() == "U".toString()) {
+      part5 = swaparr(part5, i, i + 1);
+    }
+  }
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
     for (k = 0; k <= i; k++) {
@@ -335,6 +397,11 @@ function inverse_str(str) {
       return str[0];
     }
   }
+}
+
+function swaparr(arr, index1, index2) {
+  arr[index1] = arr.splice(index2, 1, arr[index1])[0];
+  return arr;
 }
 
 document.getElementById("go").addEventListener("click", commutator);
