@@ -206,10 +206,57 @@
    arr2 = inverse(arr1.concat());
    part5 = simplify(part3.concat(part4));
    for (i = 0; i < part5.length - 1; i++) {
-     if (part5[i][0].toString() == "D".toString() && part5[i + 1][0].toString() == "U".toString()) {
-       part5 = swaparr(part5, i, i + 1);
-     }
-   }
+    if (part5[i][0].toString() == "D".toString() && part5[i + 1][0].toString() == "U".toString()) {
+      part5 = swaparr(part5, i, i + 1);
+    }
+    if (part5[i][0].toString() == "B".toString() && part5[i + 1][0].toString() == "F".toString()) {
+      part5 = swaparr(part5, i, i + 1);
+    }
+    if (part5[i][0].toString() == "L".toString() && part5[i + 1][0].toString() == "R".toString()) {
+      part5 = swaparr(part5, i, i + 1);
+    }
+  }
+   part5_out = part5.join(" ") + " "
+   part5_out = part5_out.replace(/R2 M2 /g, "r2 ");
+   part5_out = part5_out.replace(/R' M /g, "r' ");
+   part5_out = part5_out.replace(/R M' /g, "r ");
+   part5_out = part5_out.replace(/L2 M2 /g, "l2 ");
+   part5_out = part5_out.replace(/L' M' /g, "l' ");
+   part5_out = part5_out.replace(/L M /g, "l ");
+   part5_out = part5_out.replace(/F2 S2 /g, "f2 ");
+   part5_out = part5_out.replace(/F' S' /g, "f' ");
+   part5_out = part5_out.replace(/F S /g, "f ");
+   part5_out = part5_out.replace(/B2 S2 /g, "b2 ");
+   part5_out = part5_out.replace(/B' S /g, "b' ");
+   part5_out = part5_out.replace(/B S' /g, "b ");
+   part5_out = part5_out.replace(/U2 E2 /g, "u2 ");
+   part5_out = part5_out.replace(/U' E /g, "u' ");
+   part5_out = part5_out.replace(/U E' /g, "u ");
+   part5_out = part5_out.replace(/D2 E2 /g, "d2 ");
+   part5_out = part5_out.replace(/D' E' /g, "d' ");
+   part5_out = part5_out.replace(/D E /g, "d ");
+ 
+   part5_out = part5_out.replace(/M2 R2 /g, "r2 ");
+   part5_out = part5_out.replace(/M R' /g, "r' ");
+   part5_out = part5_out.replace(/M' R /g, "r ");
+   part5_out = part5_out.replace(/M2 L2 /g, "l2 ");
+   part5_out = part5_out.replace(/M' L' /g, "l' ");
+   part5_out = part5_out.replace(/M L /g, "l ");
+   part5_out = part5_out.replace(/S2 F2 /g, "f2 ");
+   part5_out = part5_out.replace(/S' F' /g, "f' ");
+   part5_out = part5_out.replace(/S F /g, "f ");
+   part5_out = part5_out.replace(/S2 B2 /g, "b2 ");
+   part5_out = part5_out.replace(/S B' /g, "b' ");
+   part5_out = part5_out.replace(/S' B /g, "b ");
+   part5_out = part5_out.replace(/E2 U2 /g, "u2 ");
+   part5_out = part5_out.replace(/E U' /g, "u' ");
+   part5_out = part5_out.replace(/E' U /g, "u ");
+   part5_out = part5_out.replace(/E2 D2 /g, "d2 ");
+   part5_out = part5_out.replace(/E' D' /g, "d' ");
+   part5_out = part5_out.replace(/E D /g, "d ");
+   part5_out = part5_out.replace(/R M2 /g, "r M' ");
+   part5_out = part5_out.replace(/R' M2 /g, "r' M ");
+   part5_out = part5_out.substr(0, part5_out.length - 1);
    for (i = 0; i <= arr1.length; i++) {
      str1 = arr1.concat().slice(0, i);
      for (k = 0; k <= i; k++) {
@@ -243,7 +290,7 @@
            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
          }
          if (part5.length > 0) {
-           text1 = part5.join(" ") + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
+           text1 = part5_out + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
          }
          text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
          flag = 1;
