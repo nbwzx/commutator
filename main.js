@@ -3,15 +3,41 @@ function commutator() {
   var scoreud = new Array();
   var arrtemp
   var x = String(document.getElementById("x").value);
+  if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
+    x = x.replace(/r2/g, "R2 M2");
+    x = x.replace(/r'/g, "R' M");
+    x = x.replace(/r/g, "R M'");
+  }
+  if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
+    x = x.replace(/l2/g, "L2 M2");
+    x = x.replace(/l'/g, "L' M'");
+    x = x.replace(/l/g, "L M");
+  }
+  if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
+    x = x.replace(/f2/g, "F2 S2");
+    x = x.replace(/f'/g, "F' S'");
+    x = x.replace(/f/g, "F S");
+  }
+  if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
+    x = x.replace(/b2/g, "B2 S2");
+    x = x.replace(/b'/g, "B' S");
+    x = x.replace(/b/g, "B S'");
+  }
+  if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
+    x = x.replace(/u2/g, "U2 E2");
+    x = x.replace(/u'/g, "U' E");
+    x = x.replace(/u/g, "U E'");
+  }
+  if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
+    x = x.replace(/d2/g, "D2 E2");
+    x = x.replace(/d'/g, "D' E'");
+    x = x.replace(/d/g, "D E");
+  }
   arr1 = simplify(x.split(" "));
   count = 0;
   minscoreall = 10000;
   for (i = 0; i < arr1.length - 1; i++) {
-    if (arr1[i][0].toString() == "U".toString() && arr1[i + 1][0].toString() == "D".toString()) {
-      locationud[count] = i;
-      count = count + 1;
-    }
-    if (arr1[i][0].toString() == "D".toString() && arr1[i + 1][0].toString() == "U".toString()) {
+    if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[i][0].toString() + arr1[i + 1][0].toString())) > -1) {
       locationud[count] = i;
       count = count + 1;
     }
