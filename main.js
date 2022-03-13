@@ -169,8 +169,11 @@ function commutatormain(array) {
   part5_out = part5_out.replace(/E2 D2 /g, "d2 ");
   part5_out = part5_out.replace(/E' D' /g, "d' ");
   part5_out = part5_out.replace(/E D /g, "d ");
+  
   part5_out = part5_out.replace(/R M2 /g, "r M' ");
   part5_out = part5_out.replace(/R' M2 /g, "r' M ");
+  part5_out = part5_out.replace(/M2 R /g, "r M' ");
+  part5_out = part5_out.replace(/M2 R' /g, "r' M ");
   part5_out = part5_out.substr(0, part5_out.length - 1);
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
