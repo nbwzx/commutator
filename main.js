@@ -99,7 +99,7 @@ function commutatormain(array) {
   var len;
   var len1;
   var len2;
-  arr1 = array //simplify(x.split(" "));
+  arr1 = array.concat(); //simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
   arr2 = inverse(arr1.concat());
@@ -130,17 +130,7 @@ function commutatormain(array) {
   }
   arr2 = inverse(arr1.concat());
   part5 = simplify(part3.concat(part4));
-  for (i = 0; i < part5.length - 1; i++) {
-    if (part5[i][0].toString() == "D".toString() && part5[i + 1][0].toString() == "U".toString()) {
-      part5 = swaparr(part5, i, i + 1);
-    }
-    if (part5[i][0].toString() == "B".toString() && part5[i + 1][0].toString() == "F".toString()) {
-      part5 = swaparr(part5, i, i + 1);
-    }
-    if (part5[i][0].toString() == "L".toString() && part5[i + 1][0].toString() == "R".toString()) {
-      part5 = swaparr(part5, i, i + 1);
-    }
-  }
+  part5 = simplifyfinal(part5);
   part5_out = part5.join(" ") + " "
   part5_out = part5_out.replace(/R2 M2 /g, "r2 ");
   part5_out = part5_out.replace(/R' M /g, "r' ");
@@ -210,6 +200,8 @@ function commutatormain(array) {
       // text2=part2
       arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       arr = simplify(arrex);
+      part1 = simplifyfinal(part1);
+      part2 = simplifyfinal(part2);
       if (arr.toString() == arr1.toString()) {
         if (part5.length == 0) {
           text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
@@ -241,7 +233,7 @@ function displace(array) {
   var arr;
   var arr1;
   var arr2;
-  arr = array;
+  arr = array.concat();
   arr1 = arr.concat().slice(0, 1);
   arr2 = arr.concat().slice(arr.length - 1, arr.length);
   if (combine_str(arr1[0], arr2[0]).toString() == "0".toString()) {
@@ -273,7 +265,7 @@ function score(array) {
   var part2y;
   var arr;
   var arrex;
-  arr1 = array;
+  arr1 = array.concat();
   arr2 = inverse(arr1.concat());
   flag = 0;
   for (i = 0; i <= arr1.length; i++) {
@@ -323,7 +315,7 @@ function conjugate(array) {
   var arrtemp;
   var t;
   var minlen;
-  arr = array;
+  arr = array.concat();
   minlen = arr.length;
   t = 0;
   for (i = 1; i < array.length; i++) {
@@ -352,7 +344,7 @@ function inverse(array) {
   var temp;
   var arr;
   var i;
-  arr = array;
+  arr = array.concat();
   for (i = 0; i < arr.length / 2; i++) {
     temp = arr[i];
     arr[i] = array[arr.length - 1 - i];
@@ -364,12 +356,31 @@ function inverse(array) {
   return arr;
 }
 
+function simplifyfinal(array) {
+  var arr;
+  var i;
+  arr = array.concat();
+  arr = simplify(arr);
+  for (i = 0; i < arr.length - 1; i++) {
+    if (arr[i][0].toString() == "D".toString() && arr[i + 1][0].toString() == "U".toString()) {
+      arr = swaparr(arr, i, i + 1);
+    }
+    if (arr[i][0].toString() == "B".toString() && arr[i + 1][0].toString() == "F".toString()) {
+      arr = swaparr(arr, i, i + 1);
+    }
+    if (arr[i][0].toString() == "L".toString() && arr[i + 1][0].toString() == "R".toString()) {
+      arr = swaparr(arr, i, i + 1);
+    }
+  }
+  return arr;
+}
+
 function simplify(array) {
   var arr;
   var i;
   var len;
   len = array.length;
-  arr = array;
+  arr = array.concat();
   for (i = 0; i <= len; i++) {
     arr = simple(arr);
   }
@@ -379,7 +390,7 @@ function simplify(array) {
 function simple(array) {
   var arr;
   var i;
-  arr = array;
+  arr = array.concat();
   for (i = 0; i < arr.length - 1; i++) {
     if (combine_str(arr[i], arr[i + 1]).toString() == "".toString()) {
       arr.splice(i, 2);
