@@ -42,6 +42,11 @@ function commutator() {
       count = count + 1;
     }
   }
+  if (count > 4) {
+    document.getElementById("result1").innerHTML = "Time Out";
+    document.getElementById("result2").innerHTML = "Time Out";
+    return 0;
+  }
   var number = Math.pow(2, count);
   text1 = ""
   for (i = 0; i <= number - 1; i++) {
@@ -130,51 +135,7 @@ function commutatormain(array) {
   }
   arr2 = inverse(arr1.concat());
   part5 = simplify(part3.concat(part4));
-  part5 = simplifyfinal(part5);
-  part5_out = part5.join(" ") + " "
-  part5_out = part5_out.replace(/R2 M2 /g, "r2 ");
-  part5_out = part5_out.replace(/R' M /g, "r' ");
-  part5_out = part5_out.replace(/R M' /g, "r ");
-  part5_out = part5_out.replace(/L2 M2 /g, "l2 ");
-  part5_out = part5_out.replace(/L' M' /g, "l' ");
-  part5_out = part5_out.replace(/L M /g, "l ");
-  part5_out = part5_out.replace(/F2 S2 /g, "f2 ");
-  part5_out = part5_out.replace(/F' S' /g, "f' ");
-  part5_out = part5_out.replace(/F S /g, "f ");
-  part5_out = part5_out.replace(/B2 S2 /g, "b2 ");
-  part5_out = part5_out.replace(/B' S /g, "b' ");
-  part5_out = part5_out.replace(/B S' /g, "b ");
-  part5_out = part5_out.replace(/U2 E2 /g, "u2 ");
-  part5_out = part5_out.replace(/U' E /g, "u' ");
-  part5_out = part5_out.replace(/U E' /g, "u ");
-  part5_out = part5_out.replace(/D2 E2 /g, "d2 ");
-  part5_out = part5_out.replace(/D' E' /g, "d' ");
-  part5_out = part5_out.replace(/D E /g, "d ");
-
-  part5_out = part5_out.replace(/M2 R2 /g, "r2 ");
-  part5_out = part5_out.replace(/M R' /g, "r' ");
-  part5_out = part5_out.replace(/M' R /g, "r ");
-  part5_out = part5_out.replace(/M2 L2 /g, "l2 ");
-  part5_out = part5_out.replace(/M' L' /g, "l' ");
-  part5_out = part5_out.replace(/M L /g, "l ");
-  part5_out = part5_out.replace(/S2 F2 /g, "f2 ");
-  part5_out = part5_out.replace(/S' F' /g, "f' ");
-  part5_out = part5_out.replace(/S F /g, "f ");
-  part5_out = part5_out.replace(/S2 B2 /g, "b2 ");
-  part5_out = part5_out.replace(/S B' /g, "b' ");
-  part5_out = part5_out.replace(/S' B /g, "b ");
-  part5_out = part5_out.replace(/E2 U2 /g, "u2 ");
-  part5_out = part5_out.replace(/E U' /g, "u' ");
-  part5_out = part5_out.replace(/E' U /g, "u ");
-  part5_out = part5_out.replace(/E2 D2 /g, "d2 ");
-  part5_out = part5_out.replace(/E' D' /g, "d' ");
-  part5_out = part5_out.replace(/E D /g, "d ");
-  
-  part5_out = part5_out.replace(/R M2 /g, "r M' ");
-  part5_out = part5_out.replace(/R' M2 /g, "r' M ");
-  part5_out = part5_out.replace(/M2 R /g, "r M' ");
-  part5_out = part5_out.replace(/M2 R' /g, "r' M ");
-  part5_out = part5_out.substr(0, part5_out.length - 1);
+  part5_out = simplifyfinal(part5);
   for (i = 0; i <= arr1.length; i++) {
     str1 = arr1.concat().slice(0, i);
     for (k = 0; k <= i; k++) {
@@ -203,14 +164,14 @@ function commutatormain(array) {
       // text2=part2
       arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       arr = simplify(arrex);
-      part1 = simplifyfinal(part1);
-      part2 = simplifyfinal(part2);
+      part1_out = simplifyfinal(part1);
+      part2_out = simplifyfinal(part2);
       if (arr.toString() == arr1.toString()) {
         if (part5.length == 0) {
-          text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]";
+          text1 = "[" + part1_out + "," + part2_out + "]";
         }
         if (part5.length > 0) {
-          text1 = part5_out + ":[" + part1.join(" ") + "," + part2.join(" ") + "]";
+          text1 = part5_out + ":[" + part1_out + "," + part2_out + "]";
         }
         text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
         flag = 1;
@@ -361,6 +322,7 @@ function inverse(array) {
 
 function simplifyfinal(array) {
   var arr;
+  var arr_out;
   var i;
   arr = array.concat();
   arr = simplify(arr);
@@ -375,7 +337,51 @@ function simplifyfinal(array) {
       arr = swaparr(arr, i, i + 1);
     }
   }
-  return arr;
+  arr_out = arr.join(" ") + " "
+  arr_out = arr_out.replace(/R2 M2 /g, "r2 ");
+  arr_out = arr_out.replace(/R' M /g, "r' ");
+  arr_out = arr_out.replace(/R M' /g, "r ");
+  arr_out = arr_out.replace(/L2 M2 /g, "l2 ");
+  arr_out = arr_out.replace(/L' M' /g, "l' ");
+  arr_out = arr_out.replace(/L M /g, "l ");
+  arr_out = arr_out.replace(/F2 S2 /g, "f2 ");
+  arr_out = arr_out.replace(/F' S' /g, "f' ");
+  arr_out = arr_out.replace(/F S /g, "f ");
+  arr_out = arr_out.replace(/B2 S2 /g, "b2 ");
+  arr_out = arr_out.replace(/B' S /g, "b' ");
+  arr_out = arr_out.replace(/B S' /g, "b ");
+  arr_out = arr_out.replace(/U2 E2 /g, "u2 ");
+  arr_out = arr_out.replace(/U' E /g, "u' ");
+  arr_out = arr_out.replace(/U E' /g, "u ");
+  arr_out = arr_out.replace(/D2 E2 /g, "d2 ");
+  arr_out = arr_out.replace(/D' E' /g, "d' ");
+  arr_out = arr_out.replace(/D E /g, "d ");
+
+  arr_out = arr_out.replace(/M2 R2 /g, "r2 ");
+  arr_out = arr_out.replace(/M R' /g, "r' ");
+  arr_out = arr_out.replace(/M' R /g, "r ");
+  arr_out = arr_out.replace(/M2 L2 /g, "l2 ");
+  arr_out = arr_out.replace(/M' L' /g, "l' ");
+  arr_out = arr_out.replace(/M L /g, "l ");
+  arr_out = arr_out.replace(/S2 F2 /g, "f2 ");
+  arr_out = arr_out.replace(/S' F' /g, "f' ");
+  arr_out = arr_out.replace(/S F /g, "f ");
+  arr_out = arr_out.replace(/S2 B2 /g, "b2 ");
+  arr_out = arr_out.replace(/S B' /g, "b' ");
+  arr_out = arr_out.replace(/S' B /g, "b ");
+  arr_out = arr_out.replace(/E2 U2 /g, "u2 ");
+  arr_out = arr_out.replace(/E U' /g, "u' ");
+  arr_out = arr_out.replace(/E' U /g, "u ");
+  arr_out = arr_out.replace(/E2 D2 /g, "d2 ");
+  arr_out = arr_out.replace(/E' D' /g, "d' ");
+  arr_out = arr_out.replace(/E D /g, "d ");
+
+  arr_out = arr_out.replace(/R M2 /g, "r M' ");
+  arr_out = arr_out.replace(/R' M2 /g, "r' M ");
+  arr_out = arr_out.replace(/M2 R /g, "r M' ");
+  arr_out = arr_out.replace(/M2 R' /g, "r' M ");
+  arr_out = arr_out.substring(0, arr_out.length - 1);
+  return arr_out;
 }
 
 function simplify(array) {
