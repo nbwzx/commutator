@@ -1,7 +1,6 @@
 function commutator() {
   var locationud = new Array();
-  var scoreud = new Array();
-  var arrtemp
+  var arrtemp;
   var x = String(document.getElementById("x").value);
   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
     x = x.replace(/r2/g, "R2 M2");
@@ -244,9 +243,9 @@ function score(array) {
       part2y = simplify(part2x.concat(inverse(part1x.concat())));
       part1 = part1x;
       part2 = part2x;
-      len = part1x.length + part2x.length
-      len1 = part1y.length + part2x.length
-      len2 = part1x.length + part2y.length
+      len = part1x.length + part2x.length;
+      len1 = part1y.length + part2x.length;
+      len2 = part1x.length + part2y.length;
       if (len1 < len2 && len1 < len) {
         part1 = part1y;
         part2 = part2x;

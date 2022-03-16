@@ -154,7 +154,7 @@
      }
 
    }
-   return commutatormain(minarr)
+   return commutatormain(minarr);
    // document.getElementById("result1").innerHTML = text1;
  }
 
@@ -256,10 +256,10 @@
    }
 
    if (flag == 0) {
-     text1 = "Not found."
-     text2 = "Not found."
+     text1 = "Not found.";
+     text2 = "Not found.";
    }
-   return text1
+   return text1;
  }
 
  // R2 D R U' R D' R' U R D R' U R' D' R U' R
@@ -315,9 +315,9 @@
        part2y = simplify(part2x.concat(inverse(part1x.concat())));
        part1 = part1x;
        part2 = part2x;
-       len = part1x.length + part2x.length
-       len1 = part1y.length + part2x.length
-       len2 = part1x.length + part2y.length
+       len = part1x.length + part2x.length;
+       len1 = part1y.length + part2x.length;
+       len2 = part1x.length + part2y.length;
        if (len1 < len2 && len1 < len) {
          part1 = part1y;
          part2 = part2x;
