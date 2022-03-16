@@ -153,7 +153,7 @@ function commutatormain(array) {
       if (len1 < len2 && len1 < len) {
         part1 = part1y;
         part2 = part2x;
-      }
+      } // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
       // The second one is better.
       if (len2 <= len1 && len2 < len) {
         part1 = part1y;
@@ -299,7 +299,7 @@ function conjugate(array) {
         return simplify(arr.concat().slice(0, t - 1).concat(inverse(arr.concat().slice(arr.length - t, arr.length - (t - 1)))));
       }
     }
-  }
+  } //For  R' U2 R' D R U R' D' R U R, output R' U':[U',R' D R] instead of R' U2:[R' D R,U]
   return arr.concat().slice(0, t);
 }
 
