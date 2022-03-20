@@ -126,7 +126,7 @@
      return "Invalid input."
    }
    for (i = 0; i < arr1.length - 1; i++) {
-     if (arr[i].length > 2) {
+     if (arr1[i].length > 2) {
        return "Invalid input."
      }
    }
