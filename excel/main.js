@@ -76,21 +76,12 @@
  function commutator(x) {
    var locationud = new Array();
    var arrtemp;
-   x = x.replace(/R2'/g, "R2");
-   x = x.replace(/U2'/g, "U2");
-   x = x.replace(/D2'/g, "D2");
-   x = x.replace(/L2'/g, "L2");
-   x = x.replace(/F2'/g, "F2");
-   x = x.replace(/B2'/g, "B2");
-   x = x.replace(/E2'/g, "E2");
-   x = x.replace(/M2'/g, "M2");
-   x = x.replace(/S2'/g, "S2");
-   x = x.replace(/r2'/g, "r2");
-   x = x.replace(/u2'/g, "u2");
-   x = x.replace(/d2'/g, "d2");
-   x = x.replace(/l2'/g, "l2");
-   x = x.replace(/f2'/g, "f2");
-   x = x.replace(/b2'/g, "b2");
+   x = x.trim();
+   x = x.replace(/\s+/ig," ");
+   x = x.replace(/[’]/g, "'");
+   x = x.replace(/ '/g, "'");  
+   x = x.replace(/ 2/g, "2");
+   x = x.replace(/2'/g, "2");
    if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
      x = x.replace(/r2/g, "R2 M2");
      x = x.replace(/r'/g, "R' M");
