@@ -51,9 +51,10 @@
          result += '<tr>';
          for (var j = 0; j < arrayTitle.length; j++) {
            if (obj.hasOwnProperty(arrayTitle[j] + i)) {
+            console.log(i);
              //  result += '<td><type="text" value="' + obj[arrayTitle[j] + i].replace('\'', '') + '" /></td>';
              result += '<td>' + obj[arrayTitle[j] + i].replace('\'', '') + '</td>';
-             if (obj[arrayTitle[j] + i].replace('\'', '').length > 3) {
+             if (obj[arrayTitle[j] + i].replace('\'', '').length > 8) {
                result += '<td>' + commutator(obj[arrayTitle[j] + i].replace('\'', '')) + '</td>';
              }
            } else {
