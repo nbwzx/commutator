@@ -51,7 +51,7 @@
          result += '<tr>';
          for (var j = 0; j < arrayTitle.length; j++) {
            if (obj.hasOwnProperty(arrayTitle[j] + i)) {
-            console.log(i);
+             console.log(i);
              //  result += '<td><type="text" value="' + obj[arrayTitle[j] + i].replace('\'', '') + '" /></td>';
              result += '<td>' + obj[arrayTitle[j] + i].replace('\'', '') + '</td>';
              if (obj[arrayTitle[j] + i].replace('\'', '').length > 8) {
@@ -76,6 +76,21 @@
  function commutator(x) {
    var locationud = new Array();
    var arrtemp;
+   x = x.replace(/R2'/g, "R2");
+   x = x.replace(/U2'/g, "U2");
+   x = x.replace(/D2'/g, "D2");
+   x = x.replace(/L2'/g, "L2");
+   x = x.replace(/F2'/g, "F2");
+   x = x.replace(/B2'/g, "B2");
+   x = x.replace(/E2'/g, "E2");
+   x = x.replace(/M2'/g, "M2");
+   x = x.replace(/S2'/g, "S2");
+   x = x.replace(/r2'/g, "r2");
+   x = x.replace(/u2'/g, "u2");
+   x = x.replace(/d2'/g, "d2");
+   x = x.replace(/l2'/g, "l2");
+   x = x.replace(/f2'/g, "f2");
+   x = x.replace(/b2'/g, "b2");
    if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
      x = x.replace(/r2/g, "R2 M2");
      x = x.replace(/r'/g, "R' M");
@@ -107,6 +122,14 @@
      x = x.replace(/d/g, "D E");
    }
    arr1 = simplify(x.split(" "));
+   if (arr1.length <= 1) {
+     return "Invalid input."
+   }
+   for (i = 0; i < arr1.length - 1; i++) {
+     if (arr[i].length > 2) {
+       return "Invalid input."
+     }
+   }
    count = 0;
    minscoreall = 10000;
    for (i = 0; i < arr1.length - 1; i++) {
@@ -116,7 +139,7 @@
      }
    }
    if (count > 4) {
-     return "Time Out";
+     return "Time Out.";
    }
    var number = Math.pow(2, count);
    text1 = ""
