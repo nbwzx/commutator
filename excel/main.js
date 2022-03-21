@@ -143,22 +143,22 @@ function commutator(x) {
     }
   }
   var text_output = commutatormain(arr1);
-  if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
-    return text_output;
-  } else {
-    part3 = conjugate(arr1);
-    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-    if (part3.length == 0) {
-      return commutatorpair(arrex);
-    } else {
-      text_output = commutatorpair(arrex);
-      if (text_output.split('[').length - 1 == 3) {
-        return part3 + " " + text_output;
-      } else {
-        return part3 + ":[" + text_output + "]";
-      }
-    }
-  }
+  // if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
+  return text_output;
+  // } else { 
+  //   part3 = conjugate(arr1);
+  //   arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+  //   if (part3.length == 0) {
+  //     return commutatorpair(arrex);
+  //   } else {
+  //     text_output = commutatorpair(arrex);
+  //     if (text_output.split('[').length - 1 == 3) {
+  //       return part3 + " " + text_output;
+  //     } else {
+  //       return part3 + ":[" + text_output + "]";
+  //     }
+  //   }
+  // }
 }
 
 function commutatorpair(array) {
