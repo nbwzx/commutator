@@ -1,13 +1,21 @@
 function commutator() {
   var locationud = new Array();
   var arrtemp;
+  var text_output;
+  var sum;
   var x = String(document.getElementById("x").value);
+  var arrx;
   x = x.trim();
-  x = x.replace(/\s+/ig," ");
+  x = x.replace(/\s+/ig, " ");
   x = x.replace(/[’]/g, "'");
   x = x.replace(/ '/g, "'");
   x = x.replace(/ 2/g, "2");
   x = x.replace(/2'/g, "2");
+
+  arr1 = simplify(x.split(" "));
+  part3 = conjugate(arr1);
+  arr2 = simplify(inverse(part3.concat()).concat(arr1, part3));
+  x = arr2.join(" ");
   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
     x = x.replace(/r2/g, "R2 M2");
     x = x.replace(/r'/g, "R' M");
@@ -38,16 +46,37 @@ function commutator() {
     x = x.replace(/d'/g, "D' E'");
     x = x.replace(/d/g, "D E");
   }
-  arr1 = simplify(x.split(" "));
+  arrx = simplify(x.split(" "));
+  arr1 = simplify(part3.concat(arr2, inverse(part3.concat())));
+
   if (arr1.length <= 1) {
     document.getElementById("result1").innerHTML = "Invalid input.";
-    document.getElementById("result2").innerHTML = "Invalid input.";
     return 0;
   }
   for (i = 0; i < arr1.length - 1; i++) {
     if (arr1[i].length > 2) {
       document.getElementById("result1").innerHTML = "Invalid input.";
-      document.getElementById("result2").innerHTML = "Invalid input.";
+      return 0;
+    }
+  }
+  for (i = 0; i <= arr1.length - 1; i++) {
+    sum = 0;
+    for (j = 0; j <= arr1.length - 1; j++) {
+      if (arr1[i][0] == arr1[j][0]) {
+        if (arr1[j].length == 1) {
+          sum = sum + 1;
+        } else {
+          if (arr1[j][1] == "2") {
+            sum = sum + 2;
+          }
+          if (arr1[j][1] == "'") {
+            sum = sum - 1;
+          }
+        }
+      }
+    }
+    if (sum % 4 !== 0) {
+      document.getElementById("result1").innerHTML = "Not found.";
       return 0;
     }
   }
@@ -61,7 +90,6 @@ function commutator() {
   }
   if (count > 4) {
     document.getElementById("result1").innerHTML = "Time Out.";
-    document.getElementById("result2").innerHTML = "Time Out.";
     return 0;
   }
   var number = Math.pow(2, count);
@@ -99,8 +127,58 @@ function commutator() {
       minscoreall = minscore;
     }
   }
-  commutatormain(minarr);
+  text_output = commutatormain(minarr);
+  if (text_output.toString() !== "Not found.".toString()) {
+    document.getElementById("result1").innerHTML = text_output;
+  } else {
+    part3 = conjugate(minarr);
+    arrex = simplify(inverse(part3.concat()).concat(minarr, part3));
+    if (part3.length == 0) {
+      document.getElementById("result1").innerHTML = commutatorpair(arrex);
+    } else {
+      document.getElementById("result1").innerHTML = part3 + ":[" + commutatorpair(arrex) + "]";
+    }
+  }
   // document.getElementById("result1").innerHTML = text1;
+}
+
+function commutatorpair(array) {
+  var i;
+  var j;
+  var k;
+  var arr1;
+  var part1;
+  var part2;
+  var partleft;
+  var text1;
+  var text2;
+  var str1;
+  var str2;
+  var str3;
+  var count;
+  for (count = 1; count <= array.length; count++) {
+    arr1 = array.concat().slice(0, count);
+    for (i = 0; i <= arr1.length; i++) {
+      str1 = arr1.concat().slice(0, i);
+      for (j = 0; j <= arr1.length - i; j++) {
+        for (k = 0; k <= i; k++) {
+          str2 = arr1.concat().slice(i, i + j);
+          str3 = arr1.concat().slice(i - k, i);
+          part1 = simplify(str1);
+          part2 = simplify(str2.concat(str3));
+          arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+          arr = simplify(arrex);
+          arrleft = simplify(inverse(arr.concat()).concat(array));
+          partleft = commutatormain(arrleft);
+          if (partleft.toString() !== "Not found.".toString()) {
+            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]" + "+" + partleft;
+            return text1;
+          }
+        }
+      }
+    }
+  }
+  return "Not found."
 }
 
 function commutatormain(array) {
@@ -121,6 +199,11 @@ function commutatormain(array) {
   var len;
   var len1;
   var len2;
+  var text1;
+  var text2;
+  var str1;
+  var str2;
+  var str3;
   arr1 = array.concat(); //simplify(x.split(" "));
   part3 = conjugate(arr1);
   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
@@ -190,7 +273,7 @@ function commutatormain(array) {
         if (part5.length > 0) {
           text1 = part5_out + ":[" + part1_out + "," + part2_out + "]";
         }
-        text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
+        // text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
         flag = 1;
         break;
       }
@@ -202,10 +285,8 @@ function commutatormain(array) {
 
   if (flag == 0) {
     text1 = "Not found."
-    text2 = "Not found."
   }
-  document.getElementById("result1").innerHTML = text1;
-  document.getElementById("result2").innerHTML = text2;
+  return text1;
 }
 
 // R2 D R U' R D' R' U R D R' U R' D' R U' R

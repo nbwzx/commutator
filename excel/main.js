@@ -51,10 +51,10 @@
          result += '<tr>';
          for (var j = 0; j < arrayTitle.length; j++) {
            if (obj.hasOwnProperty(arrayTitle[j] + i)) {
-             console.log(i);
              //  result += '<td><type="text" value="' + obj[arrayTitle[j] + i].replace('\'', '') + '" /></td>';
              result += '<td>' + obj[arrayTitle[j] + i].replace('\'', '') + '</td>';
              if (obj[arrayTitle[j] + i].replace('\'', '').length > 8) {
+               console.log(i+":"+obj[arrayTitle[j] + i].replace('\'', ''));
                result += '<td>' + commutator(obj[arrayTitle[j] + i].replace('\'', '')) + '</td>';
              }
            } else {
@@ -74,208 +74,290 @@
 
 
  function commutator(x) {
-   var locationud = new Array();
-   var arrtemp;
-   x = x.trim();
-   x = x.replace(/\s+/ig," ");
-   x = x.replace(/[’]/g, "'");
-   x = x.replace(/ '/g, "'");  
-   x = x.replace(/ 2/g, "2");
-   x = x.replace(/2'/g, "2");
-   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
-     x = x.replace(/r2/g, "R2 M2");
-     x = x.replace(/r'/g, "R' M");
-     x = x.replace(/r/g, "R M'");
-   }
-   if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
-     x = x.replace(/l2/g, "L2 M2");
-     x = x.replace(/l'/g, "L' M'");
-     x = x.replace(/l/g, "L M");
-   }
-   if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
-     x = x.replace(/f2/g, "F2 S2");
-     x = x.replace(/f'/g, "F' S'");
-     x = x.replace(/f/g, "F S");
-   }
-   if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
-     x = x.replace(/b2/g, "B2 S2");
-     x = x.replace(/b'/g, "B' S");
-     x = x.replace(/b/g, "B S'");
-   }
-   if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
-     x = x.replace(/u2/g, "U2 E2");
-     x = x.replace(/u'/g, "U' E");
-     x = x.replace(/u/g, "U E'");
-   }
-   if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
-     x = x.replace(/d2/g, "D2 E2");
-     x = x.replace(/d'/g, "D' E'");
-     x = x.replace(/d/g, "D E");
-   }
-   arr1 = simplify(x.split(" "));
-   if (arr1.length <= 1) {
-     return "Invalid input."
-   }
-   for (i = 0; i < arr1.length - 1; i++) {
-     if (arr1[i].length > 2) {
-       return "Invalid input."
-     }
-   }
-   count = 0;
-   minscoreall = 10000;
-   for (i = 0; i < arr1.length - 1; i++) {
-     if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[i][0].toString() + arr1[i + 1][0].toString())) > -1) {
-       locationud[count] = i;
-       count = count + 1;
-     }
-   }
-   if (count > 4) {
-     return "Time Out.";
-   }
-   var number = Math.pow(2, count);
-   text1 = ""
-   for (i = 0; i <= number - 1; i++) {
-     text = String(i.toString(2));
-     arrex = arr1.concat();
-     for (j = 0; j < text.length; j++) {
-       if (text[text.length - 1 - j].toString() == "1".toString()) {
-         arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
-       }
-     }
+  var locationud = new Array();
+  var arrtemp;
+  var text_output;
+  var sum;
+  var arrx;
+  x = x.trim();
+  x = x.replace(/\s+/ig, " ");
+  x = x.replace(/[’]/g, "'");
+  x = x.replace(/ '/g, "'");
+  x = x.replace(/ 2/g, "2");
+  x = x.replace(/2'/g, "2");
 
-     part3 = conjugate(arrex);
-     arr2 = simplify(inverse(part3.concat()).concat(arrex, part3));
+  arr1 = simplify(x.split(" "));
+  part3 = conjugate(arr1);
+  arr2 = simplify(inverse(part3.concat()).concat(arr1, part3));
+  x = arr2.join(" ");
+  if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
+    x = x.replace(/r2/g, "R2 M2");
+    x = x.replace(/r'/g, "R' M");
+    x = x.replace(/r/g, "R M'");
+  }
+  if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
+    x = x.replace(/l2/g, "L2 M2");
+    x = x.replace(/l'/g, "L' M'");
+    x = x.replace(/l/g, "L M");
+  }
+  if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
+    x = x.replace(/f2/g, "F2 S2");
+    x = x.replace(/f'/g, "F' S'");
+    x = x.replace(/f/g, "F S");
+  }
+  if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
+    x = x.replace(/b2/g, "B2 S2");
+    x = x.replace(/b'/g, "B' S");
+    x = x.replace(/b/g, "B S'");
+  }
+  if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
+    x = x.replace(/u2/g, "U2 E2");
+    x = x.replace(/u'/g, "U' E");
+    x = x.replace(/u/g, "U E'");
+  }
+  if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
+    x = x.replace(/d2/g, "D2 E2");
+    x = x.replace(/d'/g, "D' E'");
+    x = x.replace(/d/g, "D E");
+  }
+  arrx = simplify(x.split(" "));
+  arr1 = simplify(part3.concat(arr2, inverse(part3.concat())));
 
-     arrtemp = arr2.concat();
-     minscore = 1000;
-     for (j = 0; j < arrtemp.length; j++) {
-       if (j <= arrtemp.length / 2) {
-         realscore = score(arrtemp) + j / 3; //penalty factor
-       }
-       if (j > arrtemp.length / 2) {
-         realscore = score(arrtemp) + 2 * (arrtemp.length - j) / 3; //penalty factor
-       }
-       // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
-       if (realscore < minscore) {
-         minscore = realscore;
-       }
-       arrtemp = displace(arrtemp);
-     }
+  if (arr1.length <= 1) {
+    return "Invalid input.";
+  }
+  for (i = 0; i < arr1.length - 1; i++) {
+    if (arr1[i].length > 2) {
+      return "Invalid input.";
+    }
+  }
+  for (i = 0; i <= arr1.length - 1; i++) {
+    sum = 0;
+    for (j = 0; j <= arr1.length - 1; j++) {
+      if (arr1[i][0] == arr1[j][0]) {
+        if (arr1[j].length == 1) {
+          sum = sum + 1;
+        } else {
+          if (arr1[j][1] == "2") {
+            sum = sum + 2;
+          }
+          if (arr1[j][1] == "'") {
+            sum = sum - 1;
+          }
+        }
+      }
+    }
+    if (sum % 4 !== 0) {
+      return "Not found.";
+    }
+  }
+  count = 0;
+  minscoreall = 10000;
+  for (i = 0; i < arr1.length - 1; i++) {
+    if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[i][0].toString() + arr1[i + 1][0].toString())) > -1) {
+      locationud[count] = i;
+      count = count + 1;
+    }
+  }
+  if (count > 4) {
+    return "Time Out.";
+  }
+  var number = Math.pow(2, count);
+  text1 = ""
+  for (i = 0; i <= number - 1; i++) {
+    text = String(i.toString(2));
+    arrex = arr1.concat();
+    for (j = 0; j < text.length; j++) {
+      if (text[text.length - 1 - j].toString() == "1".toString()) {
+        arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+      }
+    }
+    part3 = conjugate(arrex);
+    arr2 = simplify(inverse(part3.concat()).concat(arrex, part3));
 
-     // text1 = text1 + minscore;
-     if (minscore < minscoreall) {
-       minarr = arrex;
-       minscoreall = minscore;
-     }
+    arrtemp = arr2.concat();
+    minscore = 1000;
+    for (j = 0; j < arrtemp.length; j++) {
+      if (j <= arrtemp.length / 2) {
+        realscore = score(arrtemp) + j / 3; //penalty factor
+      }
+      if (j > arrtemp.length / 2) {
+        realscore = score(arrtemp) + 2 * (arrtemp.length - j) / 3; //penalty factor
+      }
+      // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
+      if (realscore < minscore) {
+        minscore = realscore;
+      }
+      arrtemp = displace(arrtemp);
+    }
 
-   }
-   return commutatormain(minarr);
-   // document.getElementById("result1").innerHTML = text1;
- }
+    // text1 = text1 + minscore;
+    if (minscore < minscoreall) {
+      minarr = arrex;
+      minscoreall = minscore;
+    }
+  }
+  text_output = commutatormain(minarr);
+  if (text_output.toString() !== "Not found.".toString()) {
+    return text_output;
+  } else {
+    part3 = conjugate(minarr);
+    arrex = simplify(inverse(part3.concat()).concat(minarr, part3));
+    if (part3.length == 0) {
+      return commutatorpair(arrex);
+    } else {
+      return part3 + ":[" + commutatorpair(arrex) + "]";
+    }
+  }
+  // document.getElementById("result1").innerHTML = text1;
+}
 
- function commutatormain(array) {
-   // var x = String(document.getElementById("x").value);
-   var i;
-   var j;
-   var k;
-   var flag;
-   var arrtemp;
-   var arr1;
-   var mini;
-   var minscore;
-   var part1;
-   var part2;
-   var part3;
-   var part4;
-   var part5;
-   var len;
-   var len1;
-   var len2;
-   arr1 = array.concat(); //simplify(x.split(" "));
-   part3 = conjugate(arr1);
-   arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
-   arr2 = inverse(arr1.concat());
-   flag = 0;
-   text1 = "";
-   minscore = 1000;
-   arrtemp = arr1.concat();
-   for (i = 0; i < arrtemp.length; i++) {
-     if (i <= arrtemp.length / 2) {
-       realscore = score(arrtemp) + i / 3; //penalty factor
-     }
-     if (i > arrtemp.length / 2) {
-       realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
-     }
-     // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
-     if (realscore < minscore) {
-       mini = i;
-       minscore = realscore;
-     }
-     arrtemp = displace(arrtemp);
-   }
-   if (mini <= arrtemp.length / 2) {
-     part4 = arr1.concat().slice(0, mini);
-     arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
-   } else {
-     part4 = arr1.concat().slice(mini, arrtemp.length);
-     arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
-   }
-   arr2 = inverse(arr1.concat());
-   part5 = simplify(part3.concat(part4));
-   part5_out = simplifyfinal(part5);
-   for (i = 0; i <= arr1.length; i++) {
-     str1 = arr1.concat().slice(0, i);
-     for (k = 0; k <= i; k++) {
-       j = conjugate(arr1.concat().slice(i, arr1.length)).length;
-       str2 = arr1.concat().slice(i, i + j);
-       str3 = arr1.concat().slice(i - k, i);
-       part1x = simplify(str1);
-       part2x = simplify(str2.concat(str3));
-       part1y = simplify(part1x.concat(inverse(part2x.concat())));
-       part2y = simplify(part2x.concat(inverse(part1x.concat())));
-       part1 = part1x;
-       part2 = part2x;
-       len = part1x.length + part2x.length
-       len1 = part1y.length + part2x.length
-       len2 = part1x.length + part2y.length
-       if (len1 < len2 && len1 < len) {
-         part1 = part1y;
-         part2 = part2x;
-       }
-       // The second one is better.
-       if (len2 <= len1 && len2 < len) {
-         part1 = part1y;
-         part2 = part2x;
-       }
-       // text1=part1
-       // text2=part2
-       arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-       arr = simplify(arrex);
-       part1_out = simplifyfinal(part1);
-       part2_out = simplifyfinal(part2);
-       if (arr.toString() == arr1.toString()) {
-         if (part5.length == 0) {
-           text1 = "[" + part1_out + "," + part2_out + "]";
-         }
-         if (part5.length > 0) {
-           text1 = part5_out + ":[" + part1_out + "," + part2_out + "]";
-         }
-         text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
-         flag = 1;
-         break;
-       }
-     }
-     if (flag == 1) {
-       break;
-     }
-   }
+function commutatorpair(array) {
+  var i;
+  var j;
+  var k;
+  var arr1;
+  var part1;
+  var part2;
+  var partleft;
+  var text1;
+  var text2;
+  var str1;
+  var str2;
+  var str3;
+  var count;
+  for (count = 1; count <= array.length; count++) {
+    arr1 = array.concat().slice(0, count);
+    for (i = 0; i <= arr1.length; i++) {
+      str1 = arr1.concat().slice(0, i);
+      for (j = 0; j <= arr1.length - i; j++) {
+        for (k = 0; k <= i; k++) {
+          str2 = arr1.concat().slice(i, i + j);
+          str3 = arr1.concat().slice(i - k, i);
+          part1 = simplify(str1);
+          part2 = simplify(str2.concat(str3));
+          arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+          arr = simplify(arrex);
+          arrleft = simplify(inverse(arr.concat()).concat(array));
+          partleft = commutatormain(arrleft);
+          if (partleft.toString() !== "Not found.".toString()) {
+            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]" + "+" + partleft;
+            return text1;
+          }
+        }
+      }
+    }
+  }
+  return "Not found."
+}
 
-   if (flag == 0) {
-     text1 = "Not found.";
-     text2 = "Not found.";
-   }
-   return text1;
- }
+function commutatormain(array) {
+  // var x = String(document.getElementById("x").value);
+  var i;
+  var j;
+  var k;
+  var flag;
+  var arrtemp;
+  var arr1;
+  var mini;
+  var minscore;
+  var part1;
+  var part2;
+  var part3;
+  var part4;
+  var part5;
+  var len;
+  var len1;
+  var len2;
+  var text1;
+  var text2;
+  var str1;
+  var str2;
+  var str3;
+  arr1 = array.concat(); //simplify(x.split(" "));
+  part3 = conjugate(arr1);
+  arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
+  arr2 = inverse(arr1.concat());
+  flag = 0;
+  text1 = "";
+  minscore = 1000;
+  arrtemp = arr1.concat();
+  for (i = 0; i < arrtemp.length; i++) {
+    if (i <= arrtemp.length / 2) {
+      realscore = score(arrtemp) + i / 3; //penalty factor
+    }
+    if (i > arrtemp.length / 2) {
+      realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
+    }
+    // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
+    if (realscore < minscore) {
+      mini = i;
+      minscore = realscore;
+    }
+    arrtemp = displace(arrtemp);
+  }
+  if (mini <= arrtemp.length / 2) {
+    part4 = arr1.concat().slice(0, mini);
+    arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
+  } else {
+    part4 = arr1.concat().slice(mini, arrtemp.length);
+    arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
+  }
+  arr2 = inverse(arr1.concat());
+  part5 = simplify(part3.concat(part4));
+  part5_out = simplifyfinal(part5);
+  for (i = 0; i <= arr1.length; i++) {
+    str1 = arr1.concat().slice(0, i);
+    for (k = 0; k <= i; k++) {
+      j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+      str2 = arr1.concat().slice(i, i + j);
+      str3 = arr1.concat().slice(i - k, i);
+      part1x = simplify(str1);
+      part2x = simplify(str2.concat(str3));
+      part1y = simplify(part1x.concat(inverse(part2x.concat())));
+      part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      part1 = part1x;
+      part2 = part2x;
+      len = part1x.length + part2x.length
+      len1 = part1y.length + part2x.length
+      len2 = part1x.length + part2y.length
+      if (len1 < len2 && len1 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      } // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+      // The second one is better.
+      if (len2 <= len1 && len2 < len) {
+        part1 = part1y;
+        part2 = part2x;
+      }
+      // text1=part1
+      // text2=part2
+      arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+      arr = simplify(arrex);
+      part1_out = simplifyfinal(part1);
+      part2_out = simplifyfinal(part2);
+      if (arr.toString() == arr1.toString()) {
+        if (part5.length == 0) {
+          text1 = "[" + part1_out + "," + part2_out + "]";
+        }
+        if (part5.length > 0) {
+          text1 = part5_out + ":[" + part1_out + "," + part2_out + "]";
+        }
+        // text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
+        flag = 1;
+        break;
+      }
+    }
+    if (flag == 1) {
+      break;
+    }
+  }
+
+  if (flag == 0) {
+    text1 = "Not found."
+  }
+  return text1;
+}
 
  // R2 D R U' R D' R' U R D R' U R' D' R U' R
  function displace(array) {
