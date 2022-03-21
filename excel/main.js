@@ -212,7 +212,7 @@
        if (text_output.split('[').length - 1 == 3) {
          return part3 + " " + text_output;
        } else {
-         return art3 + ":[" + text_output + "]";
+         return part3 + ":[" + text_output + "]";
        }
      }
    }
