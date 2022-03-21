@@ -200,22 +200,22 @@
      }
    }
    text_output = commutatormain(minarr);
-   if (text_output.toString() !== "Not found.".toString()) {
-     return text_output;
-   } else {
-     part3 = conjugate(minarr);
-     arrex = simplify(inverse(part3.concat()).concat(minarr, part3));
-     if (part3.length == 0) {
-       return commutatorpair(arrex);
-     } else {
-       text_output = commutatorpair(arrex);
-       if (text_output.split('[').length - 1 == 3) {
-         return part3 + " " + text_output;
-       } else {
-         return part3 + ":[" + text_output + "]";
-       }
-     }
-   }
+   // if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
+   document.getElementById("result1").innerHTML = text_output;
+   // } else {
+   //   part3 = conjugate(minarr);
+   //   arrex = simplify(inverse(part3.concat()).concat(minarr, part3));
+   //   if (part3.length == 0) {
+   //     document.getElementById("result1").innerHTML = commutatorpair(arrex);
+   //   } else {
+   //     text_output = commutatorpair(arrex);
+   //     if (text_output.split('[').length - 1 == 3) {
+   //       document.getElementById("result1").innerHTML = part3 + " " + text_output;
+   //     } else {
+   //       document.getElementById("result1").innerHTML = part3 + ":[" + text_output + "]";
+   //     }
+   //   }
+   // }
    // document.getElementById("result1").innerHTML = text1;
  }
 
