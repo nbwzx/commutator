@@ -1,18 +1,11 @@
 function commutator() {
-  var locationud = new Array();
-  var arrtemp;
-  var text_output;
-  var sum;
   var x = String(document.getElementById("x").value);
-  var arrx;
-  var score_temp;
   x = x.trim();
   x = x.replace(/\s+/ig, " ");
   x = x.replace(/[’]/g, "'");
   x = x.replace(/ '/g, "'");
   x = x.replace(/ 2/g, "2");
   x = x.replace(/2'/g, "2");
-
   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
     x = x.replace(/r2/g, "R2 M2");
     x = x.replace(/r'/g, "R' M");
@@ -43,8 +36,7 @@ function commutator() {
     x = x.replace(/d'/g, "D' E'");
     x = x.replace(/d/g, "D E");
   }
-  arr1 = simplify(x.split(" "));
-
+  var arr1 = simplify(x.split(" "));
   if (arr1.length <= 1) {
     document.getElementById("result1").innerHTML = "Invalid input.";
     return 0;
@@ -55,6 +47,7 @@ function commutator() {
       return 0;
     }
   }
+  var sum;
   for (i = 0; i <= arr1.length - 1; i++) {
     sum = 0;
     for (j = 0; j <= arr1.length - 1; j++) {
@@ -76,7 +69,6 @@ function commutator() {
       return 0;
     }
   }
-
   //handle cases like R2 M2 E' R' U' R E R' U R' M2
   if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
     if (arr1[1][0] == arr1[arr1.length - 1][0]) {
@@ -88,8 +80,7 @@ function commutator() {
       arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
     }
   }
-
-  text_output = commutatormain(arr1);
+  var text_output = commutatormain(arr1);
   // if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
   document.getElementById("result1").innerHTML = text_output;
   // } else {
@@ -110,47 +101,33 @@ function commutator() {
 }
 
 function commutatorpair(array) {
-  var i;
-  var j;
-  var k;
-  var arr1;
-  var part1;
-  var part2;
-  var text1;
-  var str1;
-  var str2;
-  var str3;
-  var count;
-  var arrtemp;
-  var arra;
-  var arrb;
-  var i_dis;
-  arrtemp = array.concat();
-  for (i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
-    for (count = 1; count <= arrtemp.length; count++) {
-      arr1 = arrtemp.concat().slice(0, count);
-      for (i = 0; i <= arr1.length; i++) {
+  var arrtemp = array.concat();
+  for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
+    for (var count = 1; count <= arrtemp.length; count++) {
+      var arr1 = arrtemp.concat().slice(0, count);
+      for (var i = 0; i <= arr1.length; i++) {
         if (i >= arrtemp.length / 2) {
           break;
         }
-        str1 = arr1.concat().slice(0, i);
-        for (j = 0; j <= arr1.length - i; j++) {
+        var str1 = arr1.concat().slice(0, i);
+        for (var j = 0; j <= arr1.length - i; j++) {
           // for (k = 0; k <= i; k++) {
+          var k = 0;
           if (j + k >= arrtemp.length / 2) {
             break;
           }
-          str2 = arr1.concat().slice(i, i + j);
-          str3 = arr1.concat().slice(i - k, i);
-          part1 = simplify(str1);
-          part2 = simplify(str2.concat(str3));
-          arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          arra = simplify(arrex);
-          arrb = simplify(inverse(arra.concat()).concat(arrtemp));
-          partb = commutatormain(arrb);
+          var str2 = arr1.concat().slice(i, i + j);
+          var str3 = arr1.concat().slice(i - k, i);
+          var part1 = simplify(str1);
+          var part2 = simplify(str2.concat(str3));
+          var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+          var arra = simplify(arrex);
+          var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+          var partb = commutatormain(arrb);
           if (partb.toString() !== "Not found.".toString()) {
-            parta = commutatormain(arra);
+            var parta = commutatormain(arra);
             if (i_dis == 0) {
-              text1 = parta + "+" + partb;
+              var text1 = parta + "+" + partb;
             } else {
               text1 = array.concat().slice(0, i_dis).join(" ") + ":[" + parta + "+" + partb + "]";
             }
@@ -167,37 +144,15 @@ function commutatorpair(array) {
 
 function commutatormain(array) {
   // var x = String(document.getElementById("x").value);
-  var i;
-  var j;
-  var k;
-  var flag;
-  var arrtemp;
-  var arr1;
+  var arr1 = array.concat();
+  var part3 = conjugate(arr1);
+  var arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
+  var flag = 0;
+  var text1 = "";
+  var minscore = 1000;
   var mini;
-  var minscore;
-  var score_temp;
-  var part1;
-  var part2;
-  var part3;
-  var part4;
-  var part5;
-  var len;
-  var len1;
-  var len2;
-  var text1;
-  var text2;
-  var str1;
-  var str2;
-  var str3;
-  arr1 = array.concat(); //simplify(x.split(" "));
-  part3 = conjugate(arr1);
-  arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
-  arr2 = inverse(arr1.concat());
-  flag = 0;
-  text1 = "";
-  minscore = 1000;
-  arrtemp = arr1.concat();
-  for (i = 0; i < arrtemp.length; i++) {
+  var arrtemp = arr1.concat();
+  for (var i = 0; i < arrtemp.length; i++) {
     score_temp = score(arrtemp.concat());
     if (i <= arrtemp.length / 2) {
       realscore = score_temp + i / 3; //penalty factor
@@ -213,30 +168,29 @@ function commutatormain(array) {
     arrtemp = displace(arrtemp);
   }
   if (mini <= arrtemp.length / 2) {
-    part4 = arr1.concat().slice(0, mini);
+    var part4 = arr1.concat().slice(0, mini);
     arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
   } else {
     part4 = arr1.concat().slice(mini, arrtemp.length);
     arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
   }
-  arr2 = inverse(arr1.concat());
-  part5 = simplify(part3.concat(part4));
-  part5_out = simplifyfinal(part5);
+  var part5 = simplify(part3.concat(part4));
+  var part5_out = simplifyfinal(part5);
   for (i = 0; i <= arr1.length; i++) {
-    str1 = arr1.concat().slice(0, i);
-    for (k = 0; k <= i; k++) {
-      j = conjugate(arr1.concat().slice(i, arr1.length)).length;
-      str2 = arr1.concat().slice(i, i + j);
-      str3 = arr1.concat().slice(i - k, i);
-      part1x = simplify(str1);
-      part2x = simplify(str2.concat(str3));
-      part1y = simplify(part1x.concat(inverse(part2x.concat())));
-      part2y = simplify(part2x.concat(inverse(part1x.concat())));
-      part1 = part1x;
-      part2 = part2x;
-      len = part1x.length + part2x.length
-      len1 = part1y.length + part2x.length
-      len2 = part1x.length + part2y.length
+    var str1 = arr1.concat().slice(0, i);
+    for (var k = 0; k <= i; k++) {
+      var j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+      var str2 = arr1.concat().slice(i, i + j);
+      var str3 = arr1.concat().slice(i - k, i);
+      var part1x = simplify(str1);
+      var part2x = simplify(str2.concat(str3));
+      var part1y = simplify(part1x.concat(inverse(part2x.concat())));
+      var part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      var part1 = part1x;
+      var part2 = part2x;
+      var len = part1x.length + part2x.length
+      var len1 = part1y.length + part2x.length
+      var len2 = part1x.length + part2y.length
       if (len1 < len2 && len1 < len) {
         part1 = part1y;
         part2 = part2x;
@@ -248,10 +202,10 @@ function commutatormain(array) {
       }
       // text1=part1
       // text2=part2
-      arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-      arr = simplify(arrex);
-      part1_out = simplifyfinal(part1);
-      part2_out = simplifyfinal(part2);
+      var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+      var arr = simplify(arrex);
+      var part1_out = simplifyfinal(part1);
+      var part2_out = simplifyfinal(part2);
       if (arr.toString() == arr1.toString()) {
         if (part5.length == 0) {
           text1 = "[" + part1_out + "," + part2_out + "]";
@@ -268,24 +222,19 @@ function commutatormain(array) {
       break;
     }
   }
-
   if (flag == 0) {
     text1 = "Not found."
   }
   return text1;
 }
-
 // R2 D R U' R D' R' U R D R' U R' D' R U' R
+
 function displace(array) {
-  var arrtemp;
-  var arr;
-  var arr1;
-  var arr2;
-  arr = array.concat();
-  arr1 = arr.concat().slice(0, 1);
-  arr2 = arr.concat().slice(arr.length - 1, arr.length);
+  var arr = array.concat();
+  var arr1 = arr.concat().slice(0, 1);
+  var arr2 = arr.concat().slice(arr.length - 1, arr.length);
   if (combine_str(arr1[0], arr2[0]).toString() == "0".toString()) {
-    arrtemp = arr.concat();
+    var arrtemp = arr.concat();
     arrtemp = inverse(arr1.concat()).concat(arrtemp, arr1);
     arrtemp = simplify(arrtemp);
   } else {
@@ -296,41 +245,23 @@ function displace(array) {
   return arrtemp;
 }
 
-
 function score(array) {
-  var i;
-  var j;
-  var k;
-  var arr1;
-  var str1;
-  var str2;
-  var str3;
-  var part1;
-  var part2;
-  var part1x;
-  var part1y;
-  var part2x;
-  var part2y;
-  var arr;
-  var arrex;
-  arr1 = array.concat();
-  arr2 = inverse(arr1.concat());
-  flag = 0;
-  for (i = 0; i <= arr1.length; i++) {
-    str1 = arr1.concat().slice(0, i);
-    for (k = 0; k <= i; k++) {
-      j = conjugate(arr1.concat().slice(i, arr1.length)).length;
-      str2 = arr1.concat().slice(i, i + j);
-      str3 = arr1.concat().slice(i - k, i);
-      part1x = simplify(str1);
-      part2x = simplify(str2.concat(str3));
-      part1y = simplify(part1x.concat(inverse(part2x.concat())));
-      part2y = simplify(part2x.concat(inverse(part1x.concat())));
-      part1 = part1x;
-      part2 = part2x;
-      len = part1x.length + part2x.length;
-      len1 = part1y.length + part2x.length;
-      len2 = part1x.length + part2y.length;
+  var arr1 = array.concat();
+  for (var i = 0; i <= arr1.length; i++) {
+    var str1 = arr1.concat().slice(0, i);
+    for (var k = 0; k <= i; k++) {
+      var j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+      var str2 = arr1.concat().slice(i, i + j);
+      var str3 = arr1.concat().slice(i - k, i);
+      var part1x = simplify(str1);
+      var part2x = simplify(str2.concat(str3));
+      var part1y = simplify(part1x.concat(inverse(part2x.concat())));
+      var part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      var part1 = part1x;
+      var part2 = part2x;
+      var len = part1x.length + part2x.length;
+      var len1 = part1y.length + part2x.length;
+      var len2 = part1x.length + part2y.length;
       if (len1 < len2 && len1 < len) {
         part1 = part1y;
         part2 = part2x;
@@ -340,8 +271,8 @@ function score(array) {
         part1 = part1y;
         part2 = part2x;
       }
-      arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-      arr = simplify(arrex);
+      var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+      var arr = simplify(arrex);
       if (arr.toString() == arr1.toString()) {
         if (part1.length < part2.length) {
           return 2 * part1.length + part2.length;
@@ -355,24 +286,16 @@ function score(array) {
 }
 
 function conjugate(array) {
-  var arr;
-  var i;
-  var arr1;
-  var arr2;
-  var len;
-  var arrtemp;
-  var t;
-  var minlen;
-  arr = array.concat();
-  minlen = arr.length;
-  t = 0;
-  for (i = 1; i < array.length; i++) {
-    arr1 = arr.concat().slice(0, i);
-    arr2 = inverse(arr1.concat());
-    arrtemp = arr.concat();
+  var arr = array.concat();
+  var minlen = arr.length;
+  var t = 0;
+  for (var i = 1; i < array.length; i++) {
+    var arr1 = arr.concat().slice(0, i);
+    var arr2 = inverse(arr1.concat());
+    var arrtemp = arr.concat();
     arrtemp = arr2.concat(arrtemp, arr1);
     arrtemp = simplify(arrtemp);
-    len = simplify(arrtemp).length;
+    var len = simplify(arrtemp).length;
     if (len < minlen) {
       t = i;
       minlen = len;
@@ -389,12 +312,9 @@ function conjugate(array) {
 }
 
 function inverse(array) {
-  var temp;
-  var arr;
-  var i;
-  arr = array.concat();
-  for (i = 0; i < arr.length / 2; i++) {
-    temp = arr[i];
+  var arr = array.concat();
+  for (var i = 0; i < arr.length / 2; i++) {
+    var temp = arr[i];
     arr[i] = array[arr.length - 1 - i];
     arr[arr.length - 1 - i] = temp;
   }
@@ -405,12 +325,9 @@ function inverse(array) {
 }
 
 function simplifyfinal(array) {
-  var arr;
-  var arr_out;
-  var i;
-  arr = array.concat();
+  var arr = array.concat();
   arr = simplify(arr);
-  for (i = 0; i < arr.length - 1; i++) {
+  for (var i = 0; i < arr.length - 1; i++) {
     if (arr[i][0].toString() == "D".toString() && arr[i + 1][0].toString() == "U".toString()) {
       arr = swaparr(arr, i, i + 1);
     }
@@ -421,7 +338,7 @@ function simplifyfinal(array) {
       arr = swaparr(arr, i, i + 1);
     }
   }
-  arr_out = arr.join(" ") + " "
+  var arr_out = arr.join(" ") + " "
   arr_out = arr_out.replace(/R2 M2 /g, "r2 ");
   arr_out = arr_out.replace(/R' M /g, "r' ");
   arr_out = arr_out.replace(/R M' /g, "r ");
@@ -440,7 +357,6 @@ function simplifyfinal(array) {
   arr_out = arr_out.replace(/D2 E2 /g, "d2 ");
   arr_out = arr_out.replace(/D' E' /g, "d' ");
   arr_out = arr_out.replace(/D E /g, "d ");
-
   arr_out = arr_out.replace(/M2 R2 /g, "r2 ");
   arr_out = arr_out.replace(/M R' /g, "r' ");
   arr_out = arr_out.replace(/M' R /g, "r ");
@@ -459,7 +375,6 @@ function simplifyfinal(array) {
   arr_out = arr_out.replace(/E2 D2 /g, "d2 ");
   arr_out = arr_out.replace(/E' D' /g, "d' ");
   arr_out = arr_out.replace(/E D /g, "d ");
-
   arr_out = arr_out.replace(/R M2 /g, "r M' ");
   arr_out = arr_out.replace(/R' M2 /g, "r' M ");
   arr_out = arr_out.replace(/M2 R /g, "r M' ");
@@ -469,22 +384,17 @@ function simplifyfinal(array) {
 }
 
 function simplify(array) {
-  var arr;
-  var i;
-  var len;
-  len = array.length;
-  arr = array.concat();
-  for (i = 0; i <= len; i++) {
+  var len = array.length;
+  var arr = array.concat();
+  for (var i = 0; i <= len; i++) {
     arr = simple(arr);
   }
   return arr;
 }
 
 function simple(array) {
-  var arr;
-  var i;
-  arr = array.concat();
-  for (i = 0; i < arr.length - 1; i++) {
+  var arr = array.concat();
+  for (var i = 0; i < arr.length - 1; i++) {
     if (combine_str(arr[i], arr[i + 1]).toString() == "".toString()) {
       arr.splice(i, 2);
       break;
@@ -536,10 +446,8 @@ function simple(array) {
 }
 
 function combine_str(str1, str2) {
-  var len1;
-  var len2;
-  len1 = str1.length;
-  len2 = str2.length;
+  var len1 = str1.length;
+  var len2 = str2.length;
   if (str1[0] == str2[0]) {
     if (len1 == 1) {
       if (len2 == 1) {
@@ -587,11 +495,9 @@ function combine_str(str1, str2) {
 }
 
 function inverse_str(str) {
-  var len;
-  len = str.length;
+  var len = str.length;
   if (len == 1) {
     return str + "'";
-
   }
   if (len == 2) {
     if (str[1] == "2") {
@@ -607,5 +513,4 @@ function swaparr(arr, index1, index2) {
   arr[index1] = arr.splice(index2, 1, arr[index1])[0];
   return arr;
 }
-
 document.getElementById("go").addEventListener("click", commutator);
