@@ -5,6 +5,7 @@ function commutator() {
   var sum;
   var x = String(document.getElementById("x").value);
   var arrx;
+  var score_temp;
   x = x.trim();
   x = x.replace(/\s+/ig, " ");
   x = x.replace(/[’]/g, "'");
@@ -47,7 +48,7 @@ function commutator() {
     x = x.replace(/d/g, "D E");
   }
   arrx = simplify(x.split(" "));
-  arr1 = simplify(part3.concat(arr2, inverse(part3.concat())));
+  arr1 = simplify(part3.concat(arrx, inverse(part3.concat())));
 
   if (arr1.length <= 1) {
     document.getElementById("result1").innerHTML = "Invalid input.";
@@ -108,11 +109,12 @@ function commutator() {
     arrtemp = arr2.concat();
     minscore = 1000;
     for (j = 0; j < arrtemp.length; j++) {
+      score_temp = score(arrtemp);
       if (j <= arrtemp.length / 2) {
-        realscore = score(arrtemp) + j / 3; //penalty factor
+        realscore = score_temp + j / 3; //penalty factor
       }
       if (j > arrtemp.length / 2) {
-        realscore = score(arrtemp) + 2 * (arrtemp.length - j) / 3; //penalty factor
+        realscore = score_temp + 2 * (arrtemp.length - j) / 3; //penalty factor
       }
       // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
       if (realscore < minscore) {
@@ -136,7 +138,12 @@ function commutator() {
     if (part3.length == 0) {
       document.getElementById("result1").innerHTML = commutatorpair(arrex);
     } else {
-      document.getElementById("result1").innerHTML = part3 + ":[" + commutatorpair(arrex) + "]";
+      text_output = commutatorpair(arrex);
+      if (text_output.split('[').length - 1 == 3) {
+        document.getElementById("result1").innerHTML = part3 + " " + text_output;
+      } else {
+        document.getElementById("result1").innerHTML = part3 + ":[" + text_output + "]";
+      }
     }
   }
   // document.getElementById("result1").innerHTML = text1;
@@ -149,34 +156,51 @@ function commutatorpair(array) {
   var arr1;
   var part1;
   var part2;
-  var partleft;
   var text1;
-  var text2;
   var str1;
   var str2;
   var str3;
   var count;
-  for (count = 1; count <= array.length; count++) {
-    arr1 = array.concat().slice(0, count);
-    for (i = 0; i <= arr1.length; i++) {
-      str1 = arr1.concat().slice(0, i);
-      for (j = 0; j <= arr1.length - i; j++) {
-        for (k = 0; k <= i; k++) {
+  var arrtemp;
+  var arra;
+  var arrb;
+  var i_dis;
+  arrtemp = array.concat();
+  for (i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
+    for (count = 1; count <= arrtemp.length; count++) {
+      arr1 = arrtemp.concat().slice(0, count);
+      for (i = 0; i <= arr1.length; i++) {
+        if (i >= arrtemp.length / 2) {
+          break;
+        }
+        str1 = arr1.concat().slice(0, i);
+        for (j = 0; j <= arr1.length - i; j++) {
+          // for (k = 0; k <= i; k++) {
+          if (j + k >= arrtemp.length / 2) {
+            break;
+          }
           str2 = arr1.concat().slice(i, i + j);
           str3 = arr1.concat().slice(i - k, i);
           part1 = simplify(str1);
           part2 = simplify(str2.concat(str3));
           arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          arr = simplify(arrex);
-          arrleft = simplify(inverse(arr.concat()).concat(array));
-          partleft = commutatormain(arrleft);
-          if (partleft.toString() !== "Not found.".toString()) {
-            text1 = "[" + part1.join(" ") + "," + part2.join(" ") + "]" + "+" + partleft;
+          arra = simplify(arrex);
+          arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+          partb = commutatormain(arrb);
+          if (partb.toString() !== "Not found.".toString()) {
+            parta = commutatormain(arra);
+            if (i_dis == 0) {
+              text1 = parta + "+" + partb;
+            } else {
+              text1 = array.concat().slice(0, i_dis).join(" ") + ":[" + parta + "+" + partb + "]";
+            }
             return text1;
           }
+          // }
         }
       }
     }
+    arrtemp = displace(arrtemp);
   }
   return "Not found."
 }
@@ -191,6 +215,7 @@ function commutatormain(array) {
   var arr1;
   var mini;
   var minscore;
+  var score_temp;
   var part1;
   var part2;
   var part3;
@@ -213,11 +238,12 @@ function commutatormain(array) {
   minscore = 1000;
   arrtemp = arr1.concat();
   for (i = 0; i < arrtemp.length; i++) {
+    score_temp = score(arrtemp);
     if (i <= arrtemp.length / 2) {
-      realscore = score(arrtemp) + i / 3; //penalty factor
+      realscore = score_temp + i / 3; //penalty factor
     }
     if (i > arrtemp.length / 2) {
-      realscore = score(arrtemp) + 2 * (arrtemp.length - i) / 3; //penalty factor
+      realscore = score_temp + 2 * (arrtemp.length - i) / 3; //penalty factor
     }
     // text1 = text1 + i.toString() + "?" + realscore + ","; //+"("+  arrtemp.toString()+")"+",";
     if (realscore < minscore) {
