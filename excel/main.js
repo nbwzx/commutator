@@ -142,24 +142,23 @@ function commutator(x) {
       arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
     }
   }
-  text_output = commutatormain(arr1);
-  // if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
-  return text_output;
-  // } else {
-  //   part3 = conjugate(minarr);
-  //   arrex = simplify(inverse(part3.concat()).concat(minarr, part3));
-  //   if (part3.length == 0) {
-  //     document.getElementById("result1").innerHTML = commutatorpair(arrex);
-  //   } else {
-  //     text_output = commutatorpair(arrex);
-  //     if (text_output.split('[').length - 1 == 3) {
-  //       document.getElementById("result1").innerHTML = part3 + " " + text_output;
-  //     } else {
-  //       document.getElementById("result1").innerHTML = part3 + ":[" + text_output + "]";
-  //     }
-  //   }
-  // }
-  // document.getElementById("result1").innerHTML = text1;
+  var text_output = commutatormain(arr1);
+  if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
+    return text_output;
+  } else {
+    part3 = conjugate(arr1);
+    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+    if (part3.length == 0) {
+      return commutatorpair(arrex);
+    } else {
+      text_output = commutatorpair(arrex);
+      if (text_output.split('[').length - 1 == 3) {
+        return part3 + " " + text_output;
+      } else {
+        return part3 + ":[" + text_output + "]";
+      }
+    }
+  }
 }
 
 function commutatorpair(array) {
