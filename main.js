@@ -2,6 +2,7 @@ function commutator() {
   var x = String(document.getElementById("x").value);
   x = x.trim();
   x = x.replace(/\s+/ig, " ");
+  x = x.replace(/[‘]/g, "'");
   x = x.replace(/[’]/g, "'");
   x = x.replace(/ '/g, "'");
   x = x.replace(/ 2/g, "2");
