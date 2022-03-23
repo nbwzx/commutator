@@ -145,7 +145,7 @@ function commutator(x) {
     }
   }
   var text_output = commutatormain(arr1);
-  if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
+  if (text_output.toString() !== "Not found.".toString()) {
     return text_output;
   } else {
     part3 = conjugate(arr1);
@@ -155,9 +155,9 @@ function commutator(x) {
     } else {
       text_output = commutatorpair(arrex);
       if (text_output.split('[').length - 1 == 3) {
-        return part3 + " " + text_output;
+        return simplifyfinal(part3) + " " + text_output;
       } else {
-        return part3 + ":[" + text_output + "]";
+        return simplifyfinal(part3) + ":[" + text_output + "]";
       }
     }
   }
