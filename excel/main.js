@@ -72,6 +72,7 @@ function commutator(x) {
   x = x.replace(/ '/g, "'");
   x = x.replace(/ 2/g, "2");
   x = x.replace(/2'/g, "2");
+  x = x.replace(/'2/g, "2"); 
   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
     x = x.replace(/r2/g, "R2 M2");
     x = x.replace(/r'/g, "R' M");
