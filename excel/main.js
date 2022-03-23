@@ -72,7 +72,7 @@ function commutator(x) {
   x = x.replace(/ '/g, "'");
   x = x.replace(/ 2/g, "2");
   x = x.replace(/2'/g, "2");
-  x = x.replace(/'2/g, "2"); 
+  x = x.replace(/'2/g, "2");
   if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
     x = x.replace(/r2/g, "R2 M2");
     x = x.replace(/r'/g, "R' M");
@@ -145,50 +145,63 @@ function commutator(x) {
     }
   }
   var text_output = commutatormain(arr1);
-  // if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
-  return text_output;
-  // } else { 
-  //   part3 = conjugate(arr1);
-  //   arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-  //   if (part3.length == 0) {
-  //     return commutatorpair(arrex);
-  //   } else {
-  //     text_output = commutatorpair(arrex);
-  //     if (text_output.split('[').length - 1 == 3) {
-  //       return part3 + " " + text_output;
-  //     } else {
-  //       return part3 + ":[" + text_output + "]";
-  //     }
-  //   }
-  // }
+  if (text_output.toString() !== "Not found.".toString()) { //use it when performed well
+    return text_output;
+  } else {
+    part3 = conjugate(arr1);
+    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+    if (part3.length == 0) {
+      return commutatorpair(arrex);
+    } else {
+      text_output = commutatorpair(arrex);
+      if (text_output.split('[').length - 1 == 3) {
+        return part3 + " " + text_output;
+      } else {
+        return part3 + ":[" + text_output + "]";
+      }
+    }
+  }
 }
 
 function commutatorpair(array) {
   var arrtemp = array.concat();
   for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
-    for (var count = 1; count <= arrtemp.length; count++) {
+    if (4 > arrtemp.length) {
+      return "Not found."
+    }
+    for (var count = 4; count <= arrtemp.length; count++) {
       var arr1 = arrtemp.concat().slice(0, count);
-      for (var i = 0; i <= arr1.length; i++) {
-        if (i >= arrtemp.length / 2) {
-          break;
-        }
+      var lenarr1 = arr1.length;
+      if (lenarr1 % 2 == 1) {
+        continue
+      }
+      for (var i = 1; i <= lenarr1 / 2 - 1; i++) {
         var str1 = arr1.concat().slice(0, i);
-        for (var j = 0; j <= arr1.length - i; j++) {
-          // for (k = 0; k <= i; k++) {
-          var k = 0;
-          if (j + k >= arrtemp.length / 2) {
-            break;
-          }
+        for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
           var str2 = arr1.concat().slice(i, i + j);
-          var str3 = arr1.concat().slice(i - k, i);
-          var part1 = simplify(str1);
-          var part2 = simplify(str2.concat(str3));
+          var part1x = simplify(str1);
+          var part2x = simplify(str2);
+          var party = simplify(part2x.concat(part1x));
+          var part1 = part1x;
+          var part2 = part2x;
+          // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+          if (party.length < Math.max(part1x.length, part2x.length)) {
+            if (part1x.length <= part2x.length) {
+              part1 = part1x;
+              part2 = party;
+            } else {
+              part1 = inverse(part2x.concat());
+              part2 = party;
+            }
+          }
           var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
           var arra = simplify(arrex);
           var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
           var partb = commutatormain(arrb);
           if (partb.toString() !== "Not found.".toString()) {
-            var parta = commutatormain(arra);
+            var part1_out = simplifyfinal(part1);
+            var part2_out = simplifyfinal(part2);
+            var parta = "[" + part1_out + "," + part2_out + "]";
             if (i_dis == 0) {
               var text1 = parta + "+" + partb;
             } else {
@@ -239,29 +252,28 @@ function commutatormain(array) {
   }
   var part5 = simplify(part3.concat(part4));
   var part5_out = simplifyfinal(part5);
-  for (i = 0; i <= arr1.length; i++) {
+  var lenarr1 = arr1.length;
+  if (lenarr1 % 2 == 1) {
+    return "Not found.";
+  }
+  for (var i = 1; i <= lenarr1 / 2 - 1; i++) {
     var str1 = arr1.concat().slice(0, i);
-    for (var k = 0; k <= i; k++) {
-      var j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+    for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
       var str2 = arr1.concat().slice(i, i + j);
-      var str3 = arr1.concat().slice(i - k, i);
       var part1x = simplify(str1);
-      var part2x = simplify(str2.concat(str3));
-      var part1y = simplify(part1x.concat(inverse(part2x.concat())));
-      var part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      var part2x = simplify(str2);
+      var party = simplify(part2x.concat(part1x));
       var part1 = part1x;
       var part2 = part2x;
-      var len = part1x.length + part2x.length
-      var len1 = part1y.length + part2x.length
-      var len2 = part1x.length + part2y.length
-      if (len1 < len2 && len1 < len) {
-        part1 = part1y;
-        part2 = part2x;
-      } // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-      // The second one is better.
-      if (len2 <= len1 && len2 < len) {
-        part1 = part1y;
-        part2 = part2x;
+      // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+      if (party.length < Math.max(part1x.length, part2x.length)) {
+        if (part1x.length <= part2x.length) {
+          part1 = part1x;
+          part2 = party;
+        } else {
+          part1 = inverse(part2x.concat());
+          part2 = party;
+        }
       }
       // text1=part1
       // text2=part2
@@ -269,7 +281,7 @@ function commutatormain(array) {
       var arr = simplify(arrex);
       var part1_out = simplifyfinal(part1);
       var part2_out = simplifyfinal(part2);
-      if (arr.toString() == arr1.toString()) {
+      if (simplify(arr.concat(inverse(arr1.concat()))).length == 0) {
         if (part5.length == 0) {
           text1 = "[" + part1_out + "," + part2_out + "]";
         }
@@ -310,33 +322,32 @@ function displace(array) {
 
 function score(array) {
   var arr1 = array.concat();
-  for (var i = 0; i <= arr1.length; i++) {
+  var lenarr1 = arr1.length;
+  if (lenarr1 % 2 == 1) {
+    return 1000;
+  }
+  for (i = 1; i <= lenarr1 / 2 - 1; i++) {
     var str1 = arr1.concat().slice(0, i);
-    for (var k = 0; k <= i; k++) {
-      var j = conjugate(arr1.concat().slice(i, arr1.length)).length;
+    for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
       var str2 = arr1.concat().slice(i, i + j);
-      var str3 = arr1.concat().slice(i - k, i);
       var part1x = simplify(str1);
-      var part2x = simplify(str2.concat(str3));
-      var part1y = simplify(part1x.concat(inverse(part2x.concat())));
-      var part2y = simplify(part2x.concat(inverse(part1x.concat())));
+      var part2x = simplify(str2);
+      var party = simplify(part2x.concat(part1x));
       var part1 = part1x;
       var part2 = part2x;
-      var len = part1x.length + part2x.length;
-      var len1 = part1y.length + part2x.length;
-      var len2 = part1x.length + part2y.length;
-      if (len1 < len2 && len1 < len) {
-        part1 = part1y;
-        part2 = part2x;
-      }
-      // The second one is better.
-      if (len2 <= len1 && len2 < len) {
-        part1 = part1y;
-        part2 = part2x;
+      // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+      if (party.length < Math.max(part1x.length, part2x.length)) {
+        if (part1x.length <= part2x.length) {
+          part1 = part1x;
+          part2 = party;
+        } else {
+          part1 = inverse(part2x.concat());
+          part2 = party;
+        }
       }
       var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       var arr = simplify(arrex);
-      if (arr.toString() == arr1.toString()) {
+      if (simplify(arr.concat(inverse(arr1.concat()))).length == 0) {
         if (part1.length < part2.length) {
           return 2 * part1.length + part2.length;
         } else {
