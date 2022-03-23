@@ -83,19 +83,23 @@ function commutator() {
     }
   }
   var text_output = commutatormain(arr1);
-  if (text_output.toString() !== "Not found.".toString()) { //use it for testing
+  if (text_output.toString() !== "Not found.".toString()) {
     document.getElementById("result1").innerHTML = text_output;
-  } else { // R U' S U2 S U' R S R2 S is "Not found."
+  } else {
     part3 = conjugate(arr1);
     arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
     if (part3.length == 0) {
       document.getElementById("result1").innerHTML = commutatorpair(arrex);
     } else {
       text_output = commutatorpair(arrex);
-      if (text_output.split('[').length - 1 == 3) {
-        document.getElementById("result1").innerHTML = simplifyfinal(part3) + " " + text_output;
+      if (text_output.toString() == "Not found.".toString()) {
+        document.getElementById("result1").innerHTML = "Not found.";
       } else {
-        document.getElementById("result1").innerHTML = simplifyfinal(part3) + ":[" + text_output + "]";
+        if (text_output.split('[').length - 1 == 3) {
+          document.getElementById("result1").innerHTML = simplifyfinal(part3) + " " + text_output;
+        } else {
+          document.getElementById("result1").innerHTML = simplifyfinal(part3) + ":[" + text_output + "]";
+        }
       }
     }
   }
