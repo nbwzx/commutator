@@ -92,6 +92,9 @@ function commutator() {
       document.getElementById("result1").innerHTML = commutatorpair(arrex);
     } else {
       text_output = commutatorpair(arrex);
+      if (text_output.toString() == "Not found.".toString()) {
+        document.getElementById("result1").innerHTML = "Not found.";
+      }
       if (text_output.split('[').length - 1 == 3) {
         document.getElementById("result1").innerHTML = simplifyfinal(part3) + " " + text_output;
       } else {
