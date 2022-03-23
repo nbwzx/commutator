@@ -154,6 +154,9 @@ function commutator(x) {
       return commutatorpair(arrex);
     } else {
       text_output = commutatorpair(arrex);
+      if (text_output.toString() == "Not found.".toString()) {
+        return "Not found.";
+      }
       if (text_output.split('[').length - 1 == 3) {
         return simplifyfinal(part3) + " " + text_output;
       } else {
