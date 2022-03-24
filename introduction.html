@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Zixing Wang">
+  <meta name="generator" content="Hugo 0.88.1">
+  <title>Commutator</title>
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/navbar-fixed/">
+  <!-- Bootstrap core CSS -->
+  <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/dist/css/prism.css" rel="stylesheet">
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+
+
+  <!-- Custom styles for this template -->
+  <link href="assets/dist/css/navbar-top-fixed.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Commutator</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">&nbsp;&nbsp;Home&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Introduction&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cube.html">&nbsp;&nbsp;Rubik's cube&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="free.html">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="excel.html">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="code.html">&nbsp;&nbsp;Source code&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/nbwzx/Commutator" target="blank">&nbsp;&nbsp;Github
+              repository&nbsp;&nbsp;</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">&nbsp;&nbsp;About&nbsp;&nbsp;</a>
+          </li>
+        </ul>
+        <!-- <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form> -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h2 id="sample-markdown">Introduction</h2>
+    <p>Decompose algorithms in commutator notation.</p>
+    <p>Let
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/J9W6pjRIDj.svg"> be any
+      group. If
+      <!-- $a,b \in G$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/hzGAuZv640.svg">, then the commutator of
+      <!-- $a$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/UhYiFhLcuQ.svg"> and
+      <!-- $b$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/3eUfhUParw.svg"> is the
+      element
+      <!-- $[a,b]=aba^{−1}b^{−1}$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/Ntecnjrojy.svg">. The expression
+      <!-- $x\colon a$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/3LN26IAubW.svg"> denotes the conjugate of
+      <!-- $a$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/2gxcQizkRw.svg"> by
+      <!-- $x$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/9iB3HkjVB9.svg">,
+      defined as
+      <!-- $xax^{−1}$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/GL6wwtSHya.svg">. Therefore,
+      <!-- $c\colon[a,b]$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/aeNksYUPvc.svg"> means
+      <!-- $c a b a^{−1} b^{−1} c^{−1}$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/ECU0xU8Yfx.svg">.
+    </p>
+    <p>In this repository, we assume that
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/Gc1pCvufb5.svg"> is a
+      free group.
+    </p>
+    <p>In mathematics, the free group
+      <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/EAUg5lHTBi.svg">
+      over a given set
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/Ibcd0FcTOp.svg">
+      consists of all words that can be built from members of
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/DWsWhbICkM.svg">,
+      considering two words to be different unless their equality follows from the group axioms (e.g.
+      <!-- $s t=s u u^{-1} t$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/fVzQWUoHVF.svg">, but
+      <!-- $s \neq t^{-1}$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/iwq8fMflYT.svg"> for
+      <!-- $s, t, u \in S$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/zZWgobxgom.svg"> ). The members of
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/egB8X9ylT4.svg"> are
+      called generators of
+      <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/xVA1KxA0G9.svg">,
+      and the number of generators is the rank of the free group. An arbitrary group
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/SEBZPzvZBn.svg"> is
+      called free if it is isomorphic to
+      <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/6ngjvQGpMe.svg">
+      for some subset
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/97GOyXaPGv.svg"> of
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/8dHefb78dL.svg">, that
+      is, if there is a subset
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/QYGvJ9ZjmI.svg"> of
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/Oqhmg8BnIn.svg"> such
+      that every element of
+      <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/BqRlGijkvY.svg"> can be
+      written in exactly one way as a product of finitely many elements of
+      <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/SBgCUnUpcK.svg"> and
+      their inverses (disregarding trivial variations such as
+      <!-- $s t=s u u^{-1} t$ --> <img style="transform: translateY(0.1em); background: white;"
+        src="assets/svg/C7FL0bS5Mk.svg"> ).
+    </p>
+    <p>It is worth researching since many 3-cycle formulas in a Rubik&#39;s cube can be written as commutators.</p>
+    <p>Currently, the time complexity of this algorithm is
+      <!-- $O(n^2)$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/UMMhXBMaRf.svg">.
+      It is still unknown if there is a faster algorithm or if this algorithm can detect all possible commutators.
+    </p>
+    <p>If you have a better algorithm, please let me know. Thank you.</p>
+    <p>Example 1:</p>
+    <pre><code><span class="hljs-symbol">Input:</span> s = <span class="hljs-string">"R U R' U'"</span>
+<span class="hljs-symbol">Output:</span> <span class="hljs-string">"[R,U]"</span>
+</code></pre>
+    <p>Example 2:</p>
+    <pre><code><span class="hljs-type">Input</span>: s = <span class="hljs-string">"a b c a' b' c'"</span>
+<span class="hljs-type">Output</span>: <span class="hljs-string">"[a b,c b]"</span>
+<span class="hljs-type">Explanation</span>: a b + c b + b' a' + b' c' = a b c a' b' c'.
+<span class="hljs-type">And</span> <span class="hljs-string">"[a c',c b]"</span> is also a valid answer.
+</code></pre>
+    <p>Example 3:</p>
+    <pre><code>Input: s = "D F<span class="hljs-string">' R U'</span> R<span class="hljs-string">' D'</span> R D U R<span class="hljs-string">' F R D'</span> R<span class="hljs-string">'"
+Output: "D:[F'</span> R U<span class="hljs-string">' R'</span>,D<span class="hljs-string">' R D R'</span>]"
+And "[D F<span class="hljs-string">' R U'</span> R<span class="hljs-string">' D'</span>,R D R<span class="hljs-string">' D'</span>]" is also a valid answer.
+</code></pre>
+    <p>Example 4:</p>
+    <pre><code>Input: s = "R<span class="hljs-string">' F'</span> R D<span class="hljs-string">' R D R2 F2 R2 D'</span> R<span class="hljs-string">' D R'</span> F<span class="hljs-string">' R"
+Output: "R'</span> F<span class="hljs-string">':[R D'</span> R D R2,F2]"
+</code></pre>
+    <p>Example 5:</p>
+    <pre><code><span class="hljs-symbol">Input:</span> s = <span class="hljs-string">"R U R'"</span>
+<span class="hljs-symbol">Output:</span> <span class="hljs-string">"Not found."</span>
+</code></pre>
+    <p>Constraints:</p>
+    <ul>
+      <li>s consist of only English letters.</li>
+    </ul>
+    </div>
+  </main>
+  <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/dist/js/prism.js"></script>
+</body>
+</html>

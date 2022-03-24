@@ -46,7 +46,7 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Home&nbsp;&nbsp;</a>
+            <a class="nav-link" href="index.html">&nbsp;&nbsp;Home&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="introduction.html">&nbsp;&nbsp;Introduction&nbsp;&nbsp;</a>
@@ -55,7 +55,7 @@
             <a class="nav-link" href="cube.html">&nbsp;&nbsp;Rubik's cube&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="free.html">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
+            <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="excel.html">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
@@ -78,32 +78,27 @@
       </div>
     </div>
   </nav>
-  <main class="flex-shrink-0">
-    <div class="container col-xxl-8 px-4 py-5">
-      <div class="row g-5 py-5 row-cols-1 row-cols-lg-2">
-        <div class="col order-last order-lg-first">
-          <h1 class="display-5 fw-bold lh-1 mb-3">Commutator</h1>
-          <h4 class="lead">Description</h4>
-          <ul class="fa-ul pt-2 checklist">
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for Rubik's cube algorithms.
-            </li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for free group algorithms.</li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for algorithms in an excel file.
-            </li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>...</li>
-          </ul>
-          <div>
-            <a type="button" class="btn btn-outline-dark btn-lg px-4 me-md-2" href="cube.html">Try It Out</a>
-          </div>
-        </div>
-        <div class="col">
-          <img src="assets/images/logo.png" class="img-fluid center-block d-block mx-auto" alt="Reverse Logo"
-            width="700" height="500">
-        </div>
+  <main class="container">
+    <h2 class="border-1">Decompose a free group algorithm in commutator notation.</h2>
+    <div class="col">
+      <br>
+      <input id="alg" type="text" style="width:1000px; height:50px; font-size: 30px;" class="form-control"
+        placeholder="Enter an algorithm" aria-label="Enter an algorithm">
+      <!-- <input type="text" style="width:500px; height:20px;" id="y" value="" /> -->
+      <br><br>
+      <button type="button" id="free" class="btn btn-danger">Decompose Me</button>
+      <div style="width:1000px; font-size: 30px;" class="alert alert-danger mt-5 invisible fade show" id="alert"
+        role="alert">
+        <!-- <h4 class="alert-heading">The commutator notation is as follows</h4>
+          <hr> -->
+        <!-- <h4 class="mb-0" id="result2"> -->
+        <!-- Insert message here -->
+        </p>
       </div>
     </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/dist/js/prism.js"></script>
+  <script src="assets/dist/js/free.js"></script>
 </body>
 </html>

@@ -26,12 +26,22 @@
         font-size: 3.5rem;
       }
     }
-  </style>
 
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .productInfo tr td {
+      border: 1px solid #ddd;
+      white-space: nowrap;
+      padding: 5px 10px;
+    }
+  </style>
 
   <!-- Custom styles for this template -->
   <link href="assets/dist/css/navbar-top-fixed.css" rel="stylesheet">
-
+  <script src="assets/dist/js/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -46,7 +56,7 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Home&nbsp;&nbsp;</a>
+            <a class="nav-link" href="index.html">&nbsp;&nbsp;Home&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="introduction.html">&nbsp;&nbsp;Introduction&nbsp;&nbsp;</a>
@@ -58,7 +68,7 @@
             <a class="nav-link" href="free.html">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="excel.html">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
+            <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="code.html">&nbsp;&nbsp;Source code&nbsp;&nbsp;</a>
@@ -78,32 +88,16 @@
       </div>
     </div>
   </nav>
-  <main class="flex-shrink-0">
-    <div class="container col-xxl-8 px-4 py-5">
-      <div class="row g-5 py-5 row-cols-1 row-cols-lg-2">
-        <div class="col order-last order-lg-first">
-          <h1 class="display-5 fw-bold lh-1 mb-3">Commutator</h1>
-          <h4 class="lead">Description</h4>
-          <ul class="fa-ul pt-2 checklist">
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for Rubik's cube algorithms.
-            </li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for free group algorithms.</li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>Decompose for algorithms in an excel file.
-            </li>
-            <li><span class="fa-li"><i class="fas fa-check-square"></i></span>...</li>
-          </ul>
-          <div>
-            <a type="button" class="btn btn-outline-dark btn-lg px-4 me-md-2" href="cube.html">Try It Out</a>
-          </div>
-        </div>
-        <div class="col">
-          <img src="assets/images/logo.png" class="img-fluid center-block d-block mx-auto" alt="Reverse Logo"
-            width="700" height="500">
-        </div>
+  <main class="container">
+    <h2 class="border-1">Decompose Rubik's cube algorithms in commutator notation.</h5>
+      <p>Input a excel file(*.xlsx), decompose all the algorithms in commutator notation.</p>
+      <p>Please download the input excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
+      <input type="file" id="upfile" />
+      <div id="out"></div>
       </div>
-    </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/dist/js/prism.js"></script>
+  <script src="assets/dist/js/excel.js"></script>
 </body>
 </html>
