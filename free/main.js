@@ -30,7 +30,7 @@ function commutator() {
         }
       }
     }
-    if (sum % 4 !== 0) {
+    if (sum !== 0) {
       document.getElementById("result1").innerHTML = "Not found.";
       return 0;
     }
