@@ -5,39 +5,6 @@ function commutator() {
   x = x.replace(/[‘]/g, "'");
   x = x.replace(/[’]/g, "'");
   x = x.replace(/ '/g, "'");
-  x = x.replace(/ 2/g, "2");
-  x = x.replace(/2'/g, "2");
-  x = x.replace(/'2/g, "2");
-  if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
-    x = x.replace(/r2/g, "R2 M2");
-    x = x.replace(/r'/g, "R' M");
-    x = x.replace(/r/g, "R M'");
-  }
-  if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
-    x = x.replace(/l2/g, "L2 M2");
-    x = x.replace(/l'/g, "L' M'");
-    x = x.replace(/l/g, "L M");
-  }
-  if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
-    x = x.replace(/f2/g, "F2 S2");
-    x = x.replace(/f'/g, "F' S'");
-    x = x.replace(/f/g, "F S");
-  }
-  if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
-    x = x.replace(/b2/g, "B2 S2");
-    x = x.replace(/b'/g, "B' S");
-    x = x.replace(/b/g, "B S'");
-  }
-  if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
-    x = x.replace(/u2/g, "U2 E2");
-    x = x.replace(/u'/g, "U' E");
-    x = x.replace(/u/g, "U E'");
-  }
-  if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
-    x = x.replace(/d2/g, "D2 E2");
-    x = x.replace(/d'/g, "D' E'");
-    x = x.replace(/d/g, "D E");
-  }
   var arr1 = simplify(x.split(" "));
   if (arr1.length == 0) {
     document.getElementById("result1").innerHTML = "Empty input.";
@@ -57,9 +24,6 @@ function commutator() {
         if (arr1[j].length == 1) {
           sum = sum + 1;
         } else {
-          if (arr1[j][1] == "2") {
-            sum = sum + 2;
-          }
           if (arr1[j][1] == "'") {
             sum = sum - 1;
           }
@@ -69,17 +33,6 @@ function commutator() {
     if (sum % 4 !== 0) {
       document.getElementById("result1").innerHTML = "Not found.";
       return 0;
-    }
-  }
-  //handle cases like R2 M2 E' R' U' R E R' U R' M2, and D R' F R D' R' D F' R  U' R' D' R U needs to be fixed.
-  if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
-    if (arr1[1][0] == arr1[arr1.length - 1][0]) {
-      arr1 = swaparr(arr1, 0, 1);
-    }
-  }
-  if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString())) > -1) {
-    if (arr1[arr1.length - 2][0] == arr1[0][0]) {
-      arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
     }
   }
   var text_output = commutatormain(arr1);
@@ -317,13 +270,6 @@ function conjugate(array) {
       minlen = len;
     }
   }
-  if (t > 0) {
-    if (arr[t - 1].length > 1) {
-      if (arr[t - 1][1].toString() == "2".toString()) {
-        return simplify(arr.concat().slice(0, t - 1).concat(inverse(arr.concat().slice(arr.length - t, arr.length - (t - 1)))));
-      }
-    }
-  } //For  R' U2 R' D R U R' D' R U R, output R' U':[U',R' D R] instead of R' U2:[R' D R,U]
   return arr.concat().slice(0, t);
 }
 
@@ -343,59 +289,7 @@ function inverse(array) {
 function simplifyfinal(array) {
   var arr = array.concat();
   arr = simplify(arr);
-  for (var i = 0; i < arr.length - 1; i++) {
-    if (arr[i][0].toString() == "D".toString() && arr[i + 1][0].toString() == "U".toString()) {
-      arr = swaparr(arr, i, i + 1);
-    }
-    if (arr[i][0].toString() == "B".toString() && arr[i + 1][0].toString() == "F".toString()) {
-      arr = swaparr(arr, i, i + 1);
-    }
-    if (arr[i][0].toString() == "L".toString() && arr[i + 1][0].toString() == "R".toString()) {
-      arr = swaparr(arr, i, i + 1);
-    }
-  }
-  var arr_out = arr.join(" ") + " "
-  arr_out = arr_out.replace(/R2 M2 /g, "r2 ");
-  arr_out = arr_out.replace(/R' M /g, "r' ");
-  arr_out = arr_out.replace(/R M' /g, "r ");
-  arr_out = arr_out.replace(/L2 M2 /g, "l2 ");
-  arr_out = arr_out.replace(/L' M' /g, "l' ");
-  arr_out = arr_out.replace(/L M /g, "l ");
-  arr_out = arr_out.replace(/F2 S2 /g, "f2 ");
-  arr_out = arr_out.replace(/F' S' /g, "f' ");
-  arr_out = arr_out.replace(/F S /g, "f ");
-  arr_out = arr_out.replace(/B2 S2 /g, "b2 ");
-  arr_out = arr_out.replace(/B' S /g, "b' ");
-  arr_out = arr_out.replace(/B S' /g, "b ");
-  arr_out = arr_out.replace(/U2 E2 /g, "u2 ");
-  arr_out = arr_out.replace(/U' E /g, "u' ");
-  arr_out = arr_out.replace(/U E' /g, "u ");
-  arr_out = arr_out.replace(/D2 E2 /g, "d2 ");
-  arr_out = arr_out.replace(/D' E' /g, "d' ");
-  arr_out = arr_out.replace(/D E /g, "d ");
-  arr_out = arr_out.replace(/M2 R2 /g, "r2 ");
-  arr_out = arr_out.replace(/M R' /g, "r' ");
-  arr_out = arr_out.replace(/M' R /g, "r ");
-  arr_out = arr_out.replace(/M2 L2 /g, "l2 ");
-  arr_out = arr_out.replace(/M' L' /g, "l' ");
-  arr_out = arr_out.replace(/M L /g, "l ");
-  arr_out = arr_out.replace(/S2 F2 /g, "f2 ");
-  arr_out = arr_out.replace(/S' F' /g, "f' ");
-  arr_out = arr_out.replace(/S F /g, "f ");
-  arr_out = arr_out.replace(/S2 B2 /g, "b2 ");
-  arr_out = arr_out.replace(/S B' /g, "b' ");
-  arr_out = arr_out.replace(/S' B /g, "b ");
-  arr_out = arr_out.replace(/E2 U2 /g, "u2 ");
-  arr_out = arr_out.replace(/E U' /g, "u' ");
-  arr_out = arr_out.replace(/E' U /g, "u ");
-  arr_out = arr_out.replace(/E2 D2 /g, "d2 ");
-  arr_out = arr_out.replace(/E' D' /g, "d' ");
-  arr_out = arr_out.replace(/E D /g, "d ");
-  arr_out = arr_out.replace(/R M2 /g, "r M' ");
-  arr_out = arr_out.replace(/R' M2 /g, "r' M ");
-  arr_out = arr_out.replace(/M2 R /g, "r M' ");
-  arr_out = arr_out.replace(/M2 R' /g, "r' M ");
-  arr_out = arr_out.substring(0, arr_out.length - 1);
+  var arr_out = arr.join(" ");
   return arr_out;
 }
 
@@ -420,42 +314,10 @@ function simple(array) {
       arr.splice(i, 2);
       break;
     }
-    if (combine_str(arr[i], arr[i + 1]).toString() == (arr[i][0] + "2").toString()) {
-      arr.splice(i + 2, 0, arr[i][0] + "2");
-      arr.splice(i, 2);
-      break;
-    }
     if (combine_str(arr[i], arr[i + 1]).toString() == (arr[i][0] + "'").toString()) {
       arr.splice(i + 2, 0, arr[i][0] + "'");
       arr.splice(i, 2);
       break;
-    }
-  }
-  for (i = 0; i < arr.length - 2; i++) {
-    if ("UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS".toString().indexOf((arr[i][0].toString() + arr[i + 1][0].toString())) > -1) {
-      if (combine_str(arr[i], arr[i + 2]).toString() == "".toString()) {
-        arr.splice(i + 2, 1);
-        arr.splice(i, 1);
-        break;
-      }
-      if (combine_str(arr[i], arr[i + 2]).toString() == (arr[i][0]).toString()) {
-        arr.splice(i + 3, 0, arr[i][0]);
-        arr.splice(i + 2, 1);
-        arr.splice(i, 1);
-        break;
-      }
-      if (combine_str(arr[i], arr[i + 2]).toString() == (arr[i][0] + "2").toString()) {
-        arr.splice(i + 3, 0, arr[i][0] + "2");
-        arr.splice(i + 2, 1);
-        arr.splice(i, 1);
-        break;
-      }
-      if (combine_str(arr[i], arr[i + 2]).toString() == (arr[i][0] + "'").toString()) {
-        arr.splice(i + 3, 0, arr[i][0] + "'");
-        arr.splice(i + 2, 1);
-        arr.splice(i, 1);
-        break;
-      }
     }
   }
   return arr;
@@ -466,13 +328,7 @@ function combine_str(str1, str2) {
   var len2 = str2.length;
   if (str1[0] == str2[0]) {
     if (len1 == 1) {
-      if (len2 == 1) {
-        return str1 + "2";
-      }
       if (len2 == 2) {
-        if (str2[1] == "2") {
-          return str1 + "'";
-        }
         if (str2[1] == "'") {
           return "";
         }
@@ -482,27 +338,6 @@ function combine_str(str1, str2) {
       if (str1[1] == "'") {
         if (len2 == 1) {
           return "";
-        }
-        if (len2 == 2) {
-          if (str2[1] == "2") {
-            return str1[0];
-          }
-          if (str2[1] == "'") {
-            return str1[0] + "2";
-          }
-        }
-      }
-      if (str1[1] == "2") {
-        if (len2 == 1) {
-          return str1[0] + "'";
-        }
-        if (len2 == 2) {
-          if (str2[1] == "2") {
-            return "";
-          }
-          if (str2[1] == "'") {
-            return str1[0];
-          }
         }
       }
     }
@@ -516,9 +351,6 @@ function inverse_str(str) {
     return str + "'";
   }
   if (len == 2) {
-    if (str[1] == "2") {
-      return str;
-    }
     if (str[1] == "'") {
       return str[0];
     }

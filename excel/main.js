@@ -104,8 +104,8 @@ function commutator(x) {
     x = x.replace(/d/g, "D E");
   }
   var arr1 = simplify(x.split(" "));
-  if (arr1.length <= 1) {
-    return "Invalid input.";
+  if (arr1.length == 0) {
+    return "Empty input.";
   }
   for (i = 0; i < arr1.length - 1; i++) {
     if (arr1[i].length > 2) {
