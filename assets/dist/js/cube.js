@@ -100,7 +100,7 @@ function commutator(x) {
         return "Not found.";
       } else {
         if (text_output.split('[').length - 1 == 3) {
-          return simplifyfinal(part3) + " " + text_output;
+          return simplifyfinal(part3.concat(text_output.split(':')[0].split(" "))) + ":[[" + text_output.split(':[[')[1];
         } else {
           return simplifyfinal(part3) + ":[" + text_output + "]";
         }

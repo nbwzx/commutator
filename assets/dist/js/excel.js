@@ -158,7 +158,7 @@ function commutator(x) {
         return "Not found.";
       } else {
         if (text_output.split('[').length - 1 == 3) {
-          return simplifyfinal(part3) + " " + text_output;
+          return simplifyfinal(part3.concat(text_output.split(':')[0].split(" "))) + ":[[" + text_output.split(':[[')[1];
         } else {
           return simplifyfinal(part3) + ":[" + text_output + "]";
         }
@@ -213,7 +213,6 @@ function commutatorpair(array) {
             }
             return text1;
           }
-          // }
         }
       }
     }
@@ -223,7 +222,6 @@ function commutatorpair(array) {
 }
 
 function commutatormain(array) {
-  // var x = String(document.getElementById("x").value);
   var arr1 = array.concat();
   var part3 = conjugate(arr1);
   var arr1 = simplify(inverse(part3.concat()).concat(arr1, part3));
@@ -278,8 +276,6 @@ function commutatormain(array) {
           part2 = party;
         }
       }
-      // text1=part1
-      // text2=part2
       var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
       var arr = simplify(arrex);
       var part1_out = simplifyfinal(part1);
@@ -291,7 +287,6 @@ function commutatormain(array) {
         if (part5.length > 0) {
           text1 = part5_out + ":[" + part1_out + "," + part2_out + "]";
         }
-        // text2 = "[t,i,j,k]=[" + part5.length.toString() + "," + i.toString() + "," + j.toString() + "," + k.toString() + "]"
         flag = 1;
         break;
       }
