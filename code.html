@@ -228,7 +228,7 @@
                   }
                   var partb1 = partb.split('[')[1].split(",")[0];
                   var partb2 = partb.split(',')[1].split("]")[0];
-                  realscore = partb1.length + partb2.length + Math.min(partb1.length, partb2.length) + realscore0
+                  realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
                   if (realscore < minscore) {
                     if (i_dis == 0) {
                       var output0b = ""
@@ -256,15 +256,25 @@
           if (output0b.toString() !== "".toString()) {
             var output0 = simplify(part3.concat(output0b));
           }
-          var output0x = "";
+          var output0x = "None";
           if (output0.toString() !== "".toString()) {
             output0x = simplify(output0.concat(inverse(outputb.concat())));
           }
-          if (output0x.length < output0.length && output0x.toString() !== "".toString()) {
+          if (output0x.length < output0.length && output0x.toString() !== "None".toString()) {
             if (output0x.toString() == "".toString()) {
               var text1 = outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "+" + "[" + outputa1 + "," + outputa2 + "]";
             } else {
-              var text1 = simplifyfinal(output0x) + ":[" + outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "+" + "[" + outputa1 + "," + outputa2 + "]" + "]";
+              var outputbarr0 = outputb0.split(':')[0].split(" ")
+              output0y = simplify(output0x.concat(outputbarr0));
+              if (output0y.length < output0x.length) {
+                if (output0y.toString() == "".toString()) {
+                  var text1 = "[" + outputb1 + "," + outputb2 + "]" + "+" + simplifyfinal(inverse(outputbarr0.concat())) + ":[" + outputa1 + "," + outputa2 + "]";
+                } else {
+                  var text1 = simplifyfinal(output0y) + ":[" + "[" + outputb1 + "," + outputb2 + "]" + "+" + simplifyfinal(inverse(outputbarr0.concat())) + ":[" + outputa1 + "," + outputa2 + "]" + "]";
+                }
+              } else {
+                var text1 = simplifyfinal(output0x) + ":[" + outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "+" + "[" + outputa1 + "," + outputa2 + "]" + "]";
+              }
             }
             return text1;
           } else {
