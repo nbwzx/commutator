@@ -111,6 +111,8 @@ function commutator(x) {
 
 function commutatorpair(array) {
   var arrtemp = array.concat();
+  var minscore = 10000
+  var pairoutput = ""
   for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
     if (4 > arrtemp.length) {
       return "Not found."
@@ -145,6 +147,7 @@ function commutatorpair(array) {
           var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
           var partb = commutatormain(arrb);
           if (partb.toString() !== "Not found.".toString()) {
+            var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
             var part1_out = simplifyfinal(part1);
             var part2_out = simplifyfinal(part2);
             var parta = "[" + part1_out + "," + part2_out + "]";
@@ -153,14 +156,24 @@ function commutatorpair(array) {
             } else {
               text1 = array.concat().slice(0, i_dis).join(" ") + ":[" + parta + "+" + partb + "]";
             }
-            return text1;
+            var partb1 = partb.split('[')[1].split(",")[0]
+            var partb2 = partb.split(',')[1].split("]")[0]
+            realscore = partb1.length + partb2.length + Math.min(partb1.length, partb2.length) + realscore0
+            if (realscore < minscore) {
+              pairoutput = text1
+              minscore = realscore;
+            }
           }
         }
       }
     }
     arrtemp = displace(arrtemp);
   }
-  return "Not found."
+  if (pairoutput.toString() == "".toString()) {
+    return "Not found.";
+  } else {
+    return pairoutput;
+  }
 }
 
 function commutatormain(array) {
