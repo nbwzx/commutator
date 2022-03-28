@@ -107,12 +107,9 @@ function commutatorpair(array, part3) {
     for (var count = 4; count <= arrtemp.length; count++) {
       var arr1 = arrtemp.concat().slice(0, count);
       var lenarr1 = arr1.length;
-      if (lenarr1 % 2 == 1) {
-        continue
-      }
-      for (var i = 1; i <= lenarr1 / 2 - 1; i++) {
+      for (var i = 1; i <= lenarr1 / 2; i++) {
         var str1 = arr1.concat().slice(0, i);
-        for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
+        for (var j = 1; j <= lenarr1 / 2; j++) {
           var str2 = arr1.concat().slice(i, i + j);
           var part1x = simplify(str1);
           var part2x = simplify(str2);
