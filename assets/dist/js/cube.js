@@ -237,12 +237,9 @@ function commutatormain(array) {
   var part5 = simplify(part3.concat(part4));
   var part5_out = simplifyfinal(part5);
   var lenarr1 = arr1.length;
-  if (lenarr1 % 2 == 1) {
-    return "Not found.";
-  }
-  for (var i = 1; i <= lenarr1 / 2 - 1; i++) {
+  for (var i = 1; i <= lenarr1 / 2; i++) {
     var str1 = arr1.concat().slice(0, i);
-    for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
+    for (var j = 1; j <= lenarr1 / 2; j++) {
       var str2 = arr1.concat().slice(i, i + j);
       var part1x = simplify(str1);
       var part2x = simplify(str2);
@@ -304,12 +301,9 @@ function displace(array) {
 function score(array) {
   var arr1 = array.concat();
   var lenarr1 = arr1.length;
-  if (lenarr1 % 2 == 1) {
-    return 1000;
-  }
-  for (i = 1; i <= lenarr1 / 2 - 1; i++) {
+  for (i = 1; i <= lenarr1 / 2; i++) {
     var str1 = arr1.concat().slice(0, i);
-    for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
+    for (var j = 1; j <= lenarr1 / 2; j++) {
       var str2 = arr1.concat().slice(i, i + j);
       var part1x = simplify(str1);
       var part2x = simplify(str2);
