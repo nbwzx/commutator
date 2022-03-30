@@ -65,6 +65,7 @@ function handleFile(e) {
 
 function commutator(x) {
   x = x.trim();
+  x = x.split("").join(" ");
   x = x.replace(/\s+/ig, " ");
   x = x.replace(/[‘]/g, "'");
   x = x.replace(/[’]/g, "'");
