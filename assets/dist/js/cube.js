@@ -36,10 +36,10 @@ function op_level(op) {
   if (op == '+') {
     return 0;
   }
-  if (op == ':') {
+  if (op == ',') {
     return 1;
   }
-  if (op == ',') {
+  if (op == ':') {
     return 2;
   }
   if (op == '[') {
