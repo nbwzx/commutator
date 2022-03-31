@@ -85,6 +85,8 @@
     <pre class="line-numbers"><code class="language-javascript">
       function expand() {
         var x = String(document.getElementById("alg").value);
+        x = x.replace(/\(/g, "[");
+        x = x.replace(/\)/g, "]");  
         x = x.replace(/]\[/g, "]+[");
         var expression = RPN(init_expression(x));
         if (expression == 'lack left' || expression == 'lack right') {

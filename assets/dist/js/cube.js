@@ -1,5 +1,7 @@
 function expand() {
   var x = String(document.getElementById("alg").value);
+  x = x.replace(/\(/g, "[");
+  x = x.replace(/\)/g, "]");  
   x = x.replace(/]\[/g, "]+[");
   var expression = RPN(init_expression(x));
   if (expression == 'lack left' || expression == 'lack right') {
@@ -114,12 +116,12 @@ function cal_two(i, j, sign) {
   switch (sign) {
     case '+':
       return simplifyfinal(arr1.concat(arr2));
-      break;    
+      break;
     case ':':
-      return simplifyfinal(arr1.concat(arr2,inverse(arr1.concat())));
+      return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat())));
       break;
     case ',':
-      return simplifyfinal(arr1.concat(arr2,inverse(arr1.concat()),inverse(arr2.concat())));
+      return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat()), inverse(arr2.concat())));
       break;
     default:
       return false;
@@ -186,7 +188,8 @@ function commutator(x) {
     return commutatorpair(arrex, part3);
   }
 }
-function preprocessing(x){
+
+function preprocessing(x) {
   x = x.trim();
   x = x.split("").join(" ");
   x = x.replace(/\s+/ig, " ");
@@ -228,6 +231,7 @@ function preprocessing(x){
   }
   return simplify(x.split(" "));
 }
+
 function commutatorpair(array, part3) {
   var arrtemp = array.concat();
   var minscore = 10000;
