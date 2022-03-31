@@ -1,7 +1,7 @@
 function expand() {
   var x = String(document.getElementById("alg").value);
   x = x.replace(/\(/g, "[");
-  x = x.replace(/\)/g, "]");  
+  x = x.replace(/\)/g, "]");
   x = x.replace(/]\[/g, "]+[");
   var expression = RPN(init_expression(x));
   if (expression == 'lack left' || expression == 'lack right') {
@@ -10,7 +10,7 @@ function expand() {
     document.getElementById("alert").classList.remove("invisible");
   } else {
     document.getElementById("alert").classList.add("invisible");
-    document.getElementById("alert").innerHTML = cal(expression);
+    document.getElementById("alert").innerHTML = simplifyfinal(preprocessing(cal(expression)));
     document.getElementById("alert").classList.remove("invisible");
   }
 }
@@ -167,18 +167,6 @@ function commutator(x) {
       return "Not found.";
     }
   }
-  //handle cases like R2 M2 E' R' U' R E R' U R' M2
-  var similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-  if (similarstr.toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
-    if (arr1[1][0] == arr1[arr1.length - 1][0]) {
-      arr1 = swaparr(arr1, 0, 1);
-    }
-  }
-  if (similarstr.toString().indexOf((arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString())) > -1) {
-    if (arr1[arr1.length - 2][0] == arr1[0][0]) {
-      arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
-    }
-  }
   var text_output = commutatormain(arr1);
   if (text_output.toString() !== "Not found.".toString()) {
     return text_output;
@@ -229,7 +217,22 @@ function preprocessing(x) {
     x = x.replace(/d'/g, "D' E'");
     x = x.replace(/d/g, "D E");
   }
-  return simplify(x.split(" "));
+  var arr1 = simplify(x.split(" "));
+  //handle cases like R2 M2 E' R' U' R E R' U R' M2
+  var similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
+  if (arr1.length > 1) {
+    if (similarstr.toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
+      if (arr1[1][0] == arr1[arr1.length - 1][0]) {
+        arr1 = swaparr(arr1, 0, 1);
+      }
+    }
+    if (similarstr.toString().indexOf((arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString())) > -1) {
+      if (arr1[arr1.length - 2][0] == arr1[0][0]) {
+        arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
+      }
+    }
+  }
+  return arr1;
 }
 
 function commutatorpair(array, part3) {
@@ -509,6 +512,9 @@ function inverse(array) {
 function simplifyfinal(array) {
   var arr = array.concat();
   arr = simplify(arr);
+  if (arr.length == 0) {
+    return "";
+  }
   for (var i = 0; i < arr.length - 1; i++) {
     if (arr[i][0].toString() == "D".toString() && arr[i + 1][0].toString() == "U".toString()) {
       arr = swaparr(arr, i, i + 1);
