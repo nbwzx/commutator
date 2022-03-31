@@ -12,6 +12,7 @@
   <!-- Bootstrap core CSS -->
   <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/dist/css/prism.css" rel="stylesheet">
+  <link rel="icon" href="assets/images/logo.ico" type="image/x-icon" />
   <style>
     .bd-placeholder-img {
       font-size: 1.125rem;
@@ -82,6 +83,135 @@
   <main class="container">
     <h2 class="border-1 border-bottom border-dark">The Source Code</h2>
     <pre class="line-numbers"><code class="language-javascript">
+      function expand() {
+        var x = String(document.getElementById("alg").value);
+        x = x.replace(/]\[/g, "]+[");
+        var expression = RPN(init_expression(x));
+        if (expression == 'lack left' || expression == 'lack right') {
+          document.getElementById("alert").classList.add("invisible");
+          document.getElementById("alert").innerHTML = expression;
+          document.getElementById("alert").classList.remove("invisible");
+        } else {
+          document.getElementById("alert").classList.add("invisible");
+          document.getElementById("alert").innerHTML = cal(expression);
+          document.getElementById("alert").classList.remove("invisible");
+        }
+      }
+      
+      function is_op(val) {
+        var op_string = '+:,[]';
+        return op_string.indexOf(val) > -1;
+      }
+      
+      function init_expression(expression) {
+        var expression = expression.replace(/\s/g, ''),
+          input_stack = [];
+        input_stack.push(expression[0]);
+        for (var i = 1; l = expression.length, i < l; i++) {
+          if (is_op(expression[i]) || is_op(input_stack.slice(-1))) {
+            input_stack.push(expression[i]);
+          } else {
+            input_stack.push(input_stack.pop() + expression[i]);
+          }
+        }
+        return input_stack;
+      }
+      
+      function op_level(op) {
+        if (op == '+') {
+          return 0;
+        }
+        if (op == ',') {
+          return 1;
+        }
+        if (op == ':') {
+          return 2;
+        }
+        if (op == '[') {
+          return 3;
+        }
+        if (op == ']') {
+          return 4;
+        }
+      }
+      
+      function RPN(input_stack) {
+        var out_stack = [],
+          op_stack = [],
+          match = false,
+          tmp_op;
+        while (input_stack.length > 0) {
+          var sign = input_stack.shift();
+          if (!is_op(sign)) {
+            out_stack.push(sign);
+          } else if (op_level(sign) == 4) {
+            match = false;
+            while (op_stack.length > 0) {
+              tmp_op = op_stack.pop();
+              if (tmp_op == '[') {
+                match = true;
+                break;
+              } else {
+                out_stack.push(tmp_op);
+              }
+            }
+            if (match == false) {
+              return 'lack left';
+            }
+          } else {
+            while (op_stack.length > 0 && op_stack.slice(-1) != '[' && op_level(sign) <= op_level(op_stack.slice(-1))) {
+              out_stack.push(op_stack.pop());
+            }
+            op_stack.push(sign);
+          }
+        }
+        while (op_stack.length > 0) {
+          var tmp_op = op_stack.pop();
+          if (tmp_op != '[') {
+            out_stack.push(tmp_op);
+          } else {
+            return 'lack right';
+          }
+        }
+        return out_stack;
+      }
+      
+      function cal(expression) {
+        var i, j,
+          RPN_exp = [],
+          ans;
+        while (expression.length > 0) {
+          var sign = expression.shift();
+          if (!is_op(sign)) {
+            RPN_exp.push(sign);
+          } else {
+            j = RPN_exp.pop();
+            i = RPN_exp.pop();
+            RPN_exp.push(cal_two(i, j, sign));
+          }
+        }
+        return RPN_exp[0];
+      }
+      
+      function cal_two(i, j, sign) {
+        var arr1 = preprocessing(i);
+        var arr2 = preprocessing(j);
+        switch (sign) {
+          case '+':
+            return simplifyfinal(arr1.concat(arr2));
+            break;
+          case ':':
+            return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat())));
+            break;
+          case ',':
+            return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat()), inverse(arr2.concat())));
+            break;
+          default:
+            return false;
+        }
+      }
+      
+      
       function cube() {
         var x = String(document.getElementById("alg").value);
         document.getElementById("alert").classList.add("invisible");
@@ -90,46 +220,7 @@
       }
       
       function commutator(x) {
-        x = x.trim();
-        x = x.split("").join(" ");
-        x = x.replace(/\s+/ig, " ");
-        x = x.replace(/[‘]/g, "'");
-        x = x.replace(/[’]/g, "'");
-        x = x.replace(/ '/g, "'");
-        x = x.replace(/ 2/g, "2");
-        x = x.replace(/2'/g, "2");
-        x = x.replace(/'2/g, "2");
-        if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
-          x = x.replace(/r2/g, "R2 M2");
-          x = x.replace(/r'/g, "R' M");
-          x = x.replace(/r/g, "R M'");
-        }
-        if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
-          x = x.replace(/l2/g, "L2 M2");
-          x = x.replace(/l'/g, "L' M'");
-          x = x.replace(/l/g, "L M");
-        }
-        if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
-          x = x.replace(/f2/g, "F2 S2");
-          x = x.replace(/f'/g, "F' S'");
-          x = x.replace(/f/g, "F S");
-        }
-        if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
-          x = x.replace(/b2/g, "B2 S2");
-          x = x.replace(/b'/g, "B' S");
-          x = x.replace(/b/g, "B S'");
-        }
-        if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
-          x = x.replace(/u2/g, "U2 E2");
-          x = x.replace(/u'/g, "U' E");
-          x = x.replace(/u/g, "U E'");
-        }
-        if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
-          x = x.replace(/d2/g, "D2 E2");
-          x = x.replace(/d'/g, "D' E'");
-          x = x.replace(/d/g, "D E");
-        }
-        var arr1 = simplify(x.split(" "));
+        var arr1 = preprocessing(x);
         if (arr1.length == 0) {
           return "Empty input.";
         }
@@ -179,6 +270,49 @@
           arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
           return commutatorpair(arrex, part3);
         }
+      }
+      
+      function preprocessing(x) {
+        x = x.trim();
+        x = x.split("").join(" ");
+        x = x.replace(/\s+/ig, " ");
+        x = x.replace(/[‘]/g, "'");
+        x = x.replace(/[’]/g, "'");
+        x = x.replace(/ '/g, "'");
+        x = x.replace(/ 2/g, "2");
+        x = x.replace(/2'/g, "2");
+        x = x.replace(/'2/g, "2");
+        if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
+          x = x.replace(/r2/g, "R2 M2");
+          x = x.replace(/r'/g, "R' M");
+          x = x.replace(/r/g, "R M'");
+        }
+        if (x.indexOf("L") > -1 || x.indexOf("M") > -1) {
+          x = x.replace(/l2/g, "L2 M2");
+          x = x.replace(/l'/g, "L' M'");
+          x = x.replace(/l/g, "L M");
+        }
+        if (x.indexOf("F") > -1 || x.indexOf("S") > -1) {
+          x = x.replace(/f2/g, "F2 S2");
+          x = x.replace(/f'/g, "F' S'");
+          x = x.replace(/f/g, "F S");
+        }
+        if (x.indexOf("B") > -1 || x.indexOf("S") > -1) {
+          x = x.replace(/b2/g, "B2 S2");
+          x = x.replace(/b'/g, "B' S");
+          x = x.replace(/b/g, "B S'");
+        }
+        if (x.indexOf("U") > -1 || x.indexOf("E") > -1) {
+          x = x.replace(/u2/g, "U2 E2");
+          x = x.replace(/u'/g, "U' E");
+          x = x.replace(/u/g, "U E'");
+        }
+        if (x.indexOf("D") > -1 || x.indexOf("E") > -1) {
+          x = x.replace(/d2/g, "D2 E2");
+          x = x.replace(/d'/g, "D' E'");
+          x = x.replace(/d/g, "D E");
+        }
+        return simplify(x.split(" "));
       }
       
       function commutatorpair(array, part3) {
@@ -647,6 +781,7 @@
       }
       
       document.getElementById("cube").addEventListener("click", cube);
+      document.getElementById("expand").addEventListener("click", expand);
     </code>
       </pre>
   </main>
