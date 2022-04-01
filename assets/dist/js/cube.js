@@ -4,7 +4,7 @@ function expand() {
   x = x.replace(/\)/g, "]");
   x = x.replace(/]\[/g, "]+[");
   var expression = RPN(init_expression(x));
-  if (expression == 'lack left' || expression == 'lack right') {
+  if (expression == 'Lack left parenthesis.' || expression == 'Lack right parenthesis.') {
     document.getElementById("alert").classList.add("invisible");
     document.getElementById("alert").innerHTML = expression;
     document.getElementById("alert").classList.remove("invisible");
@@ -73,7 +73,7 @@ function RPN(input_stack) {
         }
       }
       if (match == false) {
-        return 'lack left';
+        return 'Lack left parenthesis.';
       }
     } else {
       while (op_stack.length > 0 && op_stack.slice(-1) != '[' && op_level(sign) <= op_level(op_stack.slice(-1))) {
@@ -87,7 +87,7 @@ function RPN(input_stack) {
     if (tmp_op != '[') {
       out_stack.push(tmp_op);
     } else {
-      return 'lack right';
+      return 'Lack right parenthesis.';
     }
   }
   return out_stack;
