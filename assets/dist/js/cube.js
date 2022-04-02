@@ -1,5 +1,11 @@
 function expand() {
   var x = String(document.getElementById("alg").value);
+  if (x.toString()=="".toString()){
+    document.getElementById("alert").classList.add("invisible");
+    document.getElementById("alert").innerHTML = "Empty input.";
+    document.getElementById("alert").classList.remove("invisible");
+    return;
+  }
   x = x.replace(/\(/g, "[");
   x = x.replace(/\)/g, "]");
   x = x.replace(/]\[/g, "]+[");
@@ -111,8 +117,15 @@ function cal(expression) {
 }
 
 function cal_two(i, j, sign) {
-  var arr1 = preprocessing(i);
-  var arr2 = preprocessing(j);
+  var arr1 = [];
+  var arr2 = [];
+  if (i !== undefined) {
+    arr1 = preprocessing(i);
+  }
+  if (j !== undefined) {
+    arr2 = preprocessing(j);
+  }
+  console.log(arr1, arr2, sign)
   switch (sign) {
     case '+':
       return simplifyfinal(arr1.concat(arr2));
@@ -137,6 +150,9 @@ function cube() {
 }
 
 function commutator(x) {
+  if (x.toString()=="".toString()){
+    return "Empty input.";
+  }
   var arr1 = preprocessing(x);
   if (arr1.length == 0) {
     return "Empty input.";
