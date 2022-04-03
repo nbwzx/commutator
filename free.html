@@ -80,16 +80,17 @@
     </div>
   </nav>
   <main class="container">
+    <br>
     <h2 class="border-1">Decompose a free group algorithm in commutator notation.</h2>
     <div class="col">
       <br>
-      <input id="alg" type="text" style="width:1000px; height:50px; font-size: 30px;" class="form-control"
-        placeholder="Enter an algorithm" aria-label="Enter an algorithm">
+      <input id="alg" type="text"  class="form-control"
+        placeholder="Enter an algorithm" aria-label="Enter an algorithm" style="font-size: 30px;" onkeydown="this.onkeyup();">
       <!-- <input type="text" style="width:500px; height:20px;" id="y" value="" /> -->
       <br><br>
       <button type="button" id="free" class="btn btn-danger">Decompose Me</button>
-      <div style="width:1000px; font-size: 30px;" class="alert alert-danger mt-5 invisible fade show" id="alert"
-        role="alert">
+      <div style="font-size: 30px;" class="alert alert-danger mt-5 invisible fade show" id="alert"
+        role="alert" onkeydown="this.onkeyup();">
         <!-- <h4 class="alert-heading">The commutator notation is as follows</h4>
           <hr> -->
         <!-- <h4 class="mb-0" id="result2"> -->
