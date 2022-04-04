@@ -64,6 +64,50 @@ function handleFile(e) {
 }
 
 function commutator(x) {
+  if (x.toString() == "".toString()) {
+    return "Empty input.";
+  }
+  var arr1 = preprocessing(x);
+  if (arr1.length == 0) {
+    return "Empty input.";
+  }
+  for (i = 0; i < arr1.length - 1; i++) {
+    if (arr1[i].length > 2) {
+      return "Invalid input.";
+    }
+  }
+  var sum = 0;
+  for (var i = 0; i <= arr1.length - 1; i++) {
+    sum = 0;
+    for (j = 0; j <= arr1.length - 1; j++) {
+      if (arr1[i][0] == arr1[j][0]) {
+        if (arr1[j].length == 1) {
+          sum = sum + 1;
+        } else {
+          if (arr1[j][1] == "2") {
+            sum = sum + 2;
+          }
+          if (arr1[j][1] == "'") {
+            sum = sum - 1;
+          }
+        }
+      }
+    }
+    if (sum % 4 !== 0) {
+      return "Not found.";
+    }
+  }
+  var text_output = commutatormain(arr1);
+  if (text_output.toString() !== "Not found.".toString()) {
+    return text_output;
+  } else {
+    part3 = conjugate(arr1);
+    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+    return commutatorpair(arrex, part3);
+  }
+}
+
+function preprocessing(x) {
   x = x.trim();
   x = x.split("").join(" ");
   x = x.replace(/\s+/ig, " ");
@@ -104,117 +148,80 @@ function commutator(x) {
     x = x.replace(/d/g, "D E");
   }
   var arr1 = simplify(x.split(" "));
-  if (arr1.length == 0) {
-    return "Empty input.";
-  }
-  for (i = 0; i < arr1.length - 1; i++) {
-    if (arr1[i].length > 2) {
-      return "Invalid input.";
-    }
-  }
-  var sum = 0;
-  for (var i = 0; i <= arr1.length - 1; i++) {
-    sum = 0;
-    for (j = 0; j <= arr1.length - 1; j++) {
-      if (arr1[i][0] == arr1[j][0]) {
-        if (arr1[j].length == 1) {
-          sum = sum + 1;
-        } else {
-          if (arr1[j][1] == "2") {
-            sum = sum + 2;
-          }
-          if (arr1[j][1] == "'") {
-            sum = sum - 1;
-          }
-        }
-      }
-    }
-    if (sum % 4 !== 0) {
-      return "Not found.";
-    }
-  }
   //handle cases like R2 M2 E' R' U' R E R' U R' M2
   var similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-  if (similarstr.toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
-    if (arr1[1][0] == arr1[arr1.length - 1][0]) {
-      arr1 = swaparr(arr1, 0, 1);
+  if (arr1.length > 1) {
+    if (similarstr.toString().indexOf((arr1[0][0].toString() + arr1[1][0].toString())) > -1) {
+      if (arr1[1][0] == arr1[arr1.length - 1][0]) {
+        arr1 = swaparr(arr1, 0, 1);
+      }
+    }
+    if (similarstr.toString().indexOf((arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString())) > -1) {
+      if (arr1[arr1.length - 2][0] == arr1[0][0]) {
+        arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
+      }
     }
   }
-  if (similarstr.toString().indexOf((arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString())) > -1) {
-    if (arr1[arr1.length - 2][0] == arr1[0][0]) {
-      arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
-    }
-  }
-  var text_output = commutatormain(arr1);
-  if (text_output.toString() !== "Not found.".toString()) {
-    return text_output;
-  } else {
-    part3 = conjugate(arr1);
-    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-    return commutatorpair(arrex, part3);
-  }
+  return arr1;
 }
 
 function commutatorpair(array, part3) {
   var arrtemp = array.concat();
   var minscore = 10000;
   var outputa1 = "";
-  for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
-    if (4 > arrtemp.length) {
-      return "Not found."
-    }
-    for (var count = 4; count <= arrtemp.length; count++) {
-      var arr1 = arrtemp.concat().slice(0, count);
-      var lenarr1 = arr1.length;
-      for (var i = 1; i <= lenarr1 / 2; i++) {
-        var str1 = arr1.concat().slice(0, i);
-        for (var j = 1; j <= lenarr1 / 2; j++) {
-          var str2 = arr1.concat().slice(i, i + j);
-          var part1x = simplify(str1);
-          var part2x = simplify(str2);
-          var party = simplify(part2x.concat(part1x));
-          var part1 = part1x;
-          var part2 = part2x;
-          // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-          if (party.length < Math.max(part1x.length, part2x.length)) {
-            if (part1x.length <= part2x.length) {
-              part1 = part1x;
-              part2 = party;
-            } else {
-              part1 = inverse(part2x.concat());
-              part2 = party;
-            }
+  var lenarr1 = arrtemp.length;
+  if (4 > lenarr1) {
+    return "Not found."
+  }
+  for (var i_dis = 0; i_dis < lenarr1; i_dis++) {
+    for (var i = 1; i <= lenarr1 / 2; i++) {
+      var str1 = arrtemp.concat().slice(0, i);
+      for (var j = 1; j <= lenarr1 / 2; j++) {
+        var str2 = arrtemp.concat().slice(i, i + j);
+        var part1x = simplify(str1);
+        var part2x = simplify(str2);
+        var party = simplify(part2x.concat(part1x));
+        var part1 = part1x;
+        var part2 = part2x;
+        // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+        if (party.length < Math.max(part1x.length, part2x.length)) {
+          if (part1x.length <= part2x.length) {
+            part1 = part1x;
+            part2 = party;
+          } else {
+            part1 = inverse(part2x.concat());
+            part2 = party;
           }
-          var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          var arra = simplify(arrex);
-          var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
-          var partb = commutatormain(arrb);
-          if (partb.toString() !== "Not found.".toString()) {
-            var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
-            var parta1 = simplifyfinal(part1);
-            var parta2 = simplifyfinal(part2);
-            if (partb.toString().indexOf(":".toString()) > -1) {
-              var partb0 = partb.split(':')[0] + ":";
+        }
+        var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+        var arra = simplify(arrex);
+        var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+        var partb = commutatormain(arrb);
+        if (partb.toString() !== "Not found.".toString()) {
+          var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
+          var parta1 = simplifyfinal(part1);
+          var parta2 = simplifyfinal(part2);
+          if (partb.toString().indexOf(":".toString()) > -1) {
+            var partb0 = partb.split(':')[0] + ":";
+          } else {
+            var partb0 = "";
+          }
+          var partb1 = partb.split('[')[1].split(",")[0];
+          var partb2 = partb.split(',')[1].split("]")[0];
+          var realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
+          if (realscore < minscore) {
+            if (i_dis == 0) {
+              var output0b = "";
             } else {
-              var partb0 = "";
+              var output0b = array.concat().slice(0, i_dis);
             }
-            var partb1 = partb.split('[')[1].split(",")[0];
-            var partb2 = partb.split(',')[1].split("]")[0];
-            realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
-            if (realscore < minscore) {
-              if (i_dis == 0) {
-                var output0b = ""
-              } else {
-                var output0b = array.concat().slice(0, i_dis);
-              }
-              var outputb = arrb;
-              var outputb0 = partb0;
-              var outputa1 = parta1;
-              var outputa2 = parta2;
-              var outputb1 = partb1;
-              var outputb2 = partb2;
-              minscore = realscore;
-            }
+            var outputb = arrb;
+            var outputb0 = partb0;
+            var outputa1 = parta1;
+            var outputa2 = parta2;
+            var outputb1 = partb1;
+            var outputb2 = partb2;
+            minscore = realscore;
           }
         }
       }
@@ -268,9 +275,10 @@ function commutatormain(array) {
   var text1 = "";
   var minscore = 1000;
   var mini;
+  var realscore = 0;
   var arrtemp = arr1.concat();
   for (var i = 0; i < arrtemp.length; i++) {
-    score_temp = score(arrtemp.concat());
+    var score_temp = score(arrtemp.concat());
     if (i <= arrtemp.length / 2) {
       realscore = score_temp + i / 3; //penalty factor
     }
@@ -432,6 +440,9 @@ function inverse(array) {
 function simplifyfinal(array) {
   var arr = array.concat();
   arr = simplify(arr);
+  if (arr.length == 0) {
+    return "";
+  }
   for (var i = 0; i < arr.length - 1; i++) {
     if (arr[i][0].toString() == "D".toString() && arr[i + 1][0].toString() == "U".toString()) {
       arr = swaparr(arr, i, i + 1);

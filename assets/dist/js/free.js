@@ -6,13 +6,10 @@ function free() {
 }
 
 function commutator(x) {
-  x = x.trim();
-  x = x.split("").join(" ");
-  x = x.replace(/\s+/ig, " ");
-  x = x.replace(/[‘]/g, "'");
-  x = x.replace(/[’]/g, "'");
-  x = x.replace(/ '/g, "'");
-  var arr1 = simplify(x.split(" "));
+  if (x.toString() == "".toString()) {
+    return "Empty input.";
+  }
+  var arr1 = preprocessing(x);
   if (arr1.length == 0) {
     return "Empty input.";
   }
@@ -21,8 +18,8 @@ function commutator(x) {
       return "Invalid input.";
     }
   }
-  var sum;
-  for (i = 0; i <= arr1.length - 1; i++) {
+  var sum = 0;
+  for (var i = 0; i <= arr1.length - 1; i++) {
     sum = 0;
     for (j = 0; j <= arr1.length - 1; j++) {
       if (arr1[i][0] == arr1[j][0]) {
@@ -45,75 +42,121 @@ function commutator(x) {
   } else {
     part3 = conjugate(arr1);
     arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-    if (part3.length == 0) {
-      return commutatorpair(arrex);
-    } else {
-      text_output = commutatorpair(arrex);
-      if (text_output.toString() == "Not found.".toString()) {
-        return "Not found.";
-      } else {
-        if (text_output.split('[').length - 1 == 3) {
-          return simplifyfinal(part3) + " " + text_output;
-        } else {
-          return simplifyfinal(part3) + ":[" + text_output + "]";
-        }
-      }
-    }
+    return commutatorpair(arrex, part3);
   }
 }
 
-function commutatorpair(array) {
+function preprocessing(x) {
+  x = x.trim();
+  x = x.split("").join(" ");
+  x = x.replace(/\s+/ig, " ");
+  x = x.replace(/[‘]/g, "'");
+  x = x.replace(/[’]/g, "'");
+  x = x.replace(/ '/g, "'");
+  var arr1 = simplify(x.split(" "));
+  return arr1;
+}
+
+function commutatorpair(array, part3) {
   var arrtemp = array.concat();
-  for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
-    if (4 > arrtemp.length) {
-      return "Not found."
-    }
-    for (var count = 4; count <= arrtemp.length; count++) {
-      var arr1 = arrtemp.concat().slice(0, count);
-      var lenarr1 = arr1.length;
-      if (lenarr1 % 2 == 1) {
-        continue
-      }
-      for (var i = 1; i <= lenarr1 / 2 - 1; i++) {
-        var str1 = arr1.concat().slice(0, i);
-        for (var j = 1; j <= lenarr1 / 2 - 1; j++) {
-          var str2 = arr1.concat().slice(i, i + j);
-          var part1x = simplify(str1);
-          var part2x = simplify(str2);
-          var party = simplify(part2x.concat(part1x));
-          var part1 = part1x;
-          var part2 = part2x;
-          // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-          if (party.length < Math.max(part1x.length, part2x.length)) {
-            if (part1x.length <= part2x.length) {
-              part1 = part1x;
-              part2 = party;
-            } else {
-              part1 = inverse(part2x.concat());
-              part2 = party;
-            }
+  var minscore = 10000;
+  var outputa1 = "";
+  var lenarr1 = arrtemp.length;
+  if (lenarr1 < 4) {
+    return "Not found."
+  }
+  for (var i_dis = 0; i_dis < lenarr1; i_dis++) {
+    for (var i = 1; i <= lenarr1 / 2; i++) {
+      var str1 = arrtemp.concat().slice(0, i);
+      for (var j = 1; j <= lenarr1 / 2; j++) {
+        var str2 = arrtemp.concat().slice(i, i + j);
+        var part1x = simplify(str1);
+        var part2x = simplify(str2);
+        var party = simplify(part2x.concat(part1x));
+        var part1 = part1x;
+        var part2 = part2x;
+        // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+        if (party.length < Math.max(part1x.length, part2x.length)) {
+          if (part1x.length <= part2x.length) {
+            part1 = part1x;
+            part2 = party;
+          } else {
+            part1 = inverse(part2x.concat());
+            part2 = party;
           }
-          var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          var arra = simplify(arrex);
-          var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
-          var partb = commutatormain(arrb);
-          if (partb.toString() !== "Not found.".toString()) {
-            var part1_out = simplifyfinal(part1);
-            var part2_out = simplifyfinal(part2);
-            var parta = "[" + part1_out + "," + part2_out + "]";
+        }
+        var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+        var arra = simplify(arrex);
+        var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+        var partb = commutatormain(arrb);
+        if (partb.toString() !== "Not found.".toString()) {
+          var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
+          var parta1 = simplifyfinal(part1);
+          var parta2 = simplifyfinal(part2);
+          if (partb.toString().indexOf(":".toString()) > -1) {
+            var partb0 = partb.split(':')[0] + ":";
+          } else {
+            var partb0 = "";
+          }
+          var partb1 = partb.split('[')[1].split(",")[0];
+          var partb2 = partb.split(',')[1].split("]")[0];
+          var realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
+          if (realscore < minscore) {
             if (i_dis == 0) {
-              var text1 = parta + "+" + partb;
+              var output0b = "";
             } else {
-              text1 = array.concat().slice(0, i_dis).join(" ") + ":[" + parta + "+" + partb + "]";
+              var output0b = array.concat().slice(0, i_dis);
             }
-            return text1;
+            var outputb = arrb;
+            var outputb0 = partb0;
+            var outputa1 = parta1;
+            var outputa2 = parta2;
+            var outputb1 = partb1;
+            var outputb2 = partb2;
+            minscore = realscore;
           }
         }
       }
     }
     arrtemp = displace(arrtemp);
   }
-  return "Not found."
+  if (outputa1.toString() == "".toString()) {
+    return "Not found.";
+  } else {
+    var output0 = simplify(part3);
+    if (output0b.toString() !== "".toString()) {
+      var output0 = simplify(part3.concat(output0b));
+    }
+    var output0x = "None";
+    if (output0.toString() !== "".toString()) {
+      output0x = simplify(output0.concat(inverse(outputb.concat())));
+    }
+    if (output0x.length < output0.length && output0x.toString() !== "None".toString()) {
+      if (output0x.toString() == "".toString()) {
+        var text1 = outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "+" + "[" + outputa1 + "," + outputa2 + "]";
+      } else {
+        var outputbarr0 = outputb0.split(':')[0].split(" ")
+        output0y = simplify(output0x.concat(outputbarr0));
+        if (output0y.length < output0x.length) {
+          if (output0y.toString() == "".toString()) {
+            var text1 = "[" + outputb1 + "," + outputb2 + "]" + "+" + simplifyfinal(inverse(outputbarr0.concat())) + ":[" + outputa1 + "," + outputa2 + "]";
+          } else {
+            var text1 = simplifyfinal(output0y) + ":[" + "[" + outputb1 + "," + outputb2 + "]" + "+" + simplifyfinal(inverse(outputbarr0.concat())) + ":[" + outputa1 + "," + outputa2 + "]" + "]";
+          }
+        } else {
+          var text1 = simplifyfinal(output0x) + ":[" + outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "+" + "[" + outputa1 + "," + outputa2 + "]" + "]";
+        }
+      }
+      return text1;
+    } else {
+      if (output0.toString() == "".toString()) {
+        var text1 = "[" + outputa1 + "," + outputa2 + "]" + "+" + outputb0 + "[" + outputb1 + "," + outputb2 + "]";
+      } else {
+        var text1 = simplifyfinal(output0) + ":[" + "[" + outputa1 + "," + outputa2 + "]" + "+" + outputb0 + "[" + outputb1 + "," + outputb2 + "]" + "]";
+      }
+      return text1;
+    }
+  }
 }
 
 function commutatormain(array) {
@@ -124,9 +167,10 @@ function commutatormain(array) {
   var text1 = "";
   var minscore = 1000;
   var mini;
+  var realscore = 0;
   var arrtemp = arr1.concat();
   for (var i = 0; i < arrtemp.length; i++) {
-    score_temp = score(arrtemp.concat());
+    var score_temp = score(arrtemp.concat());
     if (i <= arrtemp.length / 2) {
       realscore = score_temp + i / 3; //penalty factor
     }
@@ -216,9 +260,6 @@ function displace(array) {
 function score(array) {
   var arr1 = array.concat();
   var lenarr1 = arr1.length;
-  if (lenarr1 % 2 == 1) {
-    return 1000;
-  }
   for (i = 1; i <= lenarr1 / 2 - 1; i++) {
     var str1 = arr1.concat().slice(0, i);
     for (var j = 1; j <= lenarr1 / 2 - 1; j++) {

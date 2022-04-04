@@ -1,6 +1,6 @@
 function expand() {
   var x = String(document.getElementById("alg").value);
-  if (x.toString()=="".toString()){
+  if (x.toString() == "".toString()) {
     document.getElementById("alert").classList.add("invisible");
     document.getElementById("alert").innerHTML = "Empty input.";
     document.getElementById("alert").classList.remove("invisible");
@@ -101,8 +101,7 @@ function RPN(input_stack) {
 
 function cal(expression) {
   var i, j,
-    RPN_exp = [],
-    ans;
+    RPN_exp = [];
   while (expression.length > 0) {
     var sign = expression.shift();
     if (!is_op(sign)) {
@@ -125,17 +124,13 @@ function cal_two(i, j, sign) {
   if (j !== undefined) {
     arr2 = preprocessing(j);
   }
-  console.log(arr1, arr2, sign)
   switch (sign) {
     case '+':
       return simplifyfinal(arr1.concat(arr2));
-      break;
     case ':':
       return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat())));
-      break;
     case ',':
       return simplifyfinal(arr1.concat(arr2, inverse(arr1.concat()), inverse(arr2.concat())));
-      break;
     default:
       return false;
   }
@@ -150,7 +145,7 @@ function cube() {
 }
 
 function commutator(x) {
-  if (x.toString()=="".toString()){
+  if (x.toString() == "".toString()) {
     return "Empty input.";
   }
   var arr1 = preprocessing(x);
@@ -255,62 +250,59 @@ function commutatorpair(array, part3) {
   var arrtemp = array.concat();
   var minscore = 10000;
   var outputa1 = "";
-  for (var i_dis = 0; i_dis <= arrtemp.length; i_dis++) {
-    if (4 > arrtemp.length) {
-      return "Not found."
-    }
-    for (var count = 4; count <= arrtemp.length; count++) {
-      var arr1 = arrtemp.concat().slice(0, count);
-      var lenarr1 = arr1.length;
-      for (var i = 1; i <= lenarr1 / 2; i++) {
-        var str1 = arr1.concat().slice(0, i);
-        for (var j = 1; j <= lenarr1 / 2; j++) {
-          var str2 = arr1.concat().slice(i, i + j);
-          var part1x = simplify(str1);
-          var part2x = simplify(str2);
-          var party = simplify(part2x.concat(part1x));
-          var part1 = part1x;
-          var part2 = part2x;
-          // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-          if (party.length < Math.max(part1x.length, part2x.length)) {
-            if (part1x.length <= part2x.length) {
-              part1 = part1x;
-              part2 = party;
-            } else {
-              part1 = inverse(part2x.concat());
-              part2 = party;
-            }
+  var lenarr1 = arrtemp.length;
+  if (lenarr1 < 4) {
+    return "Not found."
+  }
+  for (var i_dis = 0; i_dis < lenarr1; i_dis++) {
+    for (var i = 1; i <= lenarr1 / 2; i++) {
+      var str1 = arrtemp.concat().slice(0, i);
+      for (var j = 1; j <= lenarr1 / 2; j++) {
+        var str2 = arrtemp.concat().slice(i, i + j);
+        var part1x = simplify(str1);
+        var part2x = simplify(str2);
+        var party = simplify(part2x.concat(part1x));
+        var part1 = part1x;
+        var part2 = part2x;
+        // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+        if (party.length < Math.max(part1x.length, part2x.length)) {
+          if (part1x.length <= part2x.length) {
+            part1 = part1x;
+            part2 = party;
+          } else {
+            part1 = inverse(part2x.concat());
+            part2 = party;
           }
-          var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
-          var arra = simplify(arrex);
-          var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
-          var partb = commutatormain(arrb);
-          if (partb.toString() !== "Not found.".toString()) {
-            var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
-            var parta1 = simplifyfinal(part1);
-            var parta2 = simplifyfinal(part2);
-            if (partb.toString().indexOf(":".toString()) > -1) {
-              var partb0 = partb.split(':')[0] + ":";
+        }
+        var arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat()));
+        var arra = simplify(arrex);
+        var arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+        var partb = commutatormain(arrb);
+        if (partb.toString() !== "Not found.".toString()) {
+          var realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length)
+          var parta1 = simplifyfinal(part1);
+          var parta2 = simplifyfinal(part2);
+          if (partb.toString().indexOf(":".toString()) > -1) {
+            var partb0 = partb.split(':')[0] + ":";
+          } else {
+            var partb0 = "";
+          }
+          var partb1 = partb.split('[')[1].split(",")[0];
+          var partb2 = partb.split(',')[1].split("]")[0];
+          var realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
+          if (realscore < minscore) {
+            if (i_dis == 0) {
+              var output0b = "";
             } else {
-              var partb0 = "";
+              var output0b = array.concat().slice(0, i_dis);
             }
-            var partb1 = partb.split('[')[1].split(",")[0];
-            var partb2 = partb.split(',')[1].split("]")[0];
-            realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
-            if (realscore < minscore) {
-              if (i_dis == 0) {
-                var output0b = ""
-              } else {
-                var output0b = array.concat().slice(0, i_dis);
-              }
-              var outputb = arrb;
-              var outputb0 = partb0;
-              var outputa1 = parta1;
-              var outputa2 = parta2;
-              var outputb1 = partb1;
-              var outputb2 = partb2;
-              minscore = realscore;
-            }
+            var outputb = arrb;
+            var outputb0 = partb0;
+            var outputa1 = parta1;
+            var outputa2 = parta2;
+            var outputb1 = partb1;
+            var outputb2 = partb2;
+            minscore = realscore;
           }
         }
       }
@@ -364,9 +356,10 @@ function commutatormain(array) {
   var text1 = "";
   var minscore = 1000;
   var mini;
+  var realscore = 0;
   var arrtemp = arr1.concat();
   for (var i = 0; i < arrtemp.length; i++) {
-    score_temp = score(arrtemp.concat());
+    var score_temp = score(arrtemp.concat());
     if (i <= arrtemp.length / 2) {
       realscore = score_temp + i / 3; //penalty factor
     }
