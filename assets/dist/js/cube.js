@@ -86,7 +86,7 @@ function rpn(inputStack) {
                 return "Lack left parenthesis.";
             }
         } else {
-            while (operatorStack.length > 0 && operatorStack.slice(-1) !== "[" && operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1))) {
+            while (operatorStack.length > 0 && operatorStack.slice(-1).toString() !== "[".toString() && operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1))) {
                 outputStack.push(operatorStack.pop());
             }
             operatorStack.push(sign);
