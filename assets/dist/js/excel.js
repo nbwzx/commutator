@@ -102,12 +102,21 @@ function commutator(x) {
   }
   const textOutput = commutatormain(arr1);
   if (textOutput.toString() !== "Not found.".toString()) {
-    return textOutput;
+      return OuterBracket(textOutput);
   }
   const part3 = conjugate(arr1),
-    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-  return commutatorpair(arrex, part3);
+      arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+  return OuterBracket(commutatorpair(arrex, part3));
+}
 
+function OuterBracket(str) {
+  if (document.getElementById("settingsOuterBracket").checked === false) {
+      return str;
+  }
+  if ((str.charAt(0) == "[" && str.charAt(str.length - 1) == "]") || str.toString() === "Not found.".toString()) {
+      return str;
+  }
+  return `[${str}]`;
 }
 
 function preprocessing(algValue) {
