@@ -140,7 +140,6 @@ function calculateTwo(i, j, sign) {
     }
 }
 
-
 function cube() {
     const algValue = String(document.getElementById("alg").value);
     document.getElementById("alert").classList.add("invisible");
@@ -185,21 +184,11 @@ function commutator(x) {
     }
     const textOutput = commutatormain(arr1);
     if (textOutput.toString() !== "Not found.".toString()) {
-        return OuterBracket(textOutput);
+        return textOutput;
     }
     const part3 = conjugate(arr1),
         arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-    return OuterBracket(commutatorpair(arrex, part3));
-}
-
-function OuterBracket(str) {
-    if (document.getElementById("settingsOuterBracket").checked === false) {
-        return str;
-    }
-    if ((str.charAt(0) == "[" && str.charAt(str.length - 1) == "]") || str.toString() === "Not found.".toString()) {
-        return str;
-    }
-    return `[${str}]`;
+    return commutatorpair(arrex, part3);
 }
 
 function preprocessing(algValue) {
@@ -273,7 +262,9 @@ function commutatorpair(array, part3) {
         outputa2 = "",
         outputb1 = "",
         outputb2 = "",
-        text1 = "";
+        text1 = "",
+        commutator1 = "",
+        commutator2 = "";
     const lenarr1 = arrtemp.length;
     if (lenarr1 < 4) {
         return "Not found.";
@@ -300,14 +291,17 @@ function commutatorpair(array, part3) {
                 }
                 const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
                     arra = simplify(arrex),
-                    arrb = simplify(inverse(arra.concat()).concat(arrtemp)),
-                    partb = commutatormain(arrb);
+                    arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+                let partb = commutatormain(arrb);
                 if (partb.toString() !== "Not found.".toString()) {
                     const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
                         parta1 = simplifyfinal(part1),
                         parta2 = simplifyfinal(part2);
+                    if (partb.split("[").length === 3) {
+                        partb = partb.substring(1, partb.length - 1);
+                    }
                     if (partb.toString().indexOf(":".toString()) > -1) {
-                        partb0 = `${partb.split(":")[0]}:`;
+                        partb0 = partb.split(":")[0];
                     } else {
                         partb0 = "";
                     }
@@ -347,28 +341,41 @@ function commutatorpair(array, part3) {
     }
     if (output0x.length < output0.length && output0x.toString() !== "None".toString()) {
         if (output0x.toString() === "".toString()) {
-            text1 = `${outputb0}[${outputb1},${outputb2}]+[${outputa1},${outputa2}]`;
+            commutator1 = singleOutput(outputb0, outputb1, outputb2);
+            commutator2 = singleOutput("", outputa1, outputa2);
+            text1 = twoOutput("".commutator1, commutator2);
         } else {
             const outputbarr0 = outputb0.split(":")[0].split(" "),
                 output0y = simplify(output0x.concat(outputbarr0));
             if (output0y.length < output0x.length) {
-                if (output0y.toString() === "".toString()) {
-                    text1 = `[${outputb1},${outputb2}]+${simplifyfinal(inverse(outputbarr0.concat()))}:[${outputa1},${outputa2}]`;
-                } else {
-                    text1 = `${simplifyfinal(output0y)}:[[${outputb1},${outputb2}]+${simplifyfinal(inverse(outputbarr0.concat()))}:[${outputa1},${outputa2}]]`;
-                }
+                commutator1 = singleOutput("", outputb1, outputb2);
+                commutator2 = singleOutput(simplifyfinal(inverse(outputbarr0.concat())), outputa1, outputa2);
+                text1 = twoOutput(simplifyfinal(output0y), commutator1, commutator2);
             } else {
-                text1 = `${simplifyfinal(output0x)}:[${outputb0}[${outputb1},${outputb2}]+[${outputa1},${outputa2}]]`;
+                commutator1 = singleOutput(outputb0, outputb1, outputb2);
+                commutator2 = singleOutput("", outputa1, outputa2);
+                text1 = twoOutput(simplifyfinal(output0x), commutator1, commutator2);
             }
         }
         return text1;
     }
-    if (output0.toString() === "".toString()) {
-        text1 = `[${outputa1},${outputa2}]+${outputb0}[${outputb1},${outputb2}]`;
-    } else {
-        text1 = `${simplifyfinal(output0)}:[[${outputa1},${outputa2}]+${outputb0}[${outputb1},${outputb2}]]`;
-    }
+    commutator1 = singleOutput("", outputa1, outputa2);
+    commutator2 = singleOutput(outputb0, outputb1, outputb2);
+    text1 = twoOutput(simplifyfinal(output0), commutator1, commutator2);
     return text1;
+}
+
+function twoOutput(setup, commutator1, commutator2) {
+    if (document.getElementById("settingsOuterBracket").checked === false) {
+        if (setup === "") {
+            return `${commutator1}+${commutator2}`;
+        }
+        return `${setup}:[${commutator1}+${commutator2}]`;
+    }
+    if (setup === "") {
+        return `[${commutator1}${commutator2}]`;
+    }
+    return `[${setup}:[${commutator1}${commutator2}]]`;
 }
 
 function commutatormain(array) {
@@ -429,19 +436,30 @@ function commutatormain(array) {
                 part1Output = simplifyfinal(part1),
                 part2Output = simplifyfinal(part2);
             if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
-                if (part5.length === 0) {
-                    return `[${part1Output},${part2Output}]`;
-                }
-                if (part5.length > 0) {
-                    return `${part5Output}:[${part1Output},${part2Output}]`;
-                }
+                return singleOutput(part5Output, part1Output, part2Output);
             }
         }
     }
     return "Not found.";
 }
-// R2 D R U' R D' R' U R D R' U R' D' R U' R
 
+function singleOutput(setup, commutatora, commutatorb) {
+    if (document.getElementById("settingsOuterBracket").checked === false) {
+        if (setup === "") {
+            return `[${commutatora},${commutatorb}]`;
+        }
+        return `${setup}:[${commutatora},${commutatorb}]`;
+
+    }
+    if (setup === "") {
+        return `[${commutatora},${commutatorb}]`;
+    }
+    return `[${setup}:[${commutatora},${commutatorb}]]`;
+
+
+}
+
+// R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
     const arr = array.concat(),
         arr1 = arr.concat().slice(0, 1),

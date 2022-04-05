@@ -3,7 +3,6 @@ function setCookie(cname, cvalue, exdays) {
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toGMTString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";";
-    console.log(document.cookie)
 }
 
 function getCookie(cname) {
@@ -31,8 +30,7 @@ window.onload = function loadCookie() {
 function changeCookie() {
     if (byid("settingsOuterBracket").checked === true) {
         setCookie("settingsOuterBracket", "true", 30);
-    }
-    else {
+    } else {
         setCookie("settingsOuterBracket", "", -1);
     }
 }
