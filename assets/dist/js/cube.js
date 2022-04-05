@@ -43,13 +43,13 @@ function initializeExperssion(expressionOrigin) {
 }
 
 function operatorLevel(operator) {
-    if (operator === "+") {
+    if (operator === ",") {
         return 0;
     }
-    if (operator === ",") {
+    if (operator === ":") {
         return 1;
     }
-    if (operator === ":") {
+    if (operator === "+") {
         return 2;
     }
     if (operator === "[") {
