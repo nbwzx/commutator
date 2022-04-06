@@ -242,12 +242,7 @@ function commutatormain(array) {
                 part1Output = simplifyfinal(part1),
                 part2Output = simplifyfinal(part2);
             if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
-                if (part5.length === 0) {
-                    return `[${part1Output},${part2Output}]`;
-                }
-                if (part5.length > 0) {
-                    return `${part5Output}:[${part1Output},${part2Output}]`;
-                }
+                return singleOutput(part5Output, part1Output, part2Output);
             }
         }
     }
