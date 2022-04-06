@@ -182,7 +182,7 @@ function twoOutput(setup, commutator1, commutator2) {
     if (setup === "") {
         return `[${commutator1}${commutator2}]`;
     }
-    return `[${setup}:[${commutator1}${commutator2}]]`;
+    return `[${setup}:${commutator1}${commutator2}]`;
 }
 
 function commutatormain(array) {
