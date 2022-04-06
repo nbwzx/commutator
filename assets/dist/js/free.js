@@ -8,7 +8,6 @@ function free() {
 }
 
 function commutator(x) {
-    const order = 1;
     if (x.toString() === "".toString()) {
         return "Empty input.";
     }
@@ -33,7 +32,7 @@ function commutator(x) {
                 }
             }
         }
-        if (sum % order !== 0) {
+        if (sum !== 0) {
             return "Not found.";
         }
     }
