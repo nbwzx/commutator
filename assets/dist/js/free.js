@@ -141,30 +141,6 @@ function commutatorpair(array, part3) {
     if (output0b.toString() !== "".toString()) {
         output0 = simplify(part3.concat(output0b));
     }
-    let output0x = "None";
-    if (output0.toString() !== "".toString()) {
-        output0x = simplify(output0.concat(inverse(outputb.concat())));
-    }
-    if (output0x.length < output0.length && output0x.toString() !== "None".toString()) {
-        if (output0x.toString() === "".toString()) {
-            commutator1 = singleOutput(outputb0, outputb1, outputb2);
-            commutator2 = singleOutput("", outputa1, outputa2);
-            text1 = twoOutput("".commutator1, commutator2);
-        } else {
-            const outputbarr0 = outputb0.split(":")[0].split(" "),
-                output0y = simplify(output0x.concat(outputbarr0));
-            if (output0y.length < output0x.length) {
-                commutator1 = singleOutput("", outputb1, outputb2);
-                commutator2 = singleOutput(simplifyfinal(inverse(outputbarr0.concat())), outputa1, outputa2);
-                text1 = twoOutput(simplifyfinal(output0y), commutator1, commutator2);
-            } else {
-                commutator1 = singleOutput(outputb0, outputb1, outputb2);
-                commutator2 = singleOutput("", outputa1, outputa2);
-                text1 = twoOutput(simplifyfinal(output0x), commutator1, commutator2);
-            }
-        }
-        return text1;
-    }
     commutator1 = singleOutput("", outputa1, outputa2);
     commutator2 = singleOutput(outputb0, outputb1, outputb2);
     text1 = twoOutput(simplifyfinal(output0), commutator1, commutator2);

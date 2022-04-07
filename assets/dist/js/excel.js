@@ -191,55 +191,57 @@ function commutatorpair(array, part3) {
         for (let i = 1; i <= lenarr1 / 2; i++) {
             const str1 = arrtemp.concat().slice(0, i);
             for (let j = 1; j <= lenarr1 / 2; j++) {
-                const str2 = arrtemp.concat().slice(i, i + j),
-                    part1x = simplify(str1),
-                    part2x = simplify(str2),
-                    party = simplify(part2x.concat(part1x));
-                let part1 = part1x,
-                    part2 = part2x;
-                // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-                if (party.length < Math.max(part1x.length, part2x.length)) {
-                    if (part1x.length <= part2x.length) {
-                        part1 = part1x;
-                        part2 = party;
-                    } else {
-                        part1 = inverse(part2x.concat());
-                        part2 = party;
-                    }
-                }
-                const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
-                    arra = simplify(arrex),
-                    arrb = simplify(inverse(arra.concat()).concat(arrtemp));
-                let partb = commutatormain(arrb);
-                if (partb.toString() !== "Not found.".toString()) {
-                    const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
-                        parta1 = simplifyfinal(part1),
-                        parta2 = simplifyfinal(part2);
-                    if (partb.split("[").length === 3) {
-                        partb = partb.substring(1, partb.length - 1);
-                    }
-                    if (partb.toString().indexOf(":".toString()) > -1) {
-                        partb0 = partb.split(":")[0];
-                    } else {
-                        partb0 = "";
-                    }
-                    const partb1 = partb.split("[")[1].split(",")[0],
-                        partb2 = partb.split(",")[1].split("]")[0],
-                        realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
-                    if (realscore < minscore) {
-                        if (displaceIndex === 0) {
-                            output0b = "";
+                for (let k = 1; k <= 3; k++) {
+                    const str2 = repeatEnd(arrtemp.concat().slice(i, i + j), k),
+                        part1x = simplify(str1),
+                        part2x = simplify(str2),
+                        party = simplify(part2x.concat(part1x));
+                    let part1 = part1x,
+                        part2 = part2x;
+                    // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+                    if (party.length < Math.max(part1x.length, part2x.length)) {
+                        if (part1x.length <= part2x.length) {
+                            part1 = part1x;
+                            part2 = party;
                         } else {
-                            output0b = array.concat().slice(0, displaceIndex);
+                            part1 = inverse(part2x.concat());
+                            part2 = party;
                         }
-                        outputb = arrb;
-                        outputb0 = partb0;
-                        outputa1 = parta1;
-                        outputa2 = parta2;
-                        outputb1 = partb1;
-                        outputb2 = partb2;
-                        temp = 1;
-                        minscore = realscore;
+                    }
+                    const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+                        arra = simplify(arrex),
+                        arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+                    let partb = commutatormain(arrb);
+                    if (partb.toString() !== "Not found.".toString()) {
+                        const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
+                            parta1 = simplifyfinal(part1),
+                            parta2 = simplifyfinal(part2);
+                        if (partb.split("[").length === 3) {
+                            partb = partb.substring(1, partb.length - 1);
+                        }
+                        if (partb.toString().indexOf(":".toString()) > -1) {
+                            partb0 = partb.split(":")[0];
+                        } else {
+                            partb0 = "";
+                        }
+                        const partb1 = partb.split("[")[1].split(",")[0],
+                            partb2 = partb.split(",")[1].split("]")[0],
+                            realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
+                        if (realscore < minscore) {
+                            if (displaceIndex === 0) {
+                                output0b = "";
+                            } else {
+                                output0b = array.concat().slice(0, displaceIndex);
+                            }
+                            outputb = arrb;
+                            outputb0 = partb0;
+                            outputa1 = parta1;
+                            outputa2 = parta2;
+                            outputb1 = partb1;
+                            outputb2 = partb2;
+                            temp = 1;
+                            minscore = realscore;
+                        }
                     }
                 }
             }
@@ -252,30 +254,6 @@ function commutatorpair(array, part3) {
     let output0 = simplify(part3);
     if (output0b.toString() !== "".toString()) {
         output0 = simplify(part3.concat(output0b));
-    }
-    let output0x = "None";
-    if (output0.toString() !== "".toString()) {
-        output0x = simplify(output0.concat(inverse(outputb.concat())));
-    }
-    if (output0x.length < output0.length && output0x.toString() !== "None".toString()) {
-        if (output0x.toString() === "".toString()) {
-            commutator1 = singleOutput(outputb0, outputb1, outputb2);
-            commutator2 = singleOutput("", outputa1, outputa2);
-            text1 = twoOutput("".commutator1, commutator2);
-        } else {
-            const outputbarr0 = outputb0.split(":")[0].split(" "),
-                output0y = simplify(output0x.concat(outputbarr0));
-            if (output0y.length < output0x.length) {
-                commutator1 = singleOutput("", outputb1, outputb2);
-                commutator2 = singleOutput(simplifyfinal(inverse(outputbarr0.concat())), outputa1, outputa2);
-                text1 = twoOutput(simplifyfinal(output0y), commutator1, commutator2);
-            } else {
-                commutator1 = singleOutput(outputb0, outputb1, outputb2);
-                commutator2 = singleOutput("", outputa1, outputa2);
-                text1 = twoOutput(simplifyfinal(output0x), commutator1, commutator2);
-            }
-        }
-        return text1;
     }
     commutator1 = singleOutput("", outputa1, outputa2);
     commutator2 = singleOutput(outputb0, outputb1, outputb2);
@@ -333,28 +311,30 @@ function commutatormain(array) {
     for (let i = 1; i <= lenarr1 / 2; i++) {
         const str1 = arr1.concat().slice(0, i);
         for (let j = 1; j <= lenarr1 / 2; j++) {
-            const str2 = arr1.concat().slice(i, i + j),
-                part1x = simplify(str1),
-                part2x = simplify(str2),
-                party = simplify(part2x.concat(part1x));
-            let part1 = part1x,
-                part2 = part2x;
-            // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-            if (party.length < Math.max(part1x.length, part2x.length)) {
-                if (part1x.length <= part2x.length) {
-                    part1 = part1x;
-                    part2 = party;
-                } else {
-                    part1 = inverse(part2x.concat());
-                    part2 = party;
+            for (let k = 1; k <= 3; k++) {
+                const str2 = repeatEnd(arr1.concat().slice(i, i + j), k),
+                    part1x = simplify(str1),
+                    part2x = simplify(str2),
+                    party = simplify(part2x.concat(part1x));
+                let part1 = part1x,
+                    part2 = part2x;
+                // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+                if (party.length < Math.max(part1x.length, part2x.length)) {
+                    if (part1x.length <= part2x.length) {
+                        part1 = part1x;
+                        part2 = party;
+                    } else {
+                        part1 = inverse(part2x.concat());
+                        part2 = party;
+                    }
                 }
-            }
-            const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
-                arr = simplify(arrex),
-                part1Output = simplifyfinal(part1),
-                part2Output = simplifyfinal(part2);
-            if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
-                return singleOutput(part5Output, part1Output, part2Output);
+                const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+                    arr = simplify(arrex),
+                    part1Output = simplifyfinal(part1),
+                    part2Output = simplifyfinal(part2);
+                if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
+                    return singleOutput(part5Output, part1Output, part2Output);
+                }
             }
         }
     }
@@ -376,6 +356,33 @@ function singleOutput(setup, commutatora, commutatorb) {
 
 
 }
+
+function repeatEnd(array, attempt) {
+    const arr = array.concat();
+    let arr2 = arr.concat().slice(arr.length - 1, arr.length),
+        flag = 0;
+    const str = arr2[0].toString();
+    if (str.length === 2) {
+        if (str[1] === "2") {
+            arr2 = [str[0]];
+            flag = 1;
+        }
+    }
+    if (attempt === 1) {
+        return simplify(arr);
+    }
+    if (attempt === 2) {
+        return simplify(arr.concat(arr2));
+    }
+    if (attempt === 3 && flag == 0) {
+        return simplify(arr.concat(arr2, arr2));
+    }
+    if (attempt === 3 && flag == 1) {
+        return simplify(arr.concat(arr2, arr2, arr2));
+    }
+    return null;
+}
+
 
 // R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
@@ -402,26 +409,28 @@ function score(array) {
     for (let i = 1; i <= lenarr1 / 2; i++) {
         const str1 = arr1.concat().slice(0, i);
         for (let j = 1; j <= lenarr1 / 2; j++) {
-            const str2 = arr1.concat().slice(i, i + j),
-                part1x = simplify(str1),
-                part2x = simplify(str2),
-                party = simplify(part2x.concat(part1x));
-            let part1 = part1x,
-                part2 = part2x;
-            // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
-            if (party.length < Math.max(part1x.length, part2x.length)) {
-                if (part1x.length <= part2x.length) {
-                    part1 = part1x;
-                    part2 = party;
-                } else {
-                    part1 = inverse(part2x.concat());
-                    part2 = party;
+            for (let k = 1; k <= 3; k++) {
+                const str2 = repeatEnd(arr1.concat().slice(i, i + j), k),
+                    part1x = simplify(str1),
+                    part2x = simplify(str2),
+                    party = simplify(part2x.concat(part1x));
+                let part1 = part1x,
+                    part2 = part2x;
+                // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+                if (party.length < Math.max(part1x.length, part2x.length)) {
+                    if (part1x.length <= part2x.length) {
+                        part1 = part1x;
+                        part2 = party;
+                    } else {
+                        part1 = inverse(part2x.concat());
+                        part2 = party;
+                    }
                 }
-            }
-            const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
-                arr = simplify(arrex);
-            if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
-                return part1.length + part2.length + Math.min(part1.length, part2.length);
+                const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+                    arr = simplify(arrex);
+                if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
+                    return part1.length + part2.length + Math.min(part1.length, part2.length);
+                }
             }
         }
     }
