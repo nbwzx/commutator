@@ -457,7 +457,21 @@ function conjugate(array) {
     if (t > 0) {
         if (arr[t - 1].length > 1) {
             if (arr[t - 1][1].toString() === "2".toString()) {
-                return simplify(arr.concat().slice(0, t - 1).concat(inverse(arr.concat().slice(arr.length - t, arr.length - (t - 1)))));
+                const output0 = simplify(arr.concat().slice(0, t)),
+                    output1 = simplify(arr.concat().slice(0, t - 1).concat([arr[t - 1][0]])),
+                    output2 = simplify(arr.concat().slice(0, t - 1).concat([inverseOne(arr[t - 1][0])])),
+                    len0 = simplify(inverse(output0.concat()).concat(arr, output0)).length,
+                    len1 = simplify(inverse(output1.concat()).concat(arr, output1)).length,
+                    len2 = simplify(inverse(output2.concat()).concat(arr, output2)).length;
+                if (len0 < len1 && len0 < len2) {
+                    return output0;
+                } else {
+                    if (len1 <= len2) {
+                        return output1;
+                    } else {
+                        return output2;
+                    }
+                }
             }
         }
     }
