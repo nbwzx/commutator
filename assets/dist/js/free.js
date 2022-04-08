@@ -57,12 +57,11 @@ function preprocessing(algValue) {
 }
 
 function commutatorpair(array, part3) {
-    let arrtemp = array.concat(),
+    let arr1 = array.concat(),
         minscore = 10000,
         temp = 0,
         output0b = "",
         partb0 = "",
-        outputb = [],
         outputb0 = "",
         outputa1 = "",
         outputa2 = "",
@@ -71,15 +70,15 @@ function commutatorpair(array, part3) {
         text1 = "",
         commutator1 = "",
         commutator2 = "";
-    const lenarr1 = arrtemp.length;
+    const lenarr1 = arr1.length;
     if (lenarr1 < 4) {
         return "Not found.";
     }
     for (let displaceIndex = 0; displaceIndex < lenarr1; displaceIndex++) {
         for (let i = 1; i <= lenarr1 / 2; i++) {
-            const str1 = arrtemp.concat().slice(0, i);
+            const str1 = arr1.concat().slice(0, i);
             for (let j = 1; j <= lenarr1 / 2; j++) {
-                const str2 = arrtemp.concat().slice(i, i + j),
+                const str2 = arr1.concat().slice(i, i + j),
                     part1x = simplify(str1),
                     part2x = simplify(str2),
                     party = simplify(part2x.concat(part1x));
@@ -97,7 +96,7 @@ function commutatorpair(array, part3) {
                 }
                 const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
                     arra = simplify(arrex),
-                    arrb = simplify(inverse(arra.concat()).concat(arrtemp));
+                    arrb = simplify(inverse(arra.concat()).concat(arr1));
                 let partb = commutatormain(arrb);
                 if (partb.toString() !== "Not found.".toString()) {
                     const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
@@ -120,7 +119,6 @@ function commutatorpair(array, part3) {
                         } else {
                             output0b = array.concat().slice(0, displaceIndex);
                         }
-                        outputb = arrb;
                         outputb0 = partb0;
                         outputa1 = parta1;
                         outputa2 = parta2;
@@ -132,7 +130,7 @@ function commutatorpair(array, part3) {
                 }
             }
         }
-        arrtemp = displace(arrtemp);
+        arr1 = displace(arr1);
     }
     if (temp === 0) {
         return "Not found.";
@@ -195,8 +193,10 @@ function commutatormain(array) {
         part5Output = simplifyfinal(part5),
         lenarr1 = arr1.length;
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const str1 = arr1.concat().slice(0, i);
-        for (let j = 1; j <= lenarr1 / 2; j++) {
+        const str1 = arr1.concat().slice(0, i),
+            jmin = Math.max(1, Math.ceil((lenarr1) / 2 - i)),
+            jmax = Math.floor(2 * lenarr1 / 3 - i);
+        for (let j = jmin; j <= jmax; j++) {
             const str2 = arr1.concat().slice(i, i + j),
                 part1x = simplify(str1),
                 part2x = simplify(str2),
@@ -260,8 +260,10 @@ function score(array) {
         lenarr1 = arr1.length,
         scoreNotFound = 1000;
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const str1 = arr1.concat().slice(0, i);
-        for (let j = 1; j <= lenarr1 / 2; j++) {
+        const str1 = arr1.concat().slice(0, i),
+            jmin = Math.max(1, Math.ceil((lenarr1) / 2 - i)),
+            jmax = Math.floor(2 * lenarr1 / 3 - i);
+        for (let j = jmin; j <= jmax; j++) {
             const str2 = arr1.concat().slice(i, i + j),
                 part1x = simplify(str1),
                 part2x = simplify(str2),
