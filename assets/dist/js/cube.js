@@ -694,6 +694,34 @@ function simple(array) {
             }
         }
     }
+    for (let i = 0; i < arr.length - 3; i++) {
+        const similarstr = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
+        if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString()+ arr[i + 2][0].toString()) > -1) {
+            if (combineTwo(arr[i], arr[i + 3]).toString() === "".toString()) {
+                arr.splice(i + 3, 1);
+                arr.splice(i, 1);
+                break;
+            }
+            if (combineTwo(arr[i], arr[i + 3]).toString() === arr[i][0].toString()) {
+                arr.splice(i + 4, 0, arr[i][0]);
+                arr.splice(i + 3, 1);
+                arr.splice(i, 1);
+                break;
+            }
+            if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}2`.toString()) {
+                arr.splice(i + 4, 0, `${arr[i][0]}2`);
+                arr.splice(i + 3, 1);
+                arr.splice(i, 1);
+                break;
+            }
+            if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}'`.toString()) {
+                arr.splice(i + 4, 0, `${arr[i][0]}'`);
+                arr.splice(i + 3, 1);
+                arr.splice(i, 1);
+                break;
+            }
+        }
+    }
     return arr;
 }
 
