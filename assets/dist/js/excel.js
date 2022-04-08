@@ -100,20 +100,65 @@ function commutator(x) {
             return "Not found.";
         }
     }
+    let count = 0,
+        minscoreall = 10000,
+        arrex = [],
+        minarr = [];
+    const locationud = [];
+    for (let i = 0; i < arr1.length - 1; i++) {
+        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
+        if (similarstr.toString().indexOf(arr1[i][0].toString() + arr1[i + 1][0].toString()) > -1) {
+            locationud[count] = i;
+            count += 1;
+        }
+    }
+    if (count <= 4) {
+        const number = 2 ** count;
+        let minscore = 0;
+        for (let i = 0; i <= number - 1; i++) {
+            const text = String(i.toString(2));
+            arrex = arr1.concat();
+            for (let j = 0; j < text.length; j++) {
+                if (text[text.length - 1 - j].toString() === "1".toString()) {
+                    arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+                }
+            }
+            const part3 = conjugate(arrex),
+                arr2 = simplify(inverse(part3.concat()).concat(arrex, part3)),
+                penaltyFactor = 2;
+            let arrtemp = arr2.concat(),
+                realscore = 0;
+            minscore = 1000;
+            for (let j = 0; j < arrtemp.length; j++) {
+                if (j <= arrtemp.length / 4 || j >= 3 * arrtemp.length / 4) {
+                    const scoreTemp = score(arrtemp.concat());
+                    if (j <= arrtemp.length / 2) {
+                        realscore = scoreTemp + j / (penaltyFactor + 1) + part3.length / 100;
+                    }
+                    if (j > arrtemp.length / 2) {
+                        realscore = scoreTemp + penaltyFactor * (arrtemp.length - j) / (penaltyFactor + 1) + part3.length / 100;
+                    }
+                    if (realscore < minscore) {
+                        minscore = realscore;
+                    }
+                    arrtemp = displace(arrtemp);
+                }
+            }
+            if (minscore < minscoreall) {
+                minarr = arrex;
+                minscoreall = minscore;
+            }
+        }
+    } else {
+        minarr = arr1;
+    }
     const textOutput = commutatormain(arr1);
     if (textOutput.toString() !== "Not found.".toString()) {
         return textOutput;
     }
-    return commutatormain(minarr);
-
-    /*
-     * If (textOutput.toString() !== "Not found.".toString()) {
-     *     return textOutput;
-     * }
-     * const part3 = conjugate(arr1),
-     *     arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-     * return commutatorpair(arrex, part3);
-     */
+    const part3 = conjugate(arr1);
+    arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+    return commutatorpair(arrex, part3);
 }
 
 function preprocessing(algValue) {
@@ -161,14 +206,14 @@ function preprocessing(algValue) {
     // Handle cases like R2 M2 E' R' U' R E R' U R' M2
     const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
     if (arr1.length > 1) {
-        if (similarstr.toString().indexOf(arr1[0][0].toString() + arr1[1][0].toString()) > -1) {
-            if (arr1[1][0] === arr1[arr1.length - 1][0]) {
-                arr1 = swaparr(arr1, 0, 1);
-            }
-        }
         if (similarstr.toString().indexOf(arr1[arr1.length - 2][0].toString() + arr1[arr1.length - 1][0].toString()) > -1) {
             if (arr1[arr1.length - 2][0] === arr1[0][0]) {
                 arr1 = swaparr(arr1, arr1.length - 2, arr1.length - 1);
+            }
+        }
+        if (similarstr.toString().indexOf(arr1[0][0].toString() + arr1[1][0].toString()) > -1) {
+            if (arr1[1][0] === arr1[arr1.length - 1][0]) {
+                arr1 = swaparr(arr1, 0, 1);
             }
         }
     }
@@ -301,16 +346,18 @@ function commutatormain(array) {
         arrtemp = arr1.concat(),
         part4 = "";
     for (let i = 0; i < arrtemp.length; i++) {
-        const scoreTemp = score(arrtemp.concat());
-        if (i <= arrtemp.length / 2) {
-            realscore = scoreTemp + i / (penaltyFactor + 1);
-        }
-        if (i > arrtemp.length / 2) {
-            realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
-        }
-        if (realscore < minscore) {
-            mini = i;
-            minscore = realscore;
+        if (i <= arrtemp.length / 4 || i >= 3 * arrtemp.length / 4) {
+            const scoreTemp = score(arrtemp.concat());
+            if (i <= arrtemp.length / 2) {
+                realscore = scoreTemp + i / (penaltyFactor + 1);
+            }
+            if (i > arrtemp.length / 2) {
+                realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
+            }
+            if (realscore < minscore) {
+                mini = i;
+                minscore = realscore;
+            }
         }
         arrtemp = displace(arrtemp);
     }
@@ -326,8 +373,6 @@ function commutatormain(array) {
         lenarr1 = arr1.length;
 
     /*
-     * Conjecture:  (lenarr1 - 1) / 2 <= (lenarr1 - r) / 2 <= i + j <= 2 * (lenarr1 - 5 * r) / 3 <= 2 * lenarr1 / 3
-     *  So we have   Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i)) <= j <= Math.floor(2 * lenarr1 / 3 - i)
      *  Conjecture:  ir === 0 || jr === 0
      *  For free group, r = 0
      *  r = ir + jr > 0 ? 1 : 0
@@ -336,9 +381,8 @@ function commutatormain(array) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
             for (let i = 1; i <= lenarr1 / 2; i++) {
                 const str1 = repeatEnd(arr1.concat().slice(0, i), ir),
-                    jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i)),
-                    jmax = Math.floor(2 * lenarr1 / 3 - i);
-                for (let j = jmin; j <= jmax; j++) {
+                    jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
+                for (let j = jmin; j <= lenarr1 / 2; j++) {
                     const str2 = inverse(str1.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr)),
                         part1x = simplify(str1),
                         part2x = simplify(str2),
@@ -437,9 +481,8 @@ function score(array) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
             for (let i = 1; i <= lenarr1 / 2; i++) {
                 const str1 = repeatEnd(arr1.concat().slice(0, i), ir),
-                    jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i)),
-                    jmax = Math.floor(2 * lenarr1 / 3 - i);
-                for (let j = jmin; j <= jmax; j++) {
+                    jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
+                for (let j = jmin; j <= lenarr1 / 2; j++) {
                     const str2 = inverse(str1.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr)),
                         part1x = simplify(str1),
                         part2x = simplify(str2),
@@ -500,8 +543,6 @@ function conjugate(array) {
                     return output1;
                 }
                 return output2;
-
-
             }
         }
     }

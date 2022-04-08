@@ -169,16 +169,18 @@ function commutatormain(array) {
         arrtemp = arr1.concat(),
         part4 = "";
     for (let i = 0; i < arrtemp.length; i++) {
-        const scoreTemp = score(arrtemp.concat());
-        if (i <= arrtemp.length / 2) {
-            realscore = scoreTemp + i / (penaltyFactor + 1);
-        }
-        if (i > arrtemp.length / 2) {
-            realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
-        }
-        if (realscore < minscore) {
-            mini = i;
-            minscore = realscore;
+        if (i <= arrtemp.length / 4 || i >= 3 * arrtemp.length / 4) {
+            const scoreTemp = score(arrtemp.concat());
+            if (i <= arrtemp.length / 2) {
+                realscore = scoreTemp + i / (penaltyFactor + 1);
+            }
+            if (i > arrtemp.length / 2) {
+                realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
+            }
+            if (realscore < minscore) {
+                mini = i;
+                minscore = realscore;
+            }
         }
         arrtemp = displace(arrtemp);
     }
@@ -194,16 +196,15 @@ function commutatormain(array) {
         lenarr1 = arr1.length;
     for (let i = 1; i <= lenarr1 / 2; i++) {
         const str1 = arr1.concat().slice(0, i),
-            jmin = Math.max(1, Math.ceil((lenarr1) / 2 - i)),
-            jmax = Math.floor(2 * lenarr1 / 3 - i);
-        for (let j = jmin; j <= jmax; j++) {
+            jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
+        for (let j = jmin; j <= lenarr1 / 2; j++) {
             const str2 = arr1.concat().slice(i, i + j),
                 part1x = simplify(str1),
                 part2x = simplify(str2),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
-            // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
+            // For S' L M2 D L' D' M2 S D L D' L'
             if (party.length < Math.max(part1x.length, part2x.length)) {
                 if (part1x.length <= part2x.length) {
                     part1 = part1x;
@@ -261,16 +262,14 @@ function score(array) {
         scoreNotFound = 1000;
     for (let i = 1; i <= lenarr1 / 2; i++) {
         const str1 = arr1.concat().slice(0, i),
-            jmin = Math.max(1, Math.ceil((lenarr1) / 2 - i)),
-            jmax = Math.floor(2 * lenarr1 / 3 - i);
-        for (let j = jmin; j <= jmax; j++) {
+            jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
+        for (let j = jmin; j <= lenarr1 / 2; j++) {
             const str2 = arr1.concat().slice(i, i + j),
                 part1x = simplify(str1),
                 part2x = simplify(str2),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
-            // For U R' F R2 D' R' D R' F' R U' D' R D R', output [U R' F R,R D' R' D] instead of [U R' F R2 D' R' D,R D' R' D]
             if (party.length < Math.max(part1x.length, part2x.length)) {
                 if (part1x.length <= part2x.length) {
                     part1 = part1x;
