@@ -239,6 +239,16 @@ function commutatorpair(array, part3) {
                                 outputb2 = partb2;
                                 temp = 1;
                                 minscore = realscore;
+                                if (realscore0 === 3 || realscore - realscore0 === 3) {
+                                    let output0 = simplify(part3);
+                                    if (output0b.toString() !== "".toString()) {
+                                        output0 = simplify(part3.concat(output0b));
+                                    }
+                                    commutator1 = singleOutput("", outputa1, outputa2);
+                                    commutator2 = singleOutput(outputb0, outputb1, outputb2);
+                                    text1 = twoOutput(simplifyfinal(output0), commutator1, commutator2);
+                                    return text1;
+                                }
                             }
                         }
                     }
@@ -479,10 +489,10 @@ function conjugate(array) {
                 if (len0 < len1 && len0 < len2) {
                     return output0;
                 }
-                    if (len1 <= len2) {
-                        return output1;
-                    }
-                        return output2;
+                if (len1 <= len2) {
+                    return output1;
+                }
+                return output2;
 
 
             }
