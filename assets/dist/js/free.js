@@ -186,8 +186,8 @@ function commutatormain(array) {
         part4 = arr1.concat().slice(0, mini);
         arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
     } else {
-        part4 = arr1.concat().slice(mini, arrtemp.length);
-        arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
+        part4 = inverse(arr1.concat().slice(mini, arrtemp.length).concat());
+        arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
     }
     const part5 = simplify(part3.concat(part4)),
         part5Output = simplifyfinal(part5),

@@ -104,9 +104,16 @@ function commutator(x) {
     if (textOutput.toString() !== "Not found.".toString()) {
         return textOutput;
     }
-    const part3 = conjugate(arr1),
-        arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
-    return commutatorpair(arrex, part3);
+    return commutatormain(minarr);
+
+    /*
+     * If (textOutput.toString() !== "Not found.".toString()) {
+     *     return textOutput;
+     * }
+     * const part3 = conjugate(arr1),
+     *     arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+     * return commutatorpair(arrex, part3);
+     */
 }
 
 function preprocessing(algValue) {
@@ -311,8 +318,8 @@ function commutatormain(array) {
         part4 = arr1.concat().slice(0, mini);
         arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
     } else {
-        part4 = arr1.concat().slice(mini, arrtemp.length);
-        arr1 = simplify(part4.concat().concat(arr1, inverse(part4)));
+        part4 = inverse(arr1.concat().slice(mini, arrtemp.length).concat());
+        arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
     }
     const part5 = simplify(part3.concat(part4)),
         part5Output = simplifyfinal(part5),
@@ -323,7 +330,7 @@ function commutatormain(array) {
      *  So we have   Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i)) <= j <= Math.floor(2 * lenarr1 / 3 - i)
      *  Conjecture:  ir === 0 || jr === 0
      *  For free group, r = 0
-     *  r = ir + jr > 2 ? 1 : 0
+     *  r = ir + jr > 0 ? 1 : 0
      */
     for (let ir = 0; ir <= 2; ir++) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
