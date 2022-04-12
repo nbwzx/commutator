@@ -707,92 +707,97 @@ function simplifyfinal(array) {
 }
 
 function simplify(array) {
-    const len = array.length;
-    let arr = array.concat();
-    for (let i = 0; i <= len; i++) {
-        arr = simple(arr);
-    }
-    return arr;
-}
-
-function simple(array) {
     const arr = array.concat();
-    for (let i = 0; i < arr.length - 1; i++) {
+    let i = 0;
+    while (i < arr.length - 1) {
         if (combineTwo(arr[i], arr[i + 1]).toString() === "".toString()) {
             arr.splice(i, 2);
-            break;
+            i = 0;
+            continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === arr[i][0].toString()) {
             arr.splice(i + 2, 0, arr[i][0]);
             arr.splice(i, 2);
-            break;
+            i = 0;
+            continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}2`.toString()) {
             arr.splice(i + 2, 0, `${arr[i][0]}2`);
             arr.splice(i, 2);
-            break;
+            i = 0;
+            continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}'`.toString()) {
             arr.splice(i + 2, 0, `${arr[i][0]}'`);
             arr.splice(i, 2);
-            break;
+            i = 0;
+            continue;
         }
-    }
-    for (let i = 0; i < arr.length - 2; i++) {
-        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-        if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString()) > -1) {
-            if (combineTwo(arr[i], arr[i + 2]).toString() === "".toString()) {
-                arr.splice(i + 2, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 2]).toString() === arr[i][0].toString()) {
-                arr.splice(i + 3, 0, arr[i][0]);
-                arr.splice(i + 2, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}2`.toString()) {
-                arr.splice(i + 3, 0, `${arr[i][0]}2`);
-                arr.splice(i + 2, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}'`.toString()) {
-                arr.splice(i + 3, 0, `${arr[i][0]}'`);
-                arr.splice(i + 2, 1);
-                arr.splice(i, 1);
-                break;
-            }
-        }
-    }
-    for (let i = 0; i < arr.length - 3; i++) {
-        const similarstr = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
-        if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString() + arr[i + 2][0].toString()) > -1) {
-            if (combineTwo(arr[i], arr[i + 3]).toString() === "".toString()) {
-                arr.splice(i + 3, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 3]).toString() === arr[i][0].toString()) {
-                arr.splice(i + 4, 0, arr[i][0]);
-                arr.splice(i + 3, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}2`.toString()) {
-                arr.splice(i + 4, 0, `${arr[i][0]}2`);
-                arr.splice(i + 3, 1);
-                arr.splice(i, 1);
-                break;
-            }
-            if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}'`.toString()) {
-                arr.splice(i + 4, 0, `${arr[i][0]}'`);
-                arr.splice(i + 3, 1);
-                arr.splice(i, 1);
-                break;
+        if (i < arr.length - 2) {
+            const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
+            if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString()) > -1) {
+                if (combineTwo(arr[i], arr[i + 2]).toString() === "".toString()) {
+                    arr.splice(i + 2, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 2]).toString() === arr[i][0].toString()) {
+                    arr.splice(i + 3, 0, arr[i][0]);
+                    arr.splice(i + 2, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}2`.toString()) {
+                    arr.splice(i + 3, 0, `${arr[i][0]}2`);
+                    arr.splice(i + 2, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}'`.toString()) {
+                    arr.splice(i + 3, 0, `${arr[i][0]}'`);
+                    arr.splice(i + 2, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
             }
         }
+        if (i < arr.length - 3) {
+            const similarstr = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
+            if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString() + arr[i + 2][0].toString()) > -1) {
+                if (combineTwo(arr[i], arr[i + 3]).toString() === "".toString()) {
+                    arr.splice(i + 3, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 3]).toString() === arr[i][0].toString()) {
+                    arr.splice(i + 4, 0, arr[i][0]);
+                    arr.splice(i + 3, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}2`.toString()) {
+                    arr.splice(i + 4, 0, `${arr[i][0]}2`);
+                    arr.splice(i + 3, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+                if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}'`.toString()) {
+                    arr.splice(i + 4, 0, `${arr[i][0]}'`);
+                    arr.splice(i + 3, 1);
+                    arr.splice(i, 1);
+                    i = 0;
+                    continue;
+                }
+            }
+        }
+        i += 1;
     }
     return arr;
 }
