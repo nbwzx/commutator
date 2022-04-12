@@ -195,12 +195,10 @@ function commutatormain(array) {
         part5Output = simplifyfinal(part5),
         lenarr1 = arr1.length;
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const str1 = arr1.concat().slice(0, i),
+        const part1x = simplify(arr1.concat().slice(0, i)),
             jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
         for (let j = jmin; j <= lenarr1 / 2; j++) {
-            const str2 = arr1.concat().slice(i, i + j),
-                part1x = simplify(str1),
-                part2x = simplify(str2),
+            const part2x = simplify(arr1.concat().slice(i, i + j)),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
@@ -261,12 +259,10 @@ function score(array) {
         lenarr1 = arr1.length,
         scoreNotFound = 1000;
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const str1 = arr1.concat().slice(0, i),
+        const part1x = simplify(arr1.concat().slice(0, i)),
             jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
         for (let j = jmin; j <= lenarr1 / 2; j++) {
-            const str2 = arr1.concat().slice(i, i + j),
-                part1x = simplify(str1),
-                part2x = simplify(str2),
+            const part2x = simplify(arr1.concat().slice(i, i + j)),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
@@ -340,88 +336,6 @@ function simplify(array) {
             arr.splice(i, 2);
             i = 0;
             continue;
-        }
-        if (combineTwo(arr[i], arr[i + 1]).toString() === arr[i][0].toString()) {
-            arr.splice(i + 2, 0, arr[i][0]);
-            arr.splice(i, 2);
-            i = 0;
-            continue;
-        }
-        if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}2`.toString()) {
-            arr.splice(i + 2, 0, `${arr[i][0]}2`);
-            arr.splice(i, 2);
-            i = 0;
-            continue;
-        }
-        if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}'`.toString()) {
-            arr.splice(i + 2, 0, `${arr[i][0]}'`);
-            arr.splice(i, 2);
-            i = 0;
-            continue;
-        }
-        if (i < arr.length - 2) {
-            const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-            if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString()) > -1) {
-                if (combineTwo(arr[i], arr[i + 2]).toString() === "".toString()) {
-                    arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 2]).toString() === arr[i][0].toString()) {
-                    arr.splice(i + 3, 0, arr[i][0]);
-                    arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}2`.toString()) {
-                    arr.splice(i + 3, 0, `${arr[i][0]}2`);
-                    arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}'`.toString()) {
-                    arr.splice(i + 3, 0, `${arr[i][0]}'`);
-                    arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-            }
-        }
-        if (i < arr.length - 3) {
-            const similarstr = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
-            if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString() + arr[i + 2][0].toString()) > -1) {
-                if (combineTwo(arr[i], arr[i + 3]).toString() === "".toString()) {
-                    arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 3]).toString() === arr[i][0].toString()) {
-                    arr.splice(i + 4, 0, arr[i][0]);
-                    arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}2`.toString()) {
-                    arr.splice(i + 4, 0, `${arr[i][0]}2`);
-                    arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-                if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}'`.toString()) {
-                    arr.splice(i + 4, 0, `${arr[i][0]}'`);
-                    arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
-                    i = 0;
-                    continue;
-                }
-            }
         }
         i += 1;
     }

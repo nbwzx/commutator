@@ -14,7 +14,6 @@ Array.prototype.unique = function () {
 var X = XLSX;
 var file = document.getElementById('upfile');
 var out = document.getElementById('out');
-var output = '';
 
 function handleFile(e) {
     var files = e.target.files;
@@ -49,8 +48,10 @@ function handleFile(e) {
                     if (obj.hasOwnProperty(arrayTitle[j] + i)) {
                         result += '<td>' + obj[arrayTitle[j] + i].replace('\'', '') + '</td>';
                         if (obj[arrayTitle[j] + i].replace('\'', '').length > 8) {
+                            // console.time("Time");
                             console.log(i + ":" + obj[arrayTitle[j] + i].replace('\'', ''));
                             result += '<td>' + commutator(obj[arrayTitle[j] + i].replace('\'', '')) + '</td>';
+                            // console.timeEnd("Time");
                         }
                     } else {
                         result += '<td></td>';
@@ -152,7 +153,7 @@ function commutator(x) {
     } else {
         minarr = arr1;
     }
-    const textOutput = commutatormain(arr1);
+    const textOutput = commutatormain(minarr);
     if (textOutput.toString() !== "Not found.".toString()) {
         return textOutput;
     }
@@ -242,11 +243,9 @@ function commutatorpair(array, part3) {
         for (let ir = 0; ir <= 2; ir++) {
             for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
                 for (let i = 1; i <= lenarr1 / 2; i++) {
-                    const str1 = repeatEnd(arr1.concat().slice(0, i), ir);
+                    const part1x = simplify(repeatEnd(arr1.concat().slice(0, i), ir));
                     for (let j = 1; j <= lenarr1 / 2; j++) {
-                        const str2 = inverse(str1.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr)),
-                            part1x = simplify(str1),
-                            part2x = simplify(str2),
+                        const part2x = simplify(inverse(part1x.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr))),
                             party = simplify(part2x.concat(part1x));
                         let part1 = part1x,
                             part2 = part2x;
@@ -380,12 +379,10 @@ function commutatormain(array) {
     for (let ir = 0; ir <= 2; ir++) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
             for (let i = 1; i <= lenarr1 / 2; i++) {
-                const str1 = repeatEnd(arr1.concat().slice(0, i), ir),
+                const part1x = simplify(repeatEnd(arr1.concat().slice(0, i), ir)),
                     jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
                 for (let j = jmin; j <= lenarr1 / 2; j++) {
-                    const str2 = inverse(str1.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr)),
-                        part1x = simplify(str1),
-                        part2x = simplify(str2),
+                    const part2x = simplify(inverse(part1x.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr))),
                         party = simplify(part2x.concat(part1x));
                     let part1 = part1x,
                         part2 = part2x;
@@ -441,16 +438,16 @@ function repeatEnd(array, attempt) {
         }
     }
     if (attempt === 0) {
-        return simplify(arr);
+        return arr;
     }
     if (attempt === 1) {
-        return simplify(arr.concat(arr2));
+        return arr.concat(arr2);
     }
     if (attempt === 2 && flag === 0) {
-        return simplify(arr.concat(arr2, arr2));
+        return arr.concat(arr2, arr2);
     }
     if (attempt === 2 && flag === 1) {
-        return simplify(arr.concat(arr2, arr2, arr2));
+        return arr.concat(arr2, arr2, arr2);
     }
     return null;
 }
@@ -480,12 +477,10 @@ function score(array) {
     for (let ir = 0; ir <= 2; ir++) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
             for (let i = 1; i <= lenarr1 / 2; i++) {
-                const str1 = repeatEnd(arr1.concat().slice(0, i), ir),
+                const part1x = simplify(repeatEnd(arr1.concat().slice(0, i), ir)),
                     jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
                 for (let j = jmin; j <= lenarr1 / 2; j++) {
-                    const str2 = inverse(str1.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr)),
-                        part1x = simplify(str1),
-                        part2x = simplify(str2),
+                    const part2x = simplify(inverse(part1x.concat()).concat(repeatEnd(arr1.concat().slice(0, i + j), jr))),
                         party = simplify(part2x.concat(part1x));
                     let part1 = part1x,
                         part2 = part2x;
@@ -634,20 +629,17 @@ function simplify(array) {
             continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === arr[i][0].toString()) {
-            arr.splice(i + 2, 0, arr[i][0]);
-            arr.splice(i, 2);
+            arr.splice(i, 2, arr[i][0]);
             i = 0;
             continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}2`.toString()) {
-            arr.splice(i + 2, 0, `${arr[i][0]}2`);
-            arr.splice(i, 2);
+            arr.splice(i, 2, `${arr[i][0]}2`);
             i = 0;
             continue;
         }
         if (combineTwo(arr[i], arr[i + 1]).toString() === `${arr[i][0]}'`.toString()) {
-            arr.splice(i + 2, 0, `${arr[i][0]}'`);
-            arr.splice(i, 2);
+            arr.splice(i, 2, `${arr[i][0]}'`);
             i = 0;
             continue;
         }
@@ -661,23 +653,20 @@ function simplify(array) {
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 2]).toString() === arr[i][0].toString()) {
-                    arr.splice(i + 3, 0, arr[i][0]);
                     arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, arr[i][0]);
                     i = 0;
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}2`.toString()) {
-                    arr.splice(i + 3, 0, `${arr[i][0]}2`);
                     arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, `${arr[i][0]}2`);
                     i = 0;
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 2]).toString() === `${arr[i][0]}'`.toString()) {
-                    arr.splice(i + 3, 0, `${arr[i][0]}'`);
                     arr.splice(i + 2, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, `${arr[i][0]}'`);
                     i = 0;
                     continue;
                 }
@@ -693,23 +682,20 @@ function simplify(array) {
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 3]).toString() === arr[i][0].toString()) {
-                    arr.splice(i + 4, 0, arr[i][0]);
                     arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, arr[i][0]);
                     i = 0;
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}2`.toString()) {
-                    arr.splice(i + 4, 0, `${arr[i][0]}2`);
                     arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, `${arr[i][0]}2`);
                     i = 0;
                     continue;
                 }
                 if (combineTwo(arr[i], arr[i + 3]).toString() === `${arr[i][0]}'`.toString()) {
-                    arr.splice(i + 4, 0, `${arr[i][0]}'`);
                     arr.splice(i + 3, 1);
-                    arr.splice(i, 1);
+                    arr.splice(i, 1, `${arr[i][0]}'`);
                     i = 0;
                     continue;
                 }
