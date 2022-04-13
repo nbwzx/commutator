@@ -225,8 +225,8 @@ function commutator(x) {
                     if (realscore < minscore) {
                         minscore = realscore;
                     }
-                    arrtemp = displace(arrtemp);
                 }
+                arrtemp = displace(arrtemp);
             }
             if (minscore < minscoreall) {
                 minarr = arrex;
