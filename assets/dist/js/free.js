@@ -8,7 +8,7 @@ function free() {
 }
 
 function commutator(x) {
-    if (x.toString() === "".toString()) {
+    if (x.toString().length === 0) {
         return "Empty input.";
     }
     const arr1 = preprocessing(x);
@@ -114,11 +114,7 @@ function commutatorpair(array, part3) {
                         partb2 = partb.split(",")[1].split("]")[0],
                         realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
                     if (realscore < minscore) {
-                        if (displaceIndex === 0) {
-                            output0b = "";
-                        } else {
-                            output0b = array.concat().slice(0, displaceIndex);
-                        }
+                        output0b = array.concat().slice(0, displaceIndex);
                         outputb0 = partb0;
                         outputa1 = parta1;
                         outputa2 = parta2;
@@ -136,7 +132,7 @@ function commutatorpair(array, part3) {
         return "Not found.";
     }
     let output0 = simplify(part3);
-    if (output0b.toString() !== "".toString()) {
+    if (output0b.toString().length > 0) {
         output0 = simplify(part3.concat(output0b));
     }
     commutator1 = singleOutput("", outputa1, outputa2);
@@ -332,7 +328,7 @@ function simplify(array) {
     const arr = array.concat();
     let i = 0;
     while (i < arr.length - 1) {
-        if (combineTwo(arr[i], arr[i + 1]).toString() === "".toString()) {
+        if (combineTwo(arr[i], arr[i + 1]).toString().length === 0) {
             arr.splice(i, 2);
             i = 0;
             continue;

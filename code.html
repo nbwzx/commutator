@@ -447,11 +447,7 @@
                                         partb2 = partb.split(",")[1].split("]")[0],
                                         realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
                                     if (realscore < minscore) {
-                                        if (displaceIndex === 0) {
-                                            output0b = "";
-                                        } else {
-                                            output0b = array.concat().slice(0, displaceIndex);
-                                        }
+                                        output0b = array.concat().slice(0, displaceIndex);
                                         outputb0 = partb0;
                                         outputa1 = parta1;
                                         outputa2 = parta2;
@@ -541,10 +537,9 @@
                 lenarr1 = arr1.length;
         
             /*
-             *  Conjecture:  ir === 0 || jr === 0
-             *  For free group, r = 0
-             *  r = ir + jr > 0 ? 1 : 0
-             */
+            *  Conjecture:  ir === 0 || jr === 0
+            *  For free group, ir === 0 && jr === 0
+            */
             for (let ir = 0; ir <= 2; ir++) {
                 for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
                     for (let i = 1; i <= lenarr1 / 2; i++) {

@@ -68,7 +68,7 @@ function handleFile(e) {
 
 function commutator(x) {
     const order = 4;
-    if (x.toString() === "".toString()) {
+    if (x.toString().length === 0) {
         return "Empty input.";
     }
     const arr1 = preprocessing(x);
@@ -278,11 +278,7 @@ function commutatorpair(array, part3) {
                                 partb2 = partb.split(",")[1].split("]")[0],
                                 realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
                             if (realscore < minscore) {
-                                if (displaceIndex === 0) {
-                                    output0b = "";
-                                } else {
-                                    output0b = array.concat().slice(0, displaceIndex);
-                                }
+                                output0b = array.concat().slice(0, displaceIndex);
                                 outputb0 = partb0;
                                 outputa1 = parta1;
                                 outputa2 = parta2;
@@ -292,7 +288,7 @@ function commutatorpair(array, part3) {
                                 minscore = realscore;
                                 if (realscore0 === 3 || realscore - realscore0 === 3) {
                                     let output0 = simplify(part3);
-                                    if (output0b.toString() !== "".toString()) {
+                                    if (output0b.toString().length > 0) {
                                         output0 = simplify(part3.concat(output0b));
                                     }
                                     commutator1 = singleOutput("", outputa1, outputa2);
@@ -312,7 +308,7 @@ function commutatorpair(array, part3) {
         return "Not found.";
     }
     let output0 = simplify(part3);
-    if (output0b.toString() !== "".toString()) {
+    if (output0b.toString().length > 0) {
         output0 = simplify(part3.concat(output0b));
     }
     commutator1 = singleOutput("", outputa1, outputa2);
@@ -373,8 +369,7 @@ function commutatormain(array) {
 
     /*
      *  Conjecture:  ir === 0 || jr === 0
-     *  For free group, r = 0
-     *  r = ir + jr > 0 ? 1 : 0
+     *  For free group, ir === 0 && jr === 0
      */
     for (let ir = 0; ir <= 2; ir++) {
         for (let jr = 0; jr <= 2 && ir * jr === 0; jr++) {
@@ -623,7 +618,7 @@ function simplify(array) {
     const arr = array.concat();
     let i = 0;
     while (i < arr.length - 1) {
-        if (combineTwo(arr[i], arr[i + 1]).toString() === "".toString()) {
+        if (combineTwo(arr[i], arr[i + 1]).toString().length === 0) {
             arr.splice(i, 2);
             i = 0;
             continue;
@@ -646,7 +641,7 @@ function simplify(array) {
         if (i < arr.length - 2) {
             const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
             if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString()) > -1) {
-                if (combineTwo(arr[i], arr[i + 2]).toString() === "".toString()) {
+                if (combineTwo(arr[i], arr[i + 2]).toString().length === 0) {
                     arr.splice(i + 2, 1);
                     arr.splice(i, 1);
                     i = 0;
@@ -675,7 +670,7 @@ function simplify(array) {
         if (i < arr.length - 3) {
             const similarstr = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
             if (similarstr.toString().indexOf(arr[i][0].toString() + arr[i + 1][0].toString() + arr[i + 2][0].toString()) > -1) {
-                if (combineTwo(arr[i], arr[i + 3]).toString() === "".toString()) {
+                if (combineTwo(arr[i], arr[i + 3]).toString().length === 0) {
                     arr.splice(i + 3, 1);
                     arr.splice(i, 1);
                     i = 0;
