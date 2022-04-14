@@ -8,22 +8,23 @@ function free() {
 }
 
 function commutator(x) {
-    if (x.toString().length === 0) {
+    if (x.length === 0) {
         return "Empty input.";
     }
-    const arr1 = preprocessing(x);
-    if (arr1.length === 0) {
+    const arr1 = preprocessing(x),
+        len1 = arr1.length;
+    if (len1 === 0) {
         return "Empty input.";
     }
-    for (let i = 0; i < arr1.length - 1; i++) {
+    for (let i = 0; i < len1 - 1; i++) {
         if (arr1[i].length > 2) {
             return "Invalid input.";
         }
     }
     let sum = 0;
-    for (let i = 0; i <= arr1.length - 1; i++) {
+    for (let i = 0; i <= len1 - 1; i++) {
         sum = 0;
-        for (let j = 0; j <= arr1.length - 1; j++) {
+        for (let j = 0; j <= len1 - 1; j++) {
             if (arr1[i][0] === arr1[j][0]) {
                 if (arr1[j].length === 1) {
                     sum += 1;
@@ -37,17 +38,16 @@ function commutator(x) {
         }
     }
     const textOutput = commutatormain(arr1);
-    if (textOutput.toString() !== "Not found.".toString()) {
+    if (textOutput !== "Not found.") {
         return textOutput;
     }
     const part3 = conjugate(arr1),
-        arrex = simplify(inverse(part3.concat()).concat(arr1, part3));
+        arrex = simplify(inverse(part3).concat(arr1, part3));
     return commutatorpair(arrex, part3);
 }
 
 function preprocessing(algValue) {
-    let x = "";
-    x = algValue.trim();
+    let x = algValue.trim();
     x = x.split("").join(" ");
     x = x.replace(/\s+/igu, " ");
     x = x.replace(/[‘]/gu, "'");
@@ -76,9 +76,9 @@ function commutatorpair(array, part3) {
     }
     for (let displaceIndex = 0; displaceIndex < lenarr1; displaceIndex++) {
         for (let i = 1; i <= lenarr1 / 2; i++) {
-            const str1 = arr1.concat().slice(0, i);
+            const str1 = arr1.slice(0, i);
             for (let j = 1; j <= lenarr1 / 2; j++) {
-                const str2 = arr1.concat().slice(i, i + j),
+                const str2 = arr1.slice(i, i + j),
                     part1x = simplify(str1),
                     part2x = simplify(str2),
                     party = simplify(part2x.concat(part1x));
@@ -90,22 +90,22 @@ function commutatorpair(array, part3) {
                         part1 = part1x;
                         part2 = party;
                     } else {
-                        part1 = inverse(part2x.concat());
+                        part1 = inverse(part2x);
                         part2 = party;
                     }
                 }
-                const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+                const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
                     arra = simplify(arrex),
-                    arrb = simplify(inverse(arra.concat()).concat(arr1));
+                    arrb = simplify(inverse(arra).concat(arr1));
                 let partb = commutatormain(arrb);
-                if (partb.toString() !== "Not found.".toString()) {
+                if (partb !== "Not found.") {
                     const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
                         parta1 = simplifyfinal(part1),
                         parta2 = simplifyfinal(part2);
                     if (partb.split("[").length === 3) {
                         partb = partb.substring(1, partb.length - 1);
                     }
-                    if (partb.toString().indexOf(":".toString()) > -1) {
+                    if (partb.indexOf(":") > -1) {
                         partb0 = partb.split(":")[0];
                     } else {
                         partb0 = "";
@@ -114,7 +114,7 @@ function commutatorpair(array, part3) {
                         partb2 = partb.split(",")[1].split("]")[0],
                         realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
                     if (realscore < minscore) {
-                        output0b = array.concat().slice(0, displaceIndex);
+                        output0b = array.slice(0, displaceIndex);
                         outputb0 = partb0;
                         outputa1 = parta1;
                         outputa2 = parta2;
@@ -132,7 +132,7 @@ function commutatorpair(array, part3) {
         return "Not found.";
     }
     let output0 = simplify(part3);
-    if (output0b.toString().length > 0) {
+    if (output0b.length > 0) {
         output0 = simplify(part3.concat(output0b));
     }
     commutator1 = singleOutput("", outputa1, outputa2);
@@ -158,43 +158,46 @@ function commutatormain(array) {
     const arr0 = array.concat(),
         part3 = conjugate(arr0),
         penaltyFactor = 2;
-    let arr1 = simplify(inverse(part3.concat()).concat(arr0, part3)),
+    let arr1 = simplify(inverse(part3).concat(arr0, part3)),
         minscore = 2000,
         mini = 0,
         realscore = 0,
         arrtemp = arr1.concat(),
         part4 = "";
     for (let i = 0; i < arrtemp.length; i++) {
-        if (i <= arrtemp.length / 4 || i >= 3 * arrtemp.length / 4) {
-            const scoreTemp = score(arrtemp.concat());
-            if (i <= arrtemp.length / 2) {
-                realscore = scoreTemp + i / (penaltyFactor + 1);
-            }
-            if (i > arrtemp.length / 2) {
-                realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
-            }
-            if (realscore < minscore) {
-                mini = i;
-                minscore = realscore;
-            }
+        const scoreTemp = score(arrtemp);
+        if (i <= arrtemp.length / 2) {
+            realscore = scoreTemp + i / (penaltyFactor + 1);
+        }
+        if (i > arrtemp.length / 2) {
+            realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
+        }
+        if (realscore < minscore) {
+            mini = i;
+            minscore = realscore;
         }
         arrtemp = displace(arrtemp);
     }
     if (mini <= arrtemp.length / 2) {
-        part4 = arr1.concat().slice(0, mini);
-        arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
+        part4 = arr1.slice(0, mini);
+        arr1 = simplify(inverse(part4).concat(arr1, part4));
     } else {
-        part4 = inverse(arr1.concat().slice(mini, arrtemp.length).concat());
-        arr1 = simplify(inverse(part4.concat()).concat(arr1, part4));
+        part4 = inverse(arr1.slice(mini, arrtemp.length));
+        arr1 = simplify(inverse(part4).concat(arr1, part4));
     }
     const part5 = simplify(part3.concat(part4)),
         part5Output = simplifyfinal(part5),
         lenarr1 = arr1.length;
+
+    /*
+     *  Conjecture:  ir === 0 || jr === 0
+     *  For free group, ir === 0 && jr === 0
+     */
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const part1x = simplify(arr1.concat().slice(0, i)),
+        const part1x = simplify(arr1.slice(0, i)),
             jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
         for (let j = jmin; j <= lenarr1 / 2; j++) {
-            const part2x = simplify(arr1.concat().slice(i, i + j)),
+            const part2x = simplify(arr1.slice(i, i + j)),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
@@ -204,15 +207,15 @@ function commutatormain(array) {
                     part1 = part1x;
                     part2 = party;
                 } else {
-                    part1 = inverse(part2x.concat());
+                    part1 = inverse(part2x);
                     part2 = party;
                 }
             }
-            const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+            const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
                 arr = simplify(arrex),
                 part1Output = simplifyfinal(part1),
                 part2Output = simplifyfinal(part2);
-            if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
+            if (simplify(arr.concat(inverse(arr1))).length === 0) {
                 return singleOutput(part5Output, part1Output, part2Output);
             }
         }
@@ -235,19 +238,12 @@ function singleOutput(setup, commutatora, commutatorb) {
 // R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
     const arr = array.concat(),
-        arr1 = arr.concat().slice(0, 1),
-        arr2 = arr.concat().slice(arr.length - 1, arr.length);
-    let arrtemp = [];
-    if (combineTwo(arr1[0], arr2[0]).toString() === "0".toString()) {
-        arrtemp = arr.concat();
-        arrtemp = inverse(arr1.concat()).concat(arrtemp, arr1);
-        arrtemp = simplify(arrtemp);
-    } else {
-        arrtemp = arr.concat();
-        arrtemp = arr2.concat(arrtemp, inverse(arr2.concat()));
-        arrtemp = simplify(arrtemp);
+        arr1 = [arr[0]],
+        arr2 = [arr[arr.length - 1]];
+    if (arr1[0][0] === arr2[0][0]) {
+        return simplify(arr2.concat(arr, inverse(arr2)));
     }
-    return arrtemp;
+    return simplify(inverse(arr1).concat(arr, arr1));
 }
 
 function score(array) {
@@ -255,10 +251,10 @@ function score(array) {
         lenarr1 = arr1.length,
         scoreNotFound = 1000;
     for (let i = 1; i <= lenarr1 / 2; i++) {
-        const part1x = simplify(arr1.concat().slice(0, i)),
+        const part1x = simplify(arr1.slice(0, i)),
             jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
         for (let j = jmin; j <= lenarr1 / 2; j++) {
-            const part2x = simplify(arr1.concat().slice(i, i + j)),
+            const part2x = simplify(arr1.slice(i, i + j)),
                 party = simplify(part2x.concat(part1x));
             let part1 = part1x,
                 part2 = part2x;
@@ -267,13 +263,13 @@ function score(array) {
                     part1 = part1x;
                     part2 = party;
                 } else {
-                    part1 = inverse(part2x.concat());
+                    part1 = inverse(part2x);
                     part2 = party;
                 }
             }
-            const arrex = part1.concat(part2, inverse(part1.concat()), inverse(part2.concat())),
+            const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
                 arr = simplify(arrex);
-            if (simplify(arr.concat(inverse(arr1.concat()))).length === 0) {
+            if (simplify(arr.concat(inverse(arr1))).length === 0) {
                 return part1.length + part2.length + Math.min(part1.length, part2.length);
             }
         }
@@ -286,18 +282,15 @@ function conjugate(array) {
     let minlen = arr.length,
         t = 0;
     for (let i = 1; i < array.length; i++) {
-        const arr1 = arr.concat().slice(0, i),
-            arr2 = inverse(arr1.concat());
-        let arrtemp = arr.concat();
-        arrtemp = arr2.concat(arrtemp, arr1);
-        arrtemp = simplify(arrtemp);
-        const len = simplify(arrtemp).length;
+        const arr1 = arr.slice(0, i),
+            arr2 = inverse(arr1),
+            len = simplify(arr2.concat(arr, arr1)).length;
         if (len < minlen) {
             t = i;
             minlen = len;
         }
     }
-    return arr.concat().slice(0, t);
+    return arr.slice(0, t);
 }
 
 function inverse(array) {
@@ -325,14 +318,19 @@ function simplifyfinal(array) {
 }
 
 function simplify(array) {
-    const arr = array.concat();
-    let i = 0;
-    while (i < arr.length - 1) {
-        if (combineTwo(arr[i], arr[i + 1]).toString().length === 0) {
-            arr.splice(i, 2);
-            i = 0;
-            continue;
+    const arr = [array[0]];
+    let i = 1;
+    while (i < array.length) {
+        const arrayAdd = array[i],
+            len = arr.length;
+        if (arr.length >= 1) {
+            if (combineTwo(arr[len - 1], arrayAdd).length === 0) {
+                arr.splice(-1, 1);
+                i += 1;
+                continue;
+            }
         }
+        arr[len] = arrayAdd;
         i += 1;
     }
     return arr;
