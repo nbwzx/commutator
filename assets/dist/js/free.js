@@ -54,7 +54,7 @@ function commutator(x) {
     arrGlobal = arr1;
     const textOutput = commutatormain(arr1);
     if (textOutput !== "Not found.") {
-        document.getElementById("out").innerHTML = "Not found.";
+        document.getElementById("out").innerHTML = textOutput;
         return;
     }
     const part3 = conjugate(arr1),
