@@ -7,7 +7,7 @@ In this repository, we assume that <!-- $G$ --> <img style="transform: translate
 
 In mathematics, the free group <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/EAUg5lHTBi.svg"> over a given set <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/Ibcd0FcTOp.svg"> consists of all words that can be built from members of <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/DWsWhbICkM.svg">, considering two words to be different unless their equality follows from the group axioms (e.g. <!-- $s t=s u u^{-1} t$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/fVzQWUoHVF.svg">, but <!-- $s \neq t^{-1}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/iwq8fMflYT.svg"> for <!-- $s, t, u \in S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/zZWgobxgom.svg"> ). The members of <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/egB8X9ylT4.svg"> are called generators of <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/xVA1KxA0G9.svg">, and the number of generators is the rank of the free group. An arbitrary group <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/SEBZPzvZBn.svg"> is called free if it is isomorphic to <!-- $F_{S}$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/6ngjvQGpMe.svg"> for some subset <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/97GOyXaPGv.svg"> of <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/8dHefb78dL.svg">, that is, if there is a subset <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/QYGvJ9ZjmI.svg"> of <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/Oqhmg8BnIn.svg"> such that every element of <!-- $G$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/BqRlGijkvY.svg"> can be written in exactly one way as a product of finitely many elements of <!-- $S$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/SBgCUnUpcK.svg"> and their inverses (disregarding trivial variations such as <!-- $s t=s u u^{-1} t$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/C7FL0bS5Mk.svg"> ).
 
-It is worth researching since many 3-cycle formulas in a Rubik's cube can be written as commutators.
+It is worth researching since many 3-cycle and 5-cycle algorithms in a Rubik's cube can be written as commutators.
 
 Currently, the time complexity of this algorithm is <!-- $O(n^2)$ --> <img style="transform: translateY(0.1em); background: white;" src="assets/svg/UMMhXBMaRf.svg">. It is still unknown if there is a faster algorithm or if this algorithm can detect all possible commutators.
 
@@ -24,9 +24,9 @@ Example 2:
 
 ```
 Input: s = "a b c a' b' c'"
-Output: "[a b,c b]"
-Explanation: a b + c b + b' a' + b' c' = a b c a' b' c'.
-And "[a c',c b]" is also a valid answer.
+Output: "[a b,c a']"
+Explanation: a b + c a' + b' a' + a c' = a b c a' b' c'.
+And "[a b,c b]" is also a valid answer.
 ```
 
 Example 3:
