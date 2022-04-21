@@ -71,8 +71,7 @@ function commutatormain(array, depth, maxdepth) {
     const arr0 = array.concat(),
         partc = conjugate(arr0);
     let arr1 = simplify(inverse(partc).concat(arr0, partc)),
-        text1 = "",
-        commutator1 = "";
+        text1 = "";
     const arrbak = arr1.concat();
     if (depth === 0) {
         if (array.length > 0) {
@@ -132,13 +131,10 @@ function commutatormain(array, depth, maxdepth) {
                         const part1Output = simplifyfinal(part1),
                             part2Output = simplifyfinal(part2),
                             part0Output = simplifyfinal(part0);
-                        commutator1 = singleOutput(part0Output, part1Output, part2Output);
                         if (depth === 1) {
-                            text1 = commutator1;
-                        } else if (document.getElementById("settingsOuterBracket").checked === false) {
-                            text1 = `${commutator1}+${partb}`;
+                            text1 = singleOutput(part0Output, part1Output, part2Output);
                         } else {
-                            text1 = `${commutator1}${partb}`;
+                            text1 = multiOutput(part0Output, part1Output, part2Output, partb);
                         }
                         countResult += countResult;
                         if (depth === maxdepth && result.indexOf([text1]) === -1) {
@@ -155,6 +151,18 @@ function commutatormain(array, depth, maxdepth) {
         return text1;
     }
     return 0;
+}
+
+function multiOutput(setup, commutatora, commutatorb, partb) {
+    if (document.getElementById("settingsOuterBracket").checked === false) {
+        if (setup === "") {
+            return `[${commutatora},${commutatorb}]+${partb}`;
+        }
+        return `${setup}:[[${commutatora},${commutatorb}]+${partb}]`;
+    } else if (setup === "") {
+        return `[${commutatora},${commutatorb}]${partb}`;
+    }
+    return `[${setup}:[${commutatora},${commutatorb}]${partb}]`;
 }
 
 function singleOutput(setup, commutatora, commutatorb) {
