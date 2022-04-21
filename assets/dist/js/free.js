@@ -121,7 +121,7 @@ function commutatormain(array, depth, maxdepth) {
                         let part0 = simplify(partc.concat(arrbak.slice(0, displaceIndex))),
                             part1 = part1y,
                             part2 = part2y;
-                        if (part0.length > 0) {
+                        if (part0.length > 0 && maxdepth === 1) {
                             const partz = simplify(part0.concat(part2y));
                             if (partz.length < part0.length) {
                                 part0 = partz;
