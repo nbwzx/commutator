@@ -140,7 +140,7 @@ function commutatormain(array, depth, maxdepth) {
                             text1 = multiOutput(part0Output, part1Output, part2Output, partb);
                         }
                         if (depth === maxdepth && result.indexOf([text1]) === -1) {
-                            countResult += countResult;
+                            countResult += 1;
                             result.push(text1);
                         }
                     }
