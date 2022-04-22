@@ -80,6 +80,9 @@ function commutatormain(array, depth, maxdepth) {
         return 0;
     }
     if (depth >= 1) {
+        if (arr1.length < 4 * depth) {
+            return "Not found.";
+        }
         for (let displaceIndex = 0; displaceIndex <= arr1.length / 2 - 2; displaceIndex++) {
             // For a b c b' a' d c' d' = a b:[c,b' a' d]
             let maxi = 0;
@@ -136,8 +139,8 @@ function commutatormain(array, depth, maxdepth) {
                         } else {
                             text1 = multiOutput(part0Output, part1Output, part2Output, partb);
                         }
-                        countResult += countResult;
                         if (depth === maxdepth && result.indexOf([text1]) === -1) {
+                            countResult += countResult;
                             result.push(text1);
                         }
                     }
