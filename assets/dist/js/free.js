@@ -91,7 +91,7 @@ function commutatormain(array, depth, maxdepth) {
             } else {
                 maxi = arr1.length / 2 - 1;
             }
-            for (let i = 0; i <= maxi; i++) {
+            for (let i = 1; i <= maxi; i++) {
                 const part1x = simplify(arr1.slice(0, i));
                 let minj = 0;
                 if (depth === 1) {
@@ -139,7 +139,7 @@ function commutatormain(array, depth, maxdepth) {
                         } else {
                             text1 = multiOutput(part0Output, part1Output, part2Output, partb);
                         }
-                        if (depth === maxdepth && result.indexOf([text1]) === -1) {
+                        if (depth === maxdepth && result.indexOf(text1) === -1) {
                             countResult += 1;
                             result.push(text1);
                         }
