@@ -235,6 +235,7 @@ function preprocessing(algValue) {
     x = x.replace(/\s+/igu, " ");
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
+    x = x.replace(/3/gu, "'");
     x = x.replace(/ '/gu, "'");
     x = x.replace(/ 2/gu, "2");
     x = x.replace(/2'/gu, "2");
