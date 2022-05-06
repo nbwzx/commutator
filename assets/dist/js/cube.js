@@ -1,7 +1,7 @@
 "use strict";
 
-let countResult = 0;
-let result = [];
+let countResult = 0,
+    result = [];
 
 function expand() {
     let algValue = String(document.getElementById("alg").value);
@@ -138,14 +138,14 @@ function calculateTwo(i, j, sign) {
 }
 
 function cube() {
-    const date1 = new Date();
-    const algValue = String(document.getElementById("alg").value);
+    const date1 = new Date(),
+        algValue = String(document.getElementById("alg").value);
     countResult = 0;
     result = [];
     document.getElementById("out").innerHTML = "";
     document.getElementById("out").innerHTML = commutator(algValue);
-    const date2 = new Date();
-    const date3 = (date2.getTime() - date1.getTime()) / 1000;
+    const date2 = new Date(),
+        date3 = (date2.getTime() - date1.getTime()) / 1000;
     if (result.length === 0) {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n ${document.getElementById("out").innerHTML}\n `;
     } else {
@@ -331,8 +331,8 @@ function commutatormain(array, depth, maxdepth) {
                     }
                     for (const irKey in irList) {
                         const ir = irList[irKey];
-                        let part1x = [];
-                        let part2x = [];
+                        let part1x = [],
+                            part2x = [];
                         if (ir === -1) {
                             part1x = simplify(arr1.slice(0, i));
                             part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j)));
@@ -449,8 +449,8 @@ function readEnd(str) {
 
 function repeatEnd(array, attempt) {
     const str = array[array.length - 1],
-        arr = array.slice(0, array.length - 1);
-    const arrstr = [str];
+        arr = array.slice(0, array.length - 1),
+        arrstr = [str];
     if (attempt === 0) {
         return arr;
     }

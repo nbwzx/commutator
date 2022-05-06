@@ -1,17 +1,17 @@
 "use strict";
 
-let countResult = 0;
-let result = [];
+let countResult = 0,
+    result = [];
 
 function free() {
-    const date1 = new Date();
-    const algValue = String(document.getElementById("alg").value);
+    const date1 = new Date(),
+        algValue = String(document.getElementById("alg").value);
     countResult = 0;
     result = [];
     document.getElementById("out").innerHTML = "";
     document.getElementById("out").innerHTML = commutator(algValue);
-    const date2 = new Date();
-    const date3 = (date2.getTime() - date1.getTime()) / 1000;
+    const date2 = new Date(),
+        date3 = (date2.getTime() - date1.getTime()) / 1000;
     if (result.length === 0) {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n ${document.getElementById("out").innerHTML}\n `;
     } else {
