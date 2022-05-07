@@ -300,7 +300,7 @@ function commutatormain(array, depth, maxdepth) {
             for (let i = 1; i <= maxi; i++) {
                 let minj = 0;
                 if (depth === 1) {
-                    minj = Math.max(1, Math.ceil((arr1.length - 1) / 2 - i));
+                    minj = Math.max(1, Math.ceil(arr1.length / 2 - i));
                 } else {
                     minj = 1;
                 }
@@ -309,6 +309,9 @@ function commutatormain(array, depth, maxdepth) {
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
                         irList = [1, 2, 3];
                     } else {
+                        if (depth == 1 && combineTwo(arr1[i - 1], arr1[i + j]).length !== 0) {
+                            continue;
+                        }
                         irList = [-1];
                     }
                     for (const irKey in irList) {
@@ -448,14 +451,9 @@ function repeatEnd(array, attempt) {
     return null;
 }
 
-// R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
     const arr = array.concat(),
-        arr1 = [arr[0]],
-        arr2 = [arr[arr.length - 1]];
-    if (arr1[0][0] === arr2[0][0]) {
-        return simplify(arr2.concat(arr, inverse(arr2)));
-    }
+        arr1 = [arr[0]];
     return simplify(inverse(arr1).concat(arr, arr1));
 }
 

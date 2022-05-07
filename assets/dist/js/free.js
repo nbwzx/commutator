@@ -76,7 +76,8 @@ function commutatormain(array, depth, maxdepth) {
     const arr0 = array.concat(),
         partc = conjugate(arr0);
     let arr1 = simplify(inverse(partc).concat(arr0, partc)),
-        text1 = "";
+        text1 = "",
+        text0 = "";
     const arrbak = arr1.concat();
     if (depth === 0) {
         if (array.length > 0) {
@@ -105,6 +106,9 @@ function commutatormain(array, depth, maxdepth) {
                     minj = 1;
                 }
                 for (let j = minj; j <= arr1.length / 2 - 1; j++) {
+                    if (depth == 1 && combineTwo(arr1[i - 1], arr1[i + j]).length !== 0) {
+                        continue;
+                    }
                     const part2x = simplify(arr1.slice(i, i + j)),
                         arra = simplify(part1x.concat(part2x, inverse(part1x), inverse(part2x))),
                         arrb = simplify(inverse(arra).concat(arr1)),
@@ -144,6 +148,12 @@ function commutatormain(array, depth, maxdepth) {
                         } else {
                             text1 = multiOutput(part0Output, part1Output, part2Output, partb);
                         }
+                        if (depth !== maxdepth) {
+                            return text1;
+                        }
+                        if (text0 === "") {
+                            text0 = text1;
+                        }
                         if (depth === maxdepth && result.indexOf(text1) === -1) {
                             countResult += 1;
                             result.push(text1);
@@ -153,10 +163,10 @@ function commutatormain(array, depth, maxdepth) {
             }
             arr1 = displace(arr1);
         }
-        if (text1 === "") {
+        if (text0 === "") {
             return "Not found.";
         }
-        return text1;
+        return text0;
     }
     return 0;
 }
@@ -185,14 +195,9 @@ function singleOutput(setup, commutatora, commutatorb) {
     return `[${setup}:[${commutatora},${commutatorb}]]`;
 }
 
-// R2 D R U' R D' R' U R D R' U R' D' R U' R
 function displace(array) {
     const arr = array.concat(),
-        arr1 = [arr[0]],
-        arr2 = [arr[arr.length - 1]];
-    if (arr1[0][0] === arr2[0][0]) {
-        return simplify(arr2.concat(arr, inverse(arr2)));
-    }
+        arr1 = [arr[0]];
     return simplify(inverse(arr1).concat(arr, arr1));
 }
 
