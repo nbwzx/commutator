@@ -203,27 +203,25 @@ function commutator(x) {
             count += 1;
         }
     }
-    if (count <= 4) {
-        const number = 2 ** count;
-        let commutatorResult = "Not found.",
-            flag = false;
-        for (let ii = 1; ii <= (len1 - 1) / 3; ii++) {
-            for (let i = 0; i <= number - 1; i++) {
-                const text = String(i.toString(2));
-                arrex = arr1.concat();
-                for (let j = 0; j < text.length; j++) {
-                    if (text[text.length - 1 - j] === "1") {
-                        arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
-                    }
-                }
-                commutatorResult = commutatormain(arrex, ii, ii);
-                if (commutatorResult !== "Not found.") {
-                    flag = true;
+    const number = 2 ** count;
+    let commutatorResult = "Not found.",
+        flag = false;
+    for (let ii = 1; ii <= (len1 - 1) / 3; ii++) {
+        for (let i = 0; i <= number - 1; i++) {
+            const text = String(i.toString(2));
+            arrex = arr1.concat();
+            for (let j = 0; j < text.length; j++) {
+                if (text[text.length - 1 - j] === "1") {
+                    arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
                 }
             }
-            if (flag) {
-                return commutatorResult;
+            commutatorResult = commutatormain(arrex, ii, ii);
+            if (commutatorResult !== "Not found.") {
+                flag = true;
             }
+        }
+        if (flag) {
+            return commutatorResult;
         }
     }
     return "Not found.";
@@ -270,23 +268,7 @@ function preprocessing(algValue) {
         x = x.replace(/d'/gu, "D' E'");
         x = x.replace(/d/gu, "D E");
     }
-    let arr1 = simplify(x.split(" "));
-    // Handle cases like R2 M2 E' R' U' R E R' U R' M2
-    const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS",
-        len1 = arr1.length;
-    if (len1 > 1) {
-        if (similarstr.indexOf(arr1[len1 - 2][0] + arr1[len1 - 1][0]) > -1) {
-            if (arr1[len1 - 2][0] === arr1[0][0]) {
-                arr1 = swaparr(arr1, len1 - 2, len1 - 1);
-            }
-        }
-        if (similarstr.indexOf(arr1[0][0] + arr1[1][0]) > -1) {
-            if (arr1[1][0] === arr1[len1 - 1][0]) {
-                arr1 = swaparr(arr1, 0, 1);
-            }
-        }
-    }
-    return arr1;
+    return simplify(x.split(" "));
 }
 
 function commutatormain(array, depth, maxdepth) {
@@ -458,10 +440,10 @@ function repeatEnd(array, attempt) {
         return arr.concat(arrstr[0][0]);
     }
     if (attempt === 2) {
-        return arr.concat(arrstr[0][0], arrstr[0][0]);
+        return arr.concat(`${arrstr[0][0]}2`);
     }
     if (attempt === 3) {
-        return arr.concat(arrstr[0][0], arrstr[0][0], arrstr[0][0]);
+        return arr.concat(`${arrstr[0][0]}'`);
     }
     return null;
 }
@@ -540,6 +522,24 @@ function simplifyfinal(array) {
             arr = swaparr(arr, i, i + 1);
         }
         if (arr[i][0] === "L" && arr[i + 1][0] === "R") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "E" && arr[i + 1][0] === "U") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "S" && arr[i + 1][0] === "F") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "M" && arr[i + 1][0] === "R") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "D" && arr[i + 1][0] === "E") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "B" && arr[i + 1][0] === "S") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "L" && arr[i + 1][0] === "M") {
             arr = swaparr(arr, i, i + 1);
         }
     }
