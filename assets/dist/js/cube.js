@@ -271,6 +271,35 @@ function preprocessing(algValue) {
     return simplify(x.split(" "));
 }
 
+function commutatorpre(arr1, depth, maxdepth) {
+    let count = 0,
+        arrex = [];
+    const locationud = [];
+    for (let i = 0; i < arr1.length - 1; i++) {
+        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
+        if (similarstr.indexOf(arr1[i][0] + arr1[i + 1][0]) > -1) {
+            locationud[count] = i;
+            count += 1;
+        }
+    }
+    const number = 2 ** count;
+    let commutatorResult = "Not found.";
+    for (let i = 0; i <= number - 1; i++) {
+        const text = String(i.toString(2));
+        arrex = arr1.concat();
+        for (let j = 0; j < text.length; j++) {
+            if (text[text.length - 1 - j] === "1") {
+                arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+            }
+        }
+        commutatorResult = commutatormain(arrex, depth, maxdepth);
+        if (commutatorResult !== "Not found.") {
+            return commutatorResult;
+        }
+    }
+    return "Not found.";
+}
+
 function commutatormain(array, depth, maxdepth) {
     const arr0 = array.concat(),
         partc = conjugate(arr0);
@@ -323,7 +352,7 @@ function commutatormain(array, depth, maxdepth) {
                         arrb = simplify(arra.concat(arr1));
                     let partb = "";
                     if (depth > 1) {
-                        partb = commutatormain(arrb, depth - 1, maxdepth);
+                        partb = commutatorpre(arrb, depth - 1, maxdepth);
                     } else if (arrb.length > 0) {
                         continue;
                     }
