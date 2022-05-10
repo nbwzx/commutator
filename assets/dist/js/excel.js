@@ -1,65 +1,65 @@
 "use strict";
 
 Array.prototype.unique = function () {
-    var res = [];
-    var json = {};
-    for (var i = 0; i < this.length; i++) {
+    const res = [];
+    const json = {};
+    for (let i = 0; i < this.length; i++) {
         if (!json[this[i]]) {
             res.push(this[i]);
             json[this[i]] = 1;
         }
     }
     return res;
-}
-var X = XLSX;
-var file = document.getElementById('upfile');
-var out = document.getElementById('out');
+};
+const X = XLSX;
+const file = document.getElementById("upfile");
+const out = document.getElementById("out");
 
-function handleFile(e) {
-    var files = e.target.files;
-    var i, f;
-    for (i = 0, f = files[i]; i != files.length; ++i) {
-        var reader = new FileReader();
+function handleFile(ee) {
+    const files = ee.target.files;
+    for (let index = 0, f = files[index]; index !== files.length; ++index) {
+        const reader = new FileReader();
         reader.onload = function (e) {
-            var data = e.target.result;
-            var workbook = XLSX.read(data, {
-                type: 'binary'
+            const data = e.target.result;
+            const workbook = XLSX.read(data, {
+                "type": "binary"
             });
+
             /* DO SOMETHING WITH workbook HERE */
-            var result = '';
-            var tmp = X.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
-            var maxRowCount = 0;
-            var tmpRowCount = 0;
-            var arrayTitle = [];
-            var obj = {};
-            for (var i = 0; i < tmp.length; i++) {
-                tmpRowCount = parseInt(tmp[i].split('=')[0].substr(1, tmp[i].split('=')[0].length - 1));
+            let result = "";
+            const tmp = X.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
+            let maxRowCount = 0;
+            let tmpRowCount = 0;
+            let arrayTitle = [];
+            const obj = {};
+            for (let i = 0; i < tmp.length; i++) {
+                tmpRowCount = parseInt(tmp[i].split("=")[0].substr(1, tmp[i].split("=")[0].length - 1), 10);
                 if (tmpRowCount >= maxRowCount) {
                     maxRowCount = tmpRowCount;
                 }
-                obj[tmp[i].split('=')[0]] = tmp[i].split('=')[1];
-                arrayTitle.push(tmp[i].split('=')[0].charAt(0));
+                obj[tmp[i].split("=")[0]] = tmp[i].split("=")[1];
+                arrayTitle.push(tmp[i].split("=")[0].charAt(0));
             }
             arrayTitle = arrayTitle.unique(); //Array deduplication
-            result += '<table class="productInfo">';
-            for (var i = 1; i <= maxRowCount; i++) {
-                result += '<tr>';
-                for (var j = 0; j < arrayTitle.length; j++) {
+            result += "<table class=\"productInfo\">";
+            for (let i = 1; i <= maxRowCount; i++) {
+                result += "<tr>";
+                for (let j = 0; j < arrayTitle.length; j++) {
                     if (obj.hasOwnProperty(arrayTitle[j] + i)) {
-                        result += '<td>' + obj[arrayTitle[j] + i].replace('\'', '') + '</td>';
-                        if (obj[arrayTitle[j] + i].replace('\'', '').length > 8) {
+                        result += `<td>${obj[arrayTitle[j] + i].replace("'", "")}</td>`;
+                        if (obj[arrayTitle[j] + i].replace("'", "").length > 8) {
                             // console.time("Time");
-                            console.log(i + ":" + obj[arrayTitle[j] + i].replace('\'', ''));
-                            result += '<td>' + commutator(obj[arrayTitle[j] + i].replace('\'', '')) + '</td>';
+                            console.log(`${i}:${obj[arrayTitle[j] + i].replace("'", "")}`);
+                            result += `<td>${commutator(obj[arrayTitle[j] + i].replace("'", ""))}</td>`;
                             // console.timeEnd("Time");
                         }
                     } else {
-                        result += '<td></td>';
+                        result += "<td></td>";
                     }
                 }
-                result += '</tr>';
+                result += "</tr>";
             }
-            result += '</table>';
+            result += "</table>";
             out.innerHTML = result;
         };
         reader.readAsBinaryString(f);
@@ -867,4 +867,4 @@ function swaparr(arr, index1, index2) {
     return arr;
 }
 
-file.addEventListener('change', handleFile, false);
+file.addEventListener("change", handleFile, false);

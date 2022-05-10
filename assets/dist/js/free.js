@@ -111,8 +111,8 @@ function commutatormain(array, depth, maxdepth) {
                 if (depth > 1) {
                     partb = commutatormain(arrb, depth - 1, maxdepth);
                 } else if (arrb.length > 0) {
-                        continue;
-                    }
+                    continue;
+                }
                 if (partb !== "Not found.") {
                     let part1y = part1x,
                         part2y = part2x;

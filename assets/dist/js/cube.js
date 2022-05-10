@@ -11,6 +11,11 @@ function expand() {
     }
     algValue = algValue.replace(/\(/gu, "[");
     algValue = algValue.replace(/\)/gu, "]");
+    algValue = algValue.replace(/（/gu, "[");
+    algValue = algValue.replace(/）/gu, "]");
+    algValue = algValue.replace(/【/gu, "[");
+    algValue = algValue.replace(/】/gu, "]");
+    algValue = decodeString(algValue);
     algValue = algValue.replace(/\]\[/gu, "]+[");
     const expression = rpn(initializeExperssion(algValue));
     if (expression === "Lack left parenthesis." || expression === "Lack right parenthesis.") {
@@ -18,6 +23,15 @@ function expand() {
     } else {
         document.getElementById("out").innerHTML = simplifyfinal(preprocessing(calculate(expression)));
     }
+}
+
+function decodeString(str) {
+    const reg = /\[([^[\]]+)*\](\d+)/gu;
+    let decode = "";
+    do {
+        decode = str.replace(reg, ($0, $1, $2) => `[${$1}]`.repeat($2));
+    } while (decode.match(reg));
+    return decode;
 }
 
 function isOperator(val) {
@@ -126,14 +140,14 @@ function calculateTwo(i, j, sign) {
         arr2 = preprocessing(j);
     }
     switch (sign) {
-        case "+":
-            return simplifyfinal(arr1.concat(arr2));
-        case ":":
-            return simplifyfinal(arr1.concat(arr2, inverse(arr1)));
-        case ",":
-            return simplifyfinal(arr1.concat(arr2, inverse(arr1), inverse(arr2)));
-        default:
-            return false;
+    case "+":
+        return simplifyfinal(arr1.concat(arr2));
+    case ":":
+        return simplifyfinal(arr1.concat(arr2, inverse(arr1)));
+    case ",":
+        return simplifyfinal(arr1.concat(arr2, inverse(arr1), inverse(arr2)));
+    default:
+        return false;
     }
 }
 
