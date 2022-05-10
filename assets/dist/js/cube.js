@@ -15,6 +15,7 @@ function expand() {
     algValue = algValue.replace(/）/gu, "]");
     algValue = algValue.replace(/【/gu, "[");
     algValue = algValue.replace(/】/gu, "]");
+    algValue = algValue.replace(/，/gu, ",");
     algValue = decodeString(algValue);
     algValue = algValue.replace(/\]\[/gu, "]+[");
     const expression = rpn(initializeExperssion(algValue));
