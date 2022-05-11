@@ -86,7 +86,7 @@
       <br>
       <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm" aria-label="Enter an algorithm"
         style="font-size: 30px;">
-      <br>  
+      <br>
       Settings:
       <input type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket for all commutators
       <!-- <input type="text" style="width:500px; height:20px;" id="y" value="" /> -->
@@ -97,6 +97,7 @@
         role="alert" onkeydown="this.onkeyup();" >
       </div> -->
       <br><br>
+      <twisty-player id="player" alg="" experimental-setup-anchor="end"></twisty-player>
       <div id="out" style="font-size: 30px;white-space: pre-line;"></div>
     </div>
     </div>
@@ -105,5 +106,7 @@
   <script src="assets/dist/js/prism.js"></script>
   <script src="assets/dist/js/cube.js"></script>
   <script src="assets/dist/js/cookie.js"></script>
+  <script src="https://cdn.cubing.net/js/cubing/twisty" type="module"></script>
 </body>
+
 </html>

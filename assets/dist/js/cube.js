@@ -19,10 +19,13 @@ function expand() {
     algValue = decodeString(algValue);
     algValue = algValue.replace(/\]\[/gu, "]+[");
     const expression = rpn(initializeExperssion(algValue));
+    let expandOut = "";
     if (expression === "Lack left parenthesis." || expression === "Lack right parenthesis.") {
         document.getElementById("out").innerHTML = expression;
     } else {
-        document.getElementById("out").innerHTML = simplifyfinal(preprocessing(calculate(expression)));
+        expandOut = simplifyfinal(preprocessing(calculate(expression)));
+        document.getElementById("out").innerHTML = expandOut;
+        document.getElementById("player").setAttribute("alg", expandOut);
     }
 }
 
@@ -157,6 +160,7 @@ function cube() {
         algValue = String(document.getElementById("alg").value);
     countResult = 0;
     result = [];
+    document.getElementById("player").setAttribute("alg", algValue);
     document.getElementById("out").innerHTML = "";
     document.getElementById("out").innerHTML = commutator(algValue);
     const date2 = new Date(),
