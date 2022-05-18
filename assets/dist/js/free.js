@@ -26,7 +26,7 @@ function commutator(x) {
     if (x.length === 0) {
         return "Empty input.";
     }
-    const arr1 = preprocessing(x),
+    const arr1 = repeatNumber(preprocessing(x)),
         len1 = arr1.length;
     if (len1 === 0) {
         return "Empty input.";
@@ -69,7 +69,26 @@ function preprocessing(algValue) {
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
     x = x.replace(/ '/gu, "'");
-    return simplify(x.split(" "));
+    return x.split(" ");
+}
+
+function repeatNumber(arrx) {
+    let arrnum = "";
+    for (let i = 1; i < arrx.length; i++) {
+        if (arrx[i][arrx[i].length - 1] === "'"){
+            arrnum = arrx[i].substring(0, arrx[i].length - 1);
+            if (arrnum === Math.floor(arrnum).toString()){
+                arrx[i - 1] = `${arrx[i - 1]}'`;
+                arrx[i] = arrx[i - 1].repeat(Math.floor(arrnum) - 1);
+            }
+        } else {
+            arrnum = arrx[i];
+            if (arrnum === Math.floor(arrnum).toString()){
+                arrx[i] = arrx[i - 1].repeat(Math.floor(arrnum) - 1);
+            }
+        }
+    }
+    return preprocessing(arrx.join(""));
 }
 
 function commutatormain(array, depth, maxdepth) {
@@ -234,8 +253,43 @@ function simplifyfinal(array) {
     if (arr.length === 0) {
         return "";
     }
-    let arrOutput = `${arr.join(" ")} `;
-    arrOutput = arrOutput.substring(0, arrOutput.length - 1);
+    if (arr.length === 1) {
+        return arr[0];
+    }
+    let arrOutput = "";
+    let str = arr[0];
+    let num = 1;
+    const total = arr.length;
+    for (let i = 1; i < total; i++) {
+        const nowS = arr[i];
+        if (nowS === str) {
+            num = num + 1;
+            if (i + 1 === total) {
+                if (str[str.length - 1] === "'"){
+                    arrOutput += `${str.substring(0, str.length - 1)}${num}'`;
+                } else {
+                    arrOutput += `${str}${num}`;
+                }
+            }
+        } else {
+            if (num === 1){
+                if (str[str.length - 1] === "'"){
+                    arrOutput += `${str.substring(0, str.length - 1)}' `;
+                } else {
+                    arrOutput += `${str} `;
+                }
+            } else if (str[str.length - 1] === "'"){
+                arrOutput += `${str.substring(0, str.length - 1)}${num}' `;
+            } else {
+                arrOutput += `${str}${num} `;
+            }
+            num = 1;
+            str = nowS;
+            if (i + 1 === total) {
+                arrOutput += `${str}`;
+            }
+        }
+    }
     return arrOutput;
 }
 
