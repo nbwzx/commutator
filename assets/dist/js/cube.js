@@ -538,16 +538,7 @@ function conjugate(array) {
 }
 
 function inverse(array) {
-    const arr = array.concat();
-    for (let i = 0; i < arr.length / 2; i++) {
-        const temp = arr[i];
-        arr[i] = array[arr.length - 1 - i];
-        arr[arr.length - 1 - i] = temp;
-    }
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = inverseOne(arr[i]);
-    }
-    return arr;
+    return array.map((x) => inverseOne(x)).reverse();
 }
 
 function simplifyfinal(array) {
