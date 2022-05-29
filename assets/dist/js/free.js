@@ -76,7 +76,7 @@ function commutator(x) {
             return "Not found.";
         }
     }
-    for (let i = 1; i <= len / 4; i++) {
+    for (let i = 1; i <= (len - 1) / 3; i++) {
         const commutatorResult = commutatormain(arr, i, i);
         if (commutatorResult !== "Not found.") {
             return commutatorResult;
@@ -102,7 +102,7 @@ function commutatormain(array, depth, maxdepth) {
         text0 = "";
     const arrbak = arr1.concat(),
         len = arr1.length;
-    if (len < 4 * depth) {
+    if (len < 3 * depth + 1) {
         return "Not found.";
     }
     for (let d = 0; d <= len - 1; d++) {
