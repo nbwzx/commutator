@@ -308,7 +308,7 @@ function simplify(array) {
     while (i < array.length) {
         const arrayAdd = [array[i][0], normalize(array[i][1])],
             len = arr.length;
-        if (arrayAdd[1] === 0){
+        if (normalize(arrayAdd[1]) === 0){
             i += 1;
             continue;
         }
