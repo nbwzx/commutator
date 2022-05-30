@@ -31,8 +31,8 @@ function commutator(x) {
         return "Empty input.";
     }
     const arr1 = preprocessing(x);
-    let arr = [];
-    let maxAlgAmount = 0;
+    let arr = [],
+        maxAlgAmount = 0;
     for (let i = 0; i < arr1.length; i++) {
         arr[i] = [];
         arr[i][0] = arr1[i][0];
@@ -106,104 +106,118 @@ function commutatormain(array, depth, maxdepth) {
         return "Not found.";
     }
     for (let d = 0; d <= len - 1; d++) {
-        // For a b c b' a' d c' d' = a b:[c,b' a' d]
-        let maxi = 0;
-        if (depth === 1) {
-            maxi = len / 2 - Math.max(d, 2) + 1;
-        } else {
-            maxi = len / 2 - 1;
+        let drmin = 0,
+            drmax = 0;
+        if (d > 0){
+            if (arrbak[d - 1][1] > 0) {
+                drmin = 1;
+                drmax = arrbak[d - 1][1];
+            }
+            if (arrbak[d - 1][1] < 0) {
+                drmin = arrbak[d - 1][1];
+                drmax = -1;
+            }
         }
-        for (let i = 1; i <= maxi; i++) {
-            let minj = 0;
+        for (let dr = drmin; dr <= drmax; dr++) {
+            arr1 = displace(arrbak, d, dr);
+            // For a b c b' a' d c' d' = a b:[c,b' a' d]
+            let maxi = 0;
             if (depth === 1) {
-                minj = Math.max(1, Math.ceil(len / 2 - i));
+                maxi = len / 2 - Math.max(d, 2) + 1;
             } else {
-                minj = 1;
+                maxi = len / 2 - 1;
             }
-            for (let j = minj; j <= len / 2 - 1; j++) {
-                let irList = [];
-                if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                    // (a bx,by c bz)
-                    irList = [];
-                    for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
-                        irList.push(irValue);
-                    }
+            for (let i = 1; i <= maxi; i++) {
+                let minj = 0;
+                if (depth === 1) {
+                    minj = Math.max(1, Math.ceil(len / 2 - i));
                 } else {
-                    if (depth === 1 && arr1[i][0] !== arr1[len - 1][0]) {
-                        continue;
-                    }
-                    irList = [""];
+                    minj = 1;
                 }
-                for (const irKey in irList) {
-                    const ir = irList[irKey];
-                    let part1x = [],
-                        part2x = [];
-                    if (ir === "") {
-                        part1x = simplify(arr1.slice(0, i));
-                        part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j)));
+                for (let j = minj; j <= len / 2 - 1; j++) {
+                    let irList = [];
+                    if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
+                        // (a bx,by c bz)
+                        irList = [];
+                        for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
+                            irList.push(irValue);
+                        }
                     } else {
-                        const jr = normalize(arr1[i + j - 1][1] + ir);
-                        part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                        part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
-                    }
-                    const arra = simplify(part2x.concat(part1x, inverse(part2x), inverse(part1x))),
-                        arrb = simplify(arra.concat(arr1));
-                    let partb = "";
-                    if (depth > 1) {
-                        partb = commutatormain(arrb, depth - 1, maxdepth);
-                    } else if (arrb.length > 0) {
-                        continue;
-                    }
-                    if (partb !== "Not found.") {
-                        let part1y = part1x,
-                            part2y = part2x;
-                        const party = simplify(part2x.concat(part1x));
-                        if (party.length < Math.max(part1x.length, part2x.length)) {
-                            if (part1x.length <= part2x.length) {
-                                // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                                part1y = part1x;
-                                part2y = party;
-                            } else {
-                                // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                                part1y = inverse(part2x);
-                                part2y = party;
-                            }
+                        if (depth === 1 && arr1[i][0] !== arr1[len - 1][0]) {
+                            continue;
                         }
-                        // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
-                        let part0 = simplify(partc.concat(arrbak.slice(0, d))),
-                            part1 = part1y,
-                            part2 = part2y;
-                        if (part0.length > 0 && maxdepth === 1) {
-                            const partz = simplify(part0.concat(part2y));
-                            if (partz.length < part0.length) {
-                                part0 = partz;
-                                part1 = inverse(part2y);
-                                part2 = part1y;
-                            }
-                        }
-                        const part1Output = simplifyfinal(part1),
-                            part2Output = simplifyfinal(part2),
-                            part0Output = simplifyfinal(part0);
-                        if (depth === 1) {
-                            text1 = singleOutput(part0Output, part1Output, part2Output);
+                        irList = [""];
+                    }
+                    for (const irKey in irList) {
+                        const ir = irList[irKey];
+                        let part1x = [],
+                            part2x = [];
+                        if (ir === "") {
+                            part1x = simplify(arr1.slice(0, i));
+                            part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j)));
                         } else {
-                            text1 = multiOutput(part0Output, part1Output, part2Output, partb);
+                            const jr = normalize(arr1[i + j - 1][1] + ir);
+                            part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
+                            part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
                         }
-                        if (depth !== maxdepth) {
-                            return text1;
+                        const arra = simplify(part2x.concat(part1x, inverse(part2x), inverse(part1x))),
+                            arrb = simplify(arra.concat(arr1));
+                        let partb = "";
+                        if (depth > 1) {
+                            partb = commutatormain(arrb, depth - 1, maxdepth);
+                        } else if (arrb.length > 0) {
+                            continue;
                         }
-                        if (text0 === "") {
-                            text0 = text1;
-                        }
-                        if (depth === maxdepth && result.indexOf(text1) === -1) {
-                            countResult += 1;
-                            result.push(text1);
+                        if (partb !== "Not found.") {
+                            let part1y = part1x,
+                                part2y = part2x;
+                            const party = simplify(part2x.concat(part1x));
+                            if (party.length < Math.max(part1x.length, part2x.length)) {
+                                if (part1x.length <= part2x.length) {
+                                    // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
+                                    part1y = part1x;
+                                    part2y = party;
+                                } else {
+                                    // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
+                                    part1y = inverse(part2x);
+                                    part2y = party;
+                                }
+                            }
+                            // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
+                            let part0 = simplify(partc.concat(repeatEnd(arrbak.slice(0, d), dr))),
+                                part1 = part1y,
+                                part2 = part2y;
+                            if (part0.length > 0 && maxdepth === 1) {
+                                const partz = simplify(part0.concat(part2y));
+                                if (partz.length < part0.length) {
+                                    part0 = partz;
+                                    part1 = inverse(part2y);
+                                    part2 = part1y;
+                                }
+                            }
+                            const part1Output = simplifyfinal(part1),
+                                part2Output = simplifyfinal(part2),
+                                part0Output = simplifyfinal(part0);
+                            if (depth === 1) {
+                                text1 = singleOutput(part0Output, part1Output, part2Output);
+                            } else {
+                                text1 = multiOutput(part0Output, part1Output, part2Output, partb);
+                            }
+                            if (depth !== maxdepth) {
+                                return text1;
+                            }
+                            if (text0 === "") {
+                                text0 = text1;
+                            }
+                            if (depth === maxdepth && result.indexOf(text1) === -1) {
+                                countResult += 1;
+                                result.push(text1);
+                            }
                         }
                     }
                 }
             }
         }
-        arr1 = displace(arr1);
     }
     if (text0 === "") {
         return "Not found.";
@@ -212,6 +226,9 @@ function commutatormain(array, depth, maxdepth) {
 }
 
 function repeatEnd(array, attempt) {
+    if (array.length === 0){
+        return [];
+    }
     const arr = array.slice(0, array.length - 1);
     if (attempt === 0) {
         return arr;
@@ -246,9 +263,9 @@ function singleOutput(setup, commutatora, commutatorb) {
     return `[${setup}:[${commutatora},${commutatorb}]]`;
 }
 
-function displace(array) {
+function displace(array, d, dr) {
     const arr = array.concat(),
-        arr1 = [arr[0]];
+        arr1 = repeatEnd(arr.slice(0, d), dr);
     return simplify(inverse(arr1).concat(arr, arr1));
 }
 
