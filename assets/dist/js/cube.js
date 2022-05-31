@@ -396,11 +396,13 @@ function commutatormain(array, depth, maxdepth) {
         for (let dr = drmin; dr <= drmax; dr++) {
             arr1 = displace(arrbak, d, dr);
             // For a b c b' a' d c' d' = a b:[c,b' a' d]
+            // To check
+            // For M U2 D' S U' S' D' S' U' S D2 M' = M U2 D' S U' S':[D' S' U',S U D]
             let maxi = 0;
             if (depth === 1) {
-                maxi = len / 2 - Math.max(d, 2) + 1;
+                maxi = len / 2;
             } else {
-                maxi = len / 2 - 1;
+                maxi = len / 2;
             }
             for (let i = 1; i <= maxi; i++) {
                 let minj = 0;
@@ -712,7 +714,7 @@ function simplify(array) {
         }
         if (arr.length >= 2) {
             const similarstr1 = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-            if (arr[len - 1][0] === arrayAdd[0]) {
+            if (arr[len - 2][0] === arrayAdd[0]) {
                 if (similarstr1.indexOf(arr[len - 2][0] + arr[len - 1][0]) > -1) {
                     const x = [];
                     x[0] = arr[len - 2][0];
@@ -731,7 +733,7 @@ function simplify(array) {
         }
         if (arr.length >= 3) {
             const similarstr2 = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
-            if (arr[len - 1][0] === arrayAdd[0]) {
+            if (arr[len - 3][0] === arrayAdd[0]) {
                 if (similarstr2.indexOf(arr[len - 3][0] + arr[len - 2][0] + arr[len - 1][0]) > -1) {
                     const x = [];
                     x[0] = arr[len - 3][0];
