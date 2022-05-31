@@ -4,7 +4,161 @@ let countResult = 0,
     result = [],
     order = 0,
     minAmount = 0,
-    maxAmount = 0;
+    maxAmount = 0,
+    maxAlgAmount = 0;
+
+function expand() {
+    let algValue = String(document.getElementById("alg").value);
+    algValue = algValue.replace(/\(/gu, "[");
+    algValue = algValue.replace(/\)/gu, "]");
+    algValue = algValue.replace(/（/gu, "[");
+    algValue = algValue.replace(/）/gu, "]");
+    algValue = algValue.replace(/【/gu, "[");
+    algValue = algValue.replace(/】/gu, "]");
+    algValue = algValue.replace(/，/gu, ",");
+    algValue = algValue.replace(/\]\[/gu, "]+[");
+    preprocessing(algValue);
+    order = Number(document.getElementById("order").value);
+    if (order === 0) {
+        order = 2 * (maxAlgAmount + 2);
+    }
+    // See https://github.com/cubing/cubing.js/blob/main/src/cubing/alg/traversal.ts
+    // Examples:
+    // • order 4 → min -1 (e.g. cube)
+    // • order 5 → min -2 (e.g. Megaminx)
+    // • order 3 → min -1 (e.g. Pyraminx)
+    minAmount = Math.floor(order / 2) + 1 - order;
+    maxAmount = Math.floor(order / 2);
+    if (algValue.toString().length === 0) {
+        document.getElementById("out").innerHTML = "Empty input.";
+        return;
+    }
+    const expression = rpn(initializeExperssion(algValue));
+    let expandOut = "";
+    if (expression === "Lack left parenthesis." || expression === "Lack right parenthesis.") {
+        document.getElementById("out").innerHTML = expression;
+    } else {
+        expandOut = simplifyfinal(preprocessing(calculate(expression)));
+        document.getElementById("out").innerHTML = expandOut;
+    }
+}
+
+function isOperator(val) {
+    const operatorString = "+:,[]";
+    return operatorString.indexOf(val) > -1;
+}
+
+function initializeExperssion(expressionOrigin) {
+    const expression = expressionOrigin.replace(/\s/gu, " "),
+        inputStack = [];
+    inputStack.push(expression[0]);
+    for (let i = 1; i < expression.length; i++) {
+        if (isOperator(expression[i]) || isOperator(inputStack.slice(-1))) {
+            inputStack.push(expression[i]);
+        } else {
+            inputStack.push(inputStack.pop() + expression[i]);
+        }
+    }
+    return inputStack;
+}
+
+function operatorLevel(operator) {
+    if (operator === ",") {
+        return 0;
+    }
+    if (operator === ":") {
+        return 1;
+    }
+    if (operator === "+") {
+        return 2;
+    }
+    if (operator === "[") {
+        return 3;
+    }
+    if (operator === "]") {
+        return 4;
+    }
+    return null;
+}
+
+function rpn(inputStack) {
+    // Reverse Polish Notation
+    const outputStack = [],
+        operatorStack = [];
+    let match = false,
+        tempOperator = "";
+    while (inputStack.length > 0) {
+        const sign = inputStack.shift();
+        if (!isOperator(sign)) {
+            outputStack.push(sign);
+        } else if (operatorLevel(sign) === 4) {
+            match = false;
+            while (operatorStack.length > 0) {
+                tempOperator = operatorStack.pop();
+                if (tempOperator === "[") {
+                    match = true;
+                    break;
+                } else {
+                    outputStack.push(tempOperator);
+                }
+            }
+            if (match === false) {
+                return "Lack left parenthesis.";
+            }
+        } else {
+            while (operatorStack.length > 0 && operatorStack.slice(-1).toString() !== "[".toString() && operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1))) {
+                outputStack.push(operatorStack.pop());
+            }
+            operatorStack.push(sign);
+        }
+    }
+    while (operatorStack.length > 0) {
+        tempOperator = operatorStack.pop();
+        if (tempOperator === "[") {
+            return "Lack right parenthesis.";
+        }
+        outputStack.push(tempOperator);
+    }
+    return outputStack;
+}
+
+function calculate(expression) {
+    let i = 0,
+        j = 0;
+    const rpnExpression = [];
+    while (expression.length > 0) {
+        const sign = expression.shift();
+        if (isOperator(sign)) {
+            j = rpnExpression.pop();
+            i = rpnExpression.pop();
+            rpnExpression.push(calculateTwo(i, j, sign));
+        } else {
+            rpnExpression.push(sign);
+        }
+    }
+    return rpnExpression[0];
+}
+
+function calculateTwo(i, j, sign) {
+    let arr1 = [],
+        arr2 = [];
+    if (typeof i !== "undefined") {
+        arr1 = preprocessing(i);
+    }
+    if (typeof j !== "undefined") {
+        arr2 = preprocessing(j);
+    }
+    switch (sign) {
+    case "+":
+        return simplifyfinal(arr1.concat(arr2));
+    case ":":
+        return simplifyfinal(arr1.concat(arr2, inverse(arr1)));
+    case ",":
+        return simplifyfinal(arr1.concat(arr2, inverse(arr1), inverse(arr2)));
+    default:
+        return false;
+    }
+}
 
 function free() {
     const date1 = new Date(),
@@ -30,25 +184,8 @@ function commutator(x) {
     if (x.length === 0) {
         return "Empty input.";
     }
-    const arr1 = preprocessing(x);
-    let arr = [],
-        maxAlgAmount = 0;
-    for (let i = 0; i < arr1.length; i++) {
-        arr[i] = [];
-        arr[i][0] = arr1[i][0];
-        let temp = arr1[i].replace(/[^0-9]/ug, "");
-        if (temp === ""){
-            temp = 1;
-        }
-        arr[i][1] = Number(temp);
-        if (arr[i][1] > maxAlgAmount){
-            maxAlgAmount = arr[i][1];
-        }
-        if (arr1[i][arr1[i].length - 1] === "'") {
-            arr[i][1] = -arr[i][1];
-        }
-    }
-    if (order === 0){
+    let arr = preprocessing(x);
+    if (order === 0) {
         order = 2 * (maxAlgAmount + 2);
     }
     // See https://github.com/cubing/cubing.js/blob/main/src/cubing/alg/traversal.ts
@@ -91,7 +228,24 @@ function preprocessing(algValue) {
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
     x = x.replace(/ '/gu, "'");
-    return x.split(" ");
+    const arr1 = x.split(" ");
+    const arr = [];
+    for (let i = 0; i < arr1.length; i++) {
+        arr[i] = [];
+        arr[i][0] = arr1[i][0];
+        let temp = arr1[i].replace(/[^0-9]/ug, "");
+        if (temp === "") {
+            temp = 1;
+        }
+        arr[i][1] = Number(temp);
+        if (arr[i][1] > maxAlgAmount) {
+            maxAlgAmount = arr[i][1];
+        }
+        if (arr1[i][arr1[i].length - 1] === "'") {
+            arr[i][1] = -arr[i][1];
+        }
+    }
+    return arr;
 }
 
 function commutatormain(array, depth, maxdepth) {
@@ -108,7 +262,7 @@ function commutatormain(array, depth, maxdepth) {
     for (let d = 0; d <= len - 1; d++) {
         let drmin = 0,
             drmax = 0;
-        if (d > 0){
+        if (d > 0) {
             if (arrbak[d - 1][1] > 0) {
                 drmin = 1;
                 drmax = arrbak[d - 1][1];
@@ -226,7 +380,7 @@ function commutatormain(array, depth, maxdepth) {
 }
 
 function repeatEnd(array, attempt) {
-    if (array.length === 0){
+    if (array.length === 0) {
         return [];
     }
     const arr = array.slice(0, array.length - 1);
@@ -301,13 +455,13 @@ function simplifyfinal(array) {
     }
     const arrOutput = [];
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i][1] < 0){
-            if (arr[i][1] === -1){
+        if (arr[i][1] < 0) {
+            if (arr[i][1] === -1) {
                 arrOutput[i] = `${arr[i][0]}'`;
             } else {
                 arrOutput[i] = `${arr[i][0] + -arr[i][1]}'`;
             }
-        } else if (arr[i][1] === 1){
+        } else if (arr[i][1] === 1) {
             arrOutput[i] = arr[i][0];
         } else {
             arrOutput[i] = arr[i][0] + arr[i][1];
@@ -325,7 +479,7 @@ function simplify(array) {
     while (i < array.length) {
         const arrayAdd = [array[i][0], normalize(array[i][1])],
             len = arr.length;
-        if (normalize(arrayAdd[1]) === 0){
+        if (normalize(arrayAdd[1]) === 0) {
             i += 1;
             continue;
         }
@@ -334,7 +488,7 @@ function simplify(array) {
                 const x = [];
                 x[0] = arr[len - 1][0];
                 x[1] = normalize(arr[len - 1][1] + arrayAdd[1]);
-                if (x[1] === 0){
+                if (x[1] === 0) {
                     arr.splice(-1, 1);
                     i += 1;
                     continue;
@@ -351,8 +505,9 @@ function simplify(array) {
     return arr;
 }
 
-function normalize(num){
+function normalize(num) {
     return (num % order + order - minAmount) % order + minAmount;
 }
 
 document.getElementById("free").addEventListener("click", free);
+document.getElementById("expand").addEventListener("click", expand);
