@@ -151,8 +151,6 @@ function calculateTwo(i, j, sign) {
 function cube() {
     const date1 = new Date(),
         algValue = String(document.getElementById("alg").value);
-    countResult = 0;
-    result = [];
     document.getElementById("player").setAttribute("alg", algValue);
     document.getElementById("out").innerHTML = "";
     document.getElementById("out").innerHTML = commutator(algValue);
@@ -162,13 +160,68 @@ function cube() {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n ${document.getElementById("out").innerHTML}\n `;
     } else {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n `;
+        result.sort(sortRule);
         for (let i = 0; i < result.length; i++) {
             document.getElementById("out").innerHTML = `${document.getElementById("out").innerHTML + result[i]}\n `;
         }
     }
 }
 
+function score(algValueOrigin) {
+    let i = 0,
+        j = 0;
+    let algValue = algValueOrigin.replace(/\(/gu, "[");
+    algValue = algValue.replace(/\)/gu, "]");
+    algValue = algValue.replace(/（/gu, "[");
+    algValue = algValue.replace(/）/gu, "]");
+    algValue = algValue.replace(/【/gu, "[");
+    algValue = algValue.replace(/】/gu, "]");
+    algValue = algValue.replace(/，/gu, ",");
+    algValue = algValue.replace(/\]\[/gu, "]+[");
+    const expression = rpn(initializeExperssion(algValue)),
+        rpnExpression = [];
+    while (expression.length > 0) {
+        const sign = expression.shift();
+        if (isOperator(sign)) {
+            j = rpnExpression.pop();
+            i = rpnExpression.pop();
+            if (isNaN(i) === true) {
+                i = i.split(" ").length;
+            }
+            if (isNaN(j) === true) {
+                j = j.split(" ").length;
+            }
+            rpnExpression.push(scoreTwo(i, j, sign));
+        } else {
+            rpnExpression.push(sign);
+        }
+    }
+    return rpnExpression[0];
+}
+
+function scoreTwo(i, j, sign) {
+    const abMaxScore = 2.5,
+        abMinScore = 5,
+        cScore = 1;
+    switch (sign) {
+    case "+":
+        return i + j;
+    case ":":
+        return cScore * i + j;
+    case ",":
+        return abMaxScore * Math.max(i, j) + abMinScore * Math.min(i, j);
+    default:
+        return false;
+    }
+}
+
+function sortRule(a, b) {
+    return score(a) - score(b);
+}
+
 function commutator(x) {
+    countResult = 0;
+    result = [];
     if (x.length === 0) {
         return "Empty input.";
     }
@@ -502,6 +555,25 @@ function conjugate(array) {
         if (len < minlen) {
             t = i;
             minlen = len;
+        }
+    }
+    // Need to generlize
+    // For  R' U2 R' D R U R' D' R U R, output R' U':[U',R' D R] instead of R' U2:[R' D R,U]
+    if (t > 0) {
+        if (arr[t - 1][1] === 2 || arr[t - 1][1] === -2) {
+            const output0 = simplify(arr.slice(0, t)),
+                output1 = simplify(repeatEnd(arr.slice(0, t), 1)),
+                output2 = simplify(repeatEnd(arr.slice(0, t), -1)),
+                len0 = simplify(inverse(output0).concat(arr, output0)).length,
+                len1 = simplify(inverse(output1).concat(arr, output1)).length,
+                len2 = simplify(inverse(output2).concat(arr, output2)).length;
+            if (len0 < len1 && len0 < len2) {
+                return output0;
+            }
+            if (len1 <= len2) {
+                return output1;
+            }
+            return output2;
         }
     }
     return arr.slice(0, t);

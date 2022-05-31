@@ -164,8 +164,6 @@ function free() {
     const date1 = new Date(),
         algValue = String(document.getElementById("alg").value);
     order = Number(document.getElementById("order").value);
-    countResult = 0;
-    result = [];
     document.getElementById("out").innerHTML = "";
     document.getElementById("out").innerHTML = commutator(algValue);
     const date2 = new Date(),
@@ -174,13 +172,68 @@ function free() {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n ${document.getElementById("out").innerHTML}\n `;
     } else {
         document.getElementById("out").innerHTML = `${countResult} results (${date3} seconds) \n `;
+        result.sort(sortRule);
         for (let i = 0; i < result.length; i++) {
             document.getElementById("out").innerHTML = `${document.getElementById("out").innerHTML + result[i]}\n `;
         }
     }
 }
 
+function score(algValueOrigin) {
+    let i = 0,
+        j = 0;
+    let algValue = algValueOrigin.replace(/\(/gu, "[");
+    algValue = algValue.replace(/\)/gu, "]");
+    algValue = algValue.replace(/（/gu, "[");
+    algValue = algValue.replace(/）/gu, "]");
+    algValue = algValue.replace(/【/gu, "[");
+    algValue = algValue.replace(/】/gu, "]");
+    algValue = algValue.replace(/，/gu, ",");
+    algValue = algValue.replace(/\]\[/gu, "]+[");
+    const expression = rpn(initializeExperssion(algValue)),
+        rpnExpression = [];
+    while (expression.length > 0) {
+        const sign = expression.shift();
+        if (isOperator(sign)) {
+            j = rpnExpression.pop();
+            i = rpnExpression.pop();
+            if (isNaN(i) === true) {
+                i = i.split(" ").length;
+            }
+            if (isNaN(j) === true) {
+                j = j.split(" ").length;
+            }
+            rpnExpression.push(scoreTwo(i, j, sign));
+        } else {
+            rpnExpression.push(sign);
+        }
+    }
+    return rpnExpression[0];
+}
+
+function scoreTwo(i, j, sign) {
+    const abMaxScore = 2.5,
+        abMinScore = 5,
+        cScore = 1;
+    switch (sign) {
+    case "+":
+        return i + j;
+    case ":":
+        return cScore * i + j;
+    case ",":
+        return abMaxScore * Math.max(i, j) + abMinScore * Math.min(i, j);
+    default:
+        return false;
+    }
+}
+
+function sortRule(a, b) {
+    return score(a) - score(b);
+}
+
 function commutator(x) {
+    countResult = 0;
+    result = [];
     if (x.length === 0) {
         return "Empty input.";
     }

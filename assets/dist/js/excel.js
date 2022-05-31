@@ -1,16 +1,10 @@
 "use strict";
 
-Array.prototype.unique = function () {
-    const res = [];
-    const json = {};
-    for (let i = 0; i < this.length; i++) {
-        if (!json[this[i]]) {
-            res.push(this[i]);
-            json[this[i]] = 1;
-        }
-    }
-    return res;
-};
+let result = [];
+const order = 4,
+    minAmount = -1,
+    maxAmount = 2;
+
 const X = XLSX;
 const file = document.getElementById("upfile");
 const out = document.getElementById("out");
@@ -24,9 +18,8 @@ function handleFile(ee) {
             const workbook = XLSX.read(data, {
                 "type": "binary"
             });
-
-            /* DO SOMETHING WITH workbook HERE */
-            let result = "";
+            // DO SOMETHING WITH workbook HERE
+            let excelResult = "";
             const tmp = X.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
             let maxRowCount = 0;
             let tmpRowCount = 0;
@@ -40,133 +33,233 @@ function handleFile(ee) {
                 obj[tmp[i].split("=")[0]] = tmp[i].split("=")[1];
                 arrayTitle.push(tmp[i].split("=")[0].charAt(0));
             }
-            arrayTitle = arrayTitle.unique(); //Array deduplication
-            result += "<table class=\"productInfo\">";
+            arrayTitle = Array.from(new Set(arrayTitle)); //Array deduplication
+            excelResult += "<table class=\"productInfo\">";
             for (let i = 1; i <= maxRowCount; i++) {
-                result += "<tr>";
+                excelResult += "<tr>";
                 for (let j = 0; j < arrayTitle.length; j++) {
                     if (obj.hasOwnProperty(arrayTitle[j] + i)) {
-                        result += `<td>${obj[arrayTitle[j] + i].replace("'", "")}</td>`;
+                        excelResult += `<td>${obj[arrayTitle[j] + i].replace("'", "")}</td>`;
                         if (obj[arrayTitle[j] + i].replace("'", "").length > 8) {
                             // console.time("Time");
                             console.log(`${i}:${obj[arrayTitle[j] + i].replace("'", "")}`);
-                            result += `<td>${commutator(obj[arrayTitle[j] + i].replace("'", ""))}</td>`;
+                            excelResult += `<td>${commutator(obj[arrayTitle[j] + i].replace("'", ""))}</td>`;
                             // console.timeEnd("Time");
                         }
                     } else {
-                        result += "<td></td>";
+                        excelResult += "<td></td>";
                     }
                 }
-                result += "</tr>";
+                excelResult += "</tr>";
             }
-            result += "</table>";
-            out.innerHTML = result;
+            excelResult += "</table>";
+            out.innerHTML = excelResult;
         };
         reader.readAsBinaryString(f);
     }
 }
 
+function isOperator(val) {
+    const operatorString = "+:,[]";
+    return operatorString.indexOf(val) > -1;
+}
+
+function initializeExperssion(expressionOrigin) {
+    const expression = expressionOrigin.replace(/\s/gu, " "),
+        inputStack = [];
+    inputStack.push(expression[0]);
+    for (let i = 1; i < expression.length; i++) {
+        if (isOperator(expression[i]) || isOperator(inputStack.slice(-1))) {
+            inputStack.push(expression[i]);
+        } else {
+            inputStack.push(inputStack.pop() + expression[i]);
+        }
+    }
+    return inputStack;
+}
+
+function operatorLevel(operator) {
+    if (operator === ",") {
+        return 0;
+    }
+    if (operator === ":") {
+        return 1;
+    }
+    if (operator === "+") {
+        return 2;
+    }
+    if (operator === "[") {
+        return 3;
+    }
+    if (operator === "]") {
+        return 4;
+    }
+    return null;
+}
+
+function rpn(inputStack) {
+    // Reverse Polish Notation
+    const outputStack = [],
+        operatorStack = [];
+    let match = false,
+        tempOperator = "";
+    while (inputStack.length > 0) {
+        const sign = inputStack.shift();
+        if (!isOperator(sign)) {
+            outputStack.push(sign);
+        } else if (operatorLevel(sign) === 4) {
+            match = false;
+            while (operatorStack.length > 0) {
+                tempOperator = operatorStack.pop();
+                if (tempOperator === "[") {
+                    match = true;
+                    break;
+                } else {
+                    outputStack.push(tempOperator);
+                }
+            }
+            if (match === false) {
+                return "Lack left parenthesis.";
+            }
+        } else {
+            while (operatorStack.length > 0 && operatorStack.slice(-1).toString() !== "[".toString() && operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1))) {
+                outputStack.push(operatorStack.pop());
+            }
+            operatorStack.push(sign);
+        }
+    }
+    while (operatorStack.length > 0) {
+        tempOperator = operatorStack.pop();
+        if (tempOperator === "[") {
+            return "Lack right parenthesis.";
+        }
+        outputStack.push(tempOperator);
+    }
+    return outputStack;
+}
+
+function score(algValueOrigin) {
+    let i = 0,
+        j = 0;
+    let algValue = algValueOrigin.replace(/\(/gu, "[");
+    algValue = algValue.replace(/\)/gu, "]");
+    algValue = algValue.replace(/（/gu, "[");
+    algValue = algValue.replace(/）/gu, "]");
+    algValue = algValue.replace(/【/gu, "[");
+    algValue = algValue.replace(/】/gu, "]");
+    algValue = algValue.replace(/，/gu, ",");
+    algValue = algValue.replace(/\]\[/gu, "]+[");
+    const expression = rpn(initializeExperssion(algValue)),
+        rpnExpression = [];
+    while (expression.length > 0) {
+        const sign = expression.shift();
+        if (isOperator(sign)) {
+            j = rpnExpression.pop();
+            i = rpnExpression.pop();
+            if (isNaN(i) === true) {
+                i = i.split(" ").length;
+            }
+            if (isNaN(j) === true) {
+                j = j.split(" ").length;
+            }
+            rpnExpression.push(scoreTwo(i, j, sign));
+        } else {
+            rpnExpression.push(sign);
+        }
+    }
+    return rpnExpression[0];
+}
+
+function scoreTwo(i, j, sign) {
+    const abMaxScore = 2.5,
+        abMinScore = 5,
+        cScore = 1;
+    switch (sign) {
+    case "+":
+        return i + j;
+    case ":":
+        return cScore * i + j;
+    case ",":
+        return abMaxScore * Math.max(i, j) + abMinScore * Math.min(i, j);
+    default:
+        return false;
+    }
+}
+
+function sortRule(a, b) {
+    return score(a) - score(b);
+}
+
 function commutator(x) {
-    const order = 4;
+    result = [];
     if (x.length === 0) {
         return "Empty input.";
     }
-    const arr1 = preprocessing(x),
-        len1 = arr1.length;
-    if (len1 === 0) {
+    let arr = preprocessing(x);
+    // // See https://github.com/cubing/cubing.js/blob/main/src/cubing/alg/traversal.ts
+    // // Examples:
+    // // • order 4 → min -1 (e.g. cube)
+    // // • order 5 → min -2 (e.g. Megaminx)
+    // // • order 3 → min -1 (e.g. Pyraminx)
+    arr = simplify(arr);
+    const len = arr.length;
+    if (len === 0) {
         return "Empty input.";
     }
-    for (let i = 0; i < len1 - 1; i++) {
-        if (arr1[i].length > 2) {
-            return "Invalid input.";
-        }
-    }
     let sum = 0;
-    for (let i = 0; i <= len1 - 1; i++) {
+    for (let i = 0; i <= len - 1; i++) {
         sum = 0;
-        for (let j = 0; j <= len1 - 1; j++) {
-            if (arr1[i][0] === arr1[j][0]) {
-                if (arr1[j].length === 1) {
-                    sum += 1;
-                } else {
-                    if (arr1[j][1] === "2") {
-                        sum += 2;
-                    }
-                    if (arr1[j][1] === "'") {
-                        sum -= 1;
-                    }
-                }
+        for (let j = 0; j <= len - 1; j++) {
+            if (arr[i][0] === arr[j][0]) {
+                sum = sum + arr[j][1];
             }
         }
         if (sum % order !== 0) {
+            document.getElementById("out").innerHTML = "Not found.";
             return "Not found.";
         }
     }
     let count = 0,
-        minscoreall = 10000,
-        arrex = [],
-        minarr = [];
+        arrex = [];
     const locationud = [];
-    for (let i = 0; i < arr1.length - 1; i++) {
+    for (let i = 0; i < arr.length - 1; i++) {
         const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-        if (similarstr.indexOf(arr1[i][0] + arr1[i + 1][0]) > -1) {
+        if (similarstr.indexOf(arr[i][0] + arr[i + 1][0]) > -1) {
             locationud[count] = i;
             count += 1;
         }
     }
-    if (count <= 4) {
-        const number = 2 ** count;
-        let minscore = 0;
+    const number = 2 ** count;
+    let commutatorResult = "Not found.",
+        flag = false;
+    for (let ii = 1; ii <= (len - 1) / 3; ii++) {
         for (let i = 0; i <= number - 1; i++) {
             const text = String(i.toString(2));
-            arrex = arr1.concat();
+            arrex = arr.concat();
             for (let j = 0; j < text.length; j++) {
                 if (text[text.length - 1 - j] === "1") {
                     arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
                 }
             }
-            const part3 = conjugate(arrex),
-                arr2 = simplify(inverse(part3).concat(arrex, part3)),
-                penaltyFactor = 2;
-            let arrtemp = arr2.concat(),
-                realscore = 0;
-            minscore = 1000;
-            for (let j = 0; j < arrtemp.length; j++) {
-                const scoreTemp = score(arrtemp);
-                if (j <= arrtemp.length / 2) {
-                    realscore = scoreTemp + j / (penaltyFactor + 1) + part3.length / 100;
-                }
-                if (j > arrtemp.length / 2) {
-                    realscore = scoreTemp + penaltyFactor * (arrtemp.length - j) / (penaltyFactor + 1) + part3.length / 100;
-                }
-                if (realscore < minscore) {
-                    minscore = realscore;
-                }
-                arrtemp = displace(arrtemp);
-            }
-            if (minscore < minscoreall) {
-                minarr = arrex;
-                minscoreall = minscore;
+            commutatorResult = commutatormain(arrex, ii, ii);
+            if (commutatorResult !== "Not found.") {
+                flag = true;
             }
         }
-    } else {
-        minarr = arr1;
+        if (flag) {
+            result.sort(sortRule);
+            return result[0];
+        }
     }
-    const textOutput = commutatormain(minarr);
-    if (textOutput !== "Not found.") {
-        return textOutput;
-    }
-    const part3 = conjugate(arr1);
-    arrex = simplify(inverse(part3).concat(arr1, part3));
-    return commutatorpair(arrex, part3);
+    return "Not found.";
 }
 
 function preprocessing(algValue) {
     let x = algValue.trim();
-    x = x.split("").join(" ");
     x = x.replace(/\s+/igu, " ");
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
+    x = x.replace(/3/gu, "'");
     x = x.replace(/ '/gu, "'");
     x = x.replace(/ 2/gu, "2");
     x = x.replace(/2'/gu, "2");
@@ -201,298 +294,206 @@ function preprocessing(algValue) {
         x = x.replace(/d'/gu, "D' E'");
         x = x.replace(/d/gu, "D E");
     }
-    let arr1 = simplify(x.split(" "));
-    // Handle cases like R2 M2 E' R' U' R E R' U R' M2
-    const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS",
-        len1 = arr1.length;
-    if (len1 > 1) {
-        if (similarstr.indexOf(arr1[len1 - 2][0] + arr1[len1 - 1][0]) > -1) {
-            if (arr1[len1 - 2][0] === arr1[0][0]) {
-                arr1 = swaparr(arr1, len1 - 2, len1 - 1);
-            }
+    const arr1 = x.split(" ");
+    const arr = [];
+    for (let i = 0; i < arr1.length; i++) {
+        arr[i] = [];
+        arr[i][0] = arr1[i][0];
+        let temp = arr1[i].replace(/[^0-9]/ug, "");
+        if (temp === "") {
+            temp = 1;
         }
-        if (similarstr.indexOf(arr1[0][0] + arr1[1][0]) > -1) {
-            if (arr1[1][0] === arr1[len1 - 1][0]) {
-                arr1 = swaparr(arr1, 0, 1);
-            }
+        arr[i][1] = Number(temp);
+        if (arr1[i][arr1[i].length - 1] === "'") {
+            arr[i][1] = -arr[i][1];
         }
     }
-    return arr1;
+    return arr;
 }
 
-function commutatorpair(array, part3) {
-    let arr1 = array.concat(),
-        minscore = 10000,
-        temp = 0,
-        output0b = "",
-        partb0 = "",
-        outputb0 = "",
-        outputa1 = "",
-        outputa2 = "",
-        outputb1 = "",
-        outputb2 = "",
-        text1 = "",
-        commutator1 = "",
-        commutator2 = "";
-    const lenarr1 = arr1.length;
-    if (lenarr1 < 4) {
-        return "Not found.";
+function commutatorpre(arr1, depth, maxdepth) {
+    let count = 0,
+        arrex = [];
+    const locationud = [];
+    for (let i = 0; i < arr1.length - 1; i++) {
+        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
+        if (similarstr.indexOf(arr1[i][0] + arr1[i + 1][0]) > -1) {
+            locationud[count] = i;
+            count += 1;
+        }
     }
-    for (let displaceIndex = 0; displaceIndex < lenarr1; displaceIndex++) {
-        for (let i = 1; i <= lenarr1 / 2 - 1; i++) {
-            for (let j = 1; j <= lenarr1 / 2 - 1; j++) {
-                if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                    for (let ir = 1; ir <= 3; ir++) {
-                        const jr = (readEnd(arr1[i + j - 1]) + ir) % 4;
-                        const part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                        const part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr))),
-                            party = simplify(part2x.concat(part1x));
-                        let part1 = part1x,
-                            part2 = part2x;
-                        if (party.length < Math.max(part1x.length, part2x.length)) {
-                            if (part1x.length <= part2x.length) {
-                                // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                                part1 = part1x;
-                                part2 = party;
-                            } else {
-                                // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                                part1 = inverse(part2x);
-                                part2 = party;
-                            }
-                        }
-                        const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                            arra = simplify(arrex),
-                            arrb = simplify(inverse(arra).concat(arr1));
-                        let partb = commutatormain(arrb);
-                        if (partb !== "Not found.") {
-                            const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
-                                parta1 = simplifyfinal(part1),
-                                parta2 = simplifyfinal(part2);
-                            if (partb.split("[").length === 3) {
-                                partb = partb.substring(1, partb.length - 1);
-                            }
-                            if (partb.indexOf(":") > -1) {
-                                partb0 = partb.split(":")[0];
-                            } else {
-                                partb0 = "";
-                            }
-                            const partb1 = partb.split("[")[1].split(",")[0],
-                                partb2 = partb.split(",")[1].split("]")[0],
-                                realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
-                            if (realscore < minscore) {
-                                output0b = array.slice(0, displaceIndex);
-                                outputb0 = partb0;
-                                outputa1 = parta1;
-                                outputa2 = parta2;
-                                outputb1 = partb1;
-                                outputb2 = partb2;
-                                temp = 1;
-                                minscore = realscore;
-                            }
-                        }
-                    }
-                } else {
-                    const part1x = simplify(arr1.slice(0, i));
-                    const part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j))),
-                        party = simplify(part2x.concat(part1x));
-                    let part1 = part1x,
-                        part2 = part2x;
-                    if (party.length < Math.max(part1x.length, part2x.length)) {
-                        if (part1x.length <= part2x.length) {
-                            // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                            part1 = part1x;
-                            part2 = party;
-                        } else {
-                            // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                            part1 = inverse(part2x);
-                            part2 = party;
-                        }
-                    }
-                    const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                        arra = simplify(arrex),
-                        arrb = simplify(inverse(arra).concat(arr1));
-                    let partb = commutatormain(arrb);
-                    if (partb !== "Not found.") {
-                        const realscore0 = part1.length + part2.length + Math.min(part1.length, part2.length),
-                            parta1 = simplifyfinal(part1),
-                            parta2 = simplifyfinal(part2);
-                        if (partb.split("[").length === 3) {
-                            partb = partb.substring(1, partb.length - 1);
-                        }
-                        if (partb.indexOf(":") > -1) {
-                            partb0 = partb.split(":")[0];
-                        } else {
-                            partb0 = "";
-                        }
-                        const partb1 = partb.split("[")[1].split(",")[0],
-                            partb2 = partb.split(",")[1].split("]")[0],
-                            realscore = partb1.split(" ").length + partb2.split(" ").length + Math.min(partb1.split(" ").length, partb2.split(" ").length) + realscore0;
-                        if (realscore < minscore) {
-                            output0b = array.slice(0, displaceIndex);
-                            outputb0 = partb0;
-                            outputa1 = parta1;
-                            outputa2 = parta2;
-                            outputb1 = partb1;
-                            outputb2 = partb2;
-                            temp = 1;
-                            minscore = realscore;
-                        }
-                    }
-                }
+    const number = 2 ** count;
+    let commutatorResult = "Not found.";
+    for (let i = 0; i <= number - 1; i++) {
+        const text = String(i.toString(2));
+        arrex = arr1.concat();
+        for (let j = 0; j < text.length; j++) {
+            if (text[text.length - 1 - j] === "1") {
+                arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
             }
         }
-        arr1 = displace(arr1);
-    }
-    if (temp === 0) {
-        return "Not found.";
-    }
-    let output0 = simplify(part3);
-    if (output0b.length > 0) {
-        output0 = simplify(part3.concat(output0b));
-    }
-    commutator1 = singleOutput("", outputa1, outputa2);
-    commutator2 = singleOutput(outputb0, outputb1, outputb2);
-    text1 = twoOutput(simplifyfinal(output0), commutator1, commutator2);
-    return text1;
-}
-
-function twoOutput(setup, commutator1, commutator2) {
-    if (document.getElementById("settingsOuterBracket").checked === false) {
-        if (setup === "") {
-            return `${commutator1}+${commutator2}`;
+        commutatorResult = commutatormain(arrex, depth, maxdepth);
+        if (commutatorResult !== "Not found.") {
+            return commutatorResult;
         }
-        return `${setup}:[${commutator1}+${commutator2}]`;
-    }
-    if (setup === "") {
-        return `[${commutator1}${commutator2}]`;
-    }
-    return `[${setup}:${commutator1}${commutator2}]`;
-}
-
-function commutatormain(array) {
-    const arr0 = array.concat(),
-        part3 = conjugate(arr0),
-        penaltyFactor = 2;
-    let arr1 = simplify(inverse(part3).concat(arr0, part3)),
-        minscore = 2000,
-        mini = 0,
-        realscore = 0,
-        arrtemp = arr1.concat(),
-        part4 = "",
-        scoreMin = 1000,
-        fullOutput = "";
-    for (let i = 0; i < arrtemp.length; i++) {
-        const scoreTemp = score(arrtemp);
-        if (i <= arrtemp.length / 2) {
-            realscore = scoreTemp + i / (penaltyFactor + 1);
-        }
-        if (i > arrtemp.length / 2) {
-            realscore = scoreTemp + penaltyFactor * (arrtemp.length - i) / (penaltyFactor + 1);
-        }
-        if (realscore < minscore) {
-            mini = i;
-            minscore = realscore;
-        }
-        arrtemp = displace(arrtemp);
-    }
-    if (mini <= arrtemp.length / 2) {
-        part4 = arr1.slice(0, mini);
-        arr1 = simplify(inverse(part4).concat(arr1, part4));
-    } else {
-        part4 = inverse(arr1.slice(mini, arrtemp.length));
-        arr1 = simplify(inverse(part4).concat(arr1, part4));
-    }
-    const part5 = simplify(part3.concat(part4)),
-        part5Output = simplifyfinal(part5),
-        lenarr1 = arr1.length;
-    for (let i = 1; i <= lenarr1 / 2 - 1; i++) {
-        const jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
-        for (let j = jmin; j <= lenarr1 / 2 - 1; j++) {
-            if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                for (let ir = 1; ir <= 3; ir++) {
-                    const jr = (readEnd(arr1[i + j - 1]) + ir) % 4;
-                    const part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                    const part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr))),
-                        party = simplify(part2x.concat(part1x));
-                    let part1 = part1x,
-                        part2 = part2x;
-                    if (party.length < Math.max(part1x.length, part2x.length)) {
-                        if (part1x.length <= part2x.length) {
-                            // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                            part1 = part1x;
-                            part2 = party;
-                        } else {
-                            // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                            part1 = inverse(part2x);
-                            part2 = party;
-                        }
-                    }
-                    const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                        arr = simplify(arrex),
-                        part1Output = simplifyfinal(part1),
-                        part2Output = simplifyfinal(part2);
-                    if (simplify(arr.concat(inverse(arr1))).length === 0) {
-                        const scoreMintemp = part1.length + part2.length + Math.min(part1.length, part2.length);
-                        if (scoreMintemp < scoreMin) {
-                            scoreMin = scoreMintemp;
-                            fullOutput = singleOutput(part5Output, part1Output, part2Output);
-                        }
-                    }
-                }
-            } else {
-                const part1x = simplify(arr1.slice(0, i));
-                const part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j))),
-                    party = simplify(part2x.concat(part1x));
-                let part1 = part1x,
-                    part2 = part2x;
-                if (party.length < Math.max(part1x.length, part2x.length)) {
-                    if (part1x.length <= part2x.length) {
-                        // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                        part1 = part1x;
-                        part2 = party;
-                    } else {
-                        // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                        part1 = inverse(part2x);
-                        part2 = party;
-                    }
-                }
-                const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                    arr = simplify(arrex),
-                    part1Output = simplifyfinal(part1),
-                    part2Output = simplifyfinal(part2);
-                if (simplify(arr.concat(inverse(arr1))).length === 0) {
-                    const scoreMintemp = part1.length + part2.length + Math.min(part1.length, part2.length);
-                    if (scoreMintemp < scoreMin) {
-                        scoreMin = scoreMintemp;
-                        fullOutput = singleOutput(part5Output, part1Output, part2Output);
-                    }
-                }
-            }
-        }
-    }
-    if (fullOutput.length > 0) {
-        return fullOutput;
     }
     return "Not found.";
 }
 
-function readEnd(str) {
-    const len = str.length;
-    if (len === 0) {
-        return 0;
+function commutatormain(array, depth, maxdepth) {
+    const arr0 = array.concat(),
+        partc = conjugate(arr0);
+    let arr1 = simplify(inverse(partc).concat(arr0, partc)),
+        text1 = "",
+        text0 = "";
+    const arrbak = arr1.concat(),
+        len = arr1.length;
+    if (len < 3 * depth + 1) {
+        return "Not found.";
     }
-    if (len === 1) {
-        return 1;
-    }
-    if (len === 2) {
-        if (str[1] === "2") {
-            return 2;
+    for (let d = 0; d <= len - 1; d++) {
+        let drmin = 0,
+            drmax = 0;
+        if (d > 0) {
+            if (arrbak[d - 1][1] > 0) {
+                drmin = 1;
+                drmax = arrbak[d - 1][1];
+            }
+            if (arrbak[d - 1][1] < 0) {
+                drmin = arrbak[d - 1][1];
+                drmax = -1;
+            }
         }
-        if (str[1] === "'") {
-            return 3;
+        for (let dr = drmin; dr <= drmax; dr++) {
+            arr1 = displace(arrbak, d, dr);
+            // For a b c b' a' d c' d' = a b:[c,b' a' d]
+            let maxi = 0;
+            if (depth === 1) {
+                maxi = len / 2 - Math.max(d, 2) + 1;
+            } else {
+                maxi = len / 2 - 1;
+            }
+            for (let i = 1; i <= maxi; i++) {
+                let minj = 0;
+                if (depth === 1) {
+                    minj = Math.max(1, Math.ceil(len / 2 - i));
+                } else {
+                    minj = 1;
+                }
+                for (let j = minj; j <= len / 2 - 1; j++) {
+                    let irList = [];
+                    if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
+                        // (a bx,by c bz)
+                        irList = [];
+                        for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
+                            irList.push(irValue);
+                        }
+                    } else {
+                        if (depth === 1 && arr1[i][0] !== arr1[len - 1][0]) {
+                            continue;
+                        }
+                        irList = [""];
+                    }
+                    for (const irKey in irList) {
+                        const ir = irList[irKey];
+                        let part1x = [],
+                            part2x = [];
+                        if (ir === "") {
+                            part1x = simplify(arr1.slice(0, i));
+                            part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j)));
+                        } else {
+                            const jr = normalize(arr1[i + j - 1][1] + ir);
+                            part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
+                            part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
+                        }
+                        const arra = simplify(part2x.concat(part1x, inverse(part2x), inverse(part1x))),
+                            arrb = simplify(arra.concat(arr1));
+                        let partb = "";
+                        if (depth > 1) {
+                            partb = commutatorpre(arrb, depth - 1, maxdepth);
+                        } else if (arrb.length > 0) {
+                            continue;
+                        }
+                        if (partb !== "Not found.") {
+                            let part1y = part1x,
+                                part2y = part2x;
+                            const party = simplify(part2x.concat(part1x));
+                            if (party.length < Math.max(part1x.length, part2x.length)) {
+                                if (part1x.length <= part2x.length) {
+                                    // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
+                                    part1y = part1x;
+                                    part2y = party;
+                                } else {
+                                    // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
+                                    part1y = inverse(part2x);
+                                    part2y = party;
+                                }
+                            }
+                            // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
+                            let part0 = simplify(partc.concat(repeatEnd(arrbak.slice(0, d), dr))),
+                                part1 = part1y,
+                                part2 = part2y;
+                            if (part0.length > 0 && maxdepth === 1) {
+                                const partz = simplify(part0.concat(part2y));
+                                if (partz.length < part0.length) {
+                                    part0 = partz;
+                                    part1 = inverse(part2y);
+                                    part2 = part1y;
+                                }
+                            }
+                            const part1Output = simplifyfinal(part1),
+                                part2Output = simplifyfinal(part2),
+                                part0Output = simplifyfinal(part0);
+                            if (depth === 1) {
+                                text1 = singleOutput(part0Output, part1Output, part2Output);
+                            } else {
+                                text1 = multiOutput(part0Output, part1Output, part2Output, partb);
+                            }
+                            if (depth !== maxdepth) {
+                                return text1;
+                            }
+                            if (text0 === "") {
+                                text0 = text1;
+                            }
+                            if (depth === maxdepth && result.indexOf(text1) === -1) {
+                                result.push(text1);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
-    return null;
+    if (text0 === "") {
+        return "Not found.";
+    }
+    return text0;
+}
+
+function repeatEnd(array, attempt) {
+    if (array.length === 0) {
+        return [];
+    }
+    const arr = array.slice(0, array.length - 1);
+    if (attempt === 0) {
+        return arr;
+    }
+    const x = [];
+    x[0] = array[array.length - 1][0];
+    x[1] = attempt;
+    return arr.concat([x]);
+}
+
+function multiOutput(setup, commutatora, commutatorb, partb) {
+    if (document.getElementById("settingsOuterBracket").checked === false) {
+        if (setup === "") {
+            return `[${commutatora},${commutatorb}]+${partb}`;
+        }
+        return `${setup}:[[${commutatora},${commutatorb}]+${partb}]`;
+    } else if (setup === "") {
+        return `[${commutatora},${commutatorb}]${partb}`;
+    }
+    return `[${setup}:[${commutatora},${commutatorb}]${partb}]`;
 }
 
 function singleOutput(setup, commutatora, commutatorb) {
@@ -501,102 +502,16 @@ function singleOutput(setup, commutatora, commutatorb) {
             return `[${commutatora},${commutatorb}]`;
         }
         return `${setup}:[${commutatora},${commutatorb}]`;
-
-    }
-    if (setup === "") {
+    } else if (setup === "") {
         return `[${commutatora},${commutatorb}]`;
     }
     return `[${setup}:[${commutatora},${commutatorb}]]`;
 }
 
-function repeatEnd(array, attempt) {
-    const str = array[array.length - 1],
-        arr = array.slice(0, array.length - 1);
-    const arrstr = [str];
-    if (attempt === 0) {
-        return arr;
-    }
-    if (attempt === 1) {
-        return arr.concat(arrstr[0][0]);
-    }
-    if (attempt === 2) {
-        return arr.concat(arrstr[0][0], arrstr[0][0]);
-    }
-    if (attempt === 3) {
-        return arr.concat(arrstr[0][0], arrstr[0][0], arrstr[0][0]);
-    }
-    return null;
-}
-
-// R2 D R U' R D' R' U R D R' U R' D' R U' R
-function displace(array) {
+function displace(array, d, dr) {
     const arr = array.concat(),
-        arr1 = [arr[0]],
-        arr2 = [arr[arr.length - 1]];
-    if (arr1[0][0] === arr2[0][0]) {
-        return simplify(arr2.concat(arr, inverse(arr2)));
-    }
+        arr1 = repeatEnd(arr.slice(0, d), dr);
     return simplify(inverse(arr1).concat(arr, arr1));
-}
-
-function score(array) {
-    const arr1 = array.concat(),
-        lenarr1 = arr1.length;
-    let scoreMin = 1000;
-    for (let i = 1; i <= lenarr1 / 2 - 1; i++) {
-        const jmin = Math.max(1, Math.ceil((lenarr1 - 1) / 2 - i));
-        for (let j = jmin; j <= lenarr1 / 2 - 1; j++) {
-            if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                for (let ir = 1; ir <= 3; ir++) {
-                    const jr = (readEnd(arr1[i + j - 1]) + ir) % 4;
-                    const part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                    const part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr))),
-                        party = simplify(part2x.concat(part1x));
-                    let part1 = part1x,
-                        part2 = part2x;
-                    if (party.length < Math.max(part1x.length, part2x.length)) {
-                        if (part1x.length <= part2x.length) {
-                            // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                            part1 = part1x;
-                            part2 = party;
-                        } else {
-                            // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                            part1 = inverse(part2x);
-                            part2 = party;
-                        }
-                    }
-                    const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                        arr = simplify(arrex);
-                    if (simplify(arr.concat(inverse(arr1))).length === 0) {
-                        scoreMin = Math.min(scoreMin, part1.length + part2.length + Math.min(part1.length, part2.length));
-                    }
-                }
-            } else {
-                const part1x = simplify(arr1.slice(0, i));
-                const part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j))),
-                    party = simplify(part2x.concat(part1x));
-                let part1 = part1x,
-                    part2 = part2x;
-                if (party.length < Math.max(part1x.length, part2x.length)) {
-                    if (part1x.length <= part2x.length) {
-                        // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                        part1 = part1x;
-                        part2 = party;
-                    } else {
-                        // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                        part1 = inverse(part2x);
-                        part2 = party;
-                    }
-                }
-                const arrex = part1.concat(part2, inverse(part1), inverse(part2)),
-                    arr = simplify(arrex);
-                if (simplify(arr.concat(inverse(arr1))).length === 0) {
-                    scoreMin = Math.min(scoreMin, part1.length + part2.length + Math.min(part1.length, part2.length));
-                }
-            }
-        }
-    }
-    return scoreMin;
 }
 
 function conjugate(array) {
@@ -612,24 +527,23 @@ function conjugate(array) {
             minlen = len;
         }
     }
+    // Need to generlize
     // For  R' U2 R' D R U R' D' R U R, output R' U':[U',R' D R] instead of R' U2:[R' D R,U]
     if (t > 0) {
-        if (arr[t - 1].length > 1) {
-            if (arr[t - 1][1] === "2") {
-                const output0 = simplify(arr.slice(0, t)),
-                    output1 = simplify(arr.slice(0, t - 1).concat([arr[t - 1][0]])),
-                    output2 = simplify(arr.slice(0, t - 1).concat([inverseOne(arr[t - 1][0])])),
-                    len0 = simplify(inverse(output0).concat(arr, output0)).length,
-                    len1 = simplify(inverse(output1).concat(arr, output1)).length,
-                    len2 = simplify(inverse(output2).concat(arr, output2)).length;
-                if (len0 < len1 && len0 < len2) {
-                    return output0;
-                }
-                if (len1 <= len2) {
-                    return output1;
-                }
-                return output2;
+        if (arr[t - 1][1] === 2 || arr[t - 1][1] === -2) {
+            const output0 = simplify(arr.slice(0, t)),
+                output1 = simplify(repeatEnd(arr.slice(0, t), 1)),
+                output2 = simplify(repeatEnd(arr.slice(0, t), -1)),
+                len0 = simplify(inverse(output0).concat(arr, output0)).length,
+                len1 = simplify(inverse(output1).concat(arr, output1)).length,
+                len2 = simplify(inverse(output2).concat(arr, output2)).length;
+            if (len0 < len1 && len0 < len2) {
+                return output0;
             }
+            if (len1 <= len2) {
+                return output1;
+            }
+            return output2;
         }
     }
     return arr.slice(0, t);
@@ -637,15 +551,10 @@ function conjugate(array) {
 
 function inverse(array) {
     const arr = array.concat();
-    for (let i = 0; i < arr.length / 2; i++) {
-        const temp = arr[i];
-        arr[i] = array[arr.length - 1 - i];
-        arr[arr.length - 1 - i] = temp;
-    }
     for (let i = 0; i < arr.length; i++) {
-        arr[i] = inverseOne(arr[i]);
+        arr[i] = [array[i][0], normalize(-array[i][1])];
     }
-    return arr;
+    return arr.map((x) => x).reverse();
 }
 
 function simplifyfinal(array) {
@@ -664,8 +573,40 @@ function simplifyfinal(array) {
         if (arr[i][0] === "L" && arr[i + 1][0] === "R") {
             arr = swaparr(arr, i, i + 1);
         }
+        if (arr[i][0] === "E" && arr[i + 1][0] === "U") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "S" && arr[i + 1][0] === "F") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "M" && arr[i + 1][0] === "R") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "D" && arr[i + 1][0] === "E") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "B" && arr[i + 1][0] === "S") {
+            arr = swaparr(arr, i, i + 1);
+        }
+        if (arr[i][0] === "L" && arr[i + 1][0] === "M") {
+            arr = swaparr(arr, i, i + 1);
+        }
     }
-    let arrOutput = `${arr.join(" ")} `;
+    const arrOutput1 = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i][1] < 0) {
+            if (arr[i][1] === -1) {
+                arrOutput1[i] = `${arr[i][0]}'`;
+            } else {
+                arrOutput1[i] = `${arr[i][0] + -arr[i][1]}'`;
+            }
+        } else if (arr[i][1] === 1) {
+            arrOutput1[i] = arr[i][0];
+        } else {
+            arrOutput1[i] = arr[i][0] + arr[i][1];
+        }
+    }
+    let arrOutput = `${arrOutput1.join(" ")} `;
     arrOutput = arrOutput.replace(/R2 M2 /gu, "r2 ");
     arrOutput = arrOutput.replace(/R' M /gu, "r' ");
     arrOutput = arrOutput.replace(/R M' /gu, "r ");
@@ -714,80 +655,66 @@ function simplify(array) {
     if (array.length === 0) {
         return [];
     }
-    const arr = [array[0]];
-    let i = 1;
+    const arr = [];
+    let i = 0;
     while (i < array.length) {
-        const arrayAdd = array[i],
+        const arrayAdd = [array[i][0], normalize(array[i][1])],
             len = arr.length;
+        if (normalize(arrayAdd[1]) === 0) {
+            i += 1;
+            continue;
+        }
         if (arr.length >= 1) {
-            if (combineTwo(arr[len - 1], arrayAdd).length === 0) {
-                arr.splice(-1, 1);
-                i += 1;
-                continue;
-            }
-            if (combineTwo(arr[len - 1], arrayAdd) === arr[len - 1][0]) {
-                arr.splice(-1, 1, arr[len - 1][0]);
-                i += 1;
-                continue;
-            }
-            if (combineTwo(arr[len - 1], arrayAdd) === `${arr[len - 1][0]}2`) {
-                arr.splice(-1, 1, `${arr[len - 1][0]}2`);
-                i += 1;
-                continue;
-            }
-            if (combineTwo(arr[len - 1], arrayAdd) === `${arr[len - 1][0]}'`) {
-                arr.splice(-1, 1, `${arr[len - 1][0]}'`);
-                i += 1;
-                continue;
+            if (arr[len - 1][0] === arrayAdd[0]) {
+                const x = [];
+                x[0] = arr[len - 1][0];
+                x[1] = normalize(arr[len - 1][1] + arrayAdd[1]);
+                if (x[1] === 0) {
+                    arr.splice(-1, 1);
+                    i += 1;
+                    continue;
+                } else {
+                    arr.splice(-1, 1, x);
+                    i += 1;
+                    continue;
+                }
             }
         }
         if (arr.length >= 2) {
             const similarstr1 = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-            if (similarstr1.indexOf(arr[len - 2][0] + arr[len - 1][0]) > -1) {
-                if (combineTwo(arr[len - 2], arrayAdd).length === 0) {
-                    arr.splice(-2, 1);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 2], arrayAdd) === arr[len - 2][0]) {
-                    arr.splice(-2, 1, arr[len - 2][0]);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 2], arrayAdd) === `${arr[len - 2][0]}2`) {
-                    arr.splice(-2, 1, `${arr[len - 2][0]}2`);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 2], arrayAdd) === `${arr[len - 2][0]}'`) {
-                    arr.splice(-2, 1, `${arr[len - 2][0]}'`);
-                    i += 1;
-                    continue;
+            if (arr[len - 1][0] === arrayAdd[0]) {
+                if (similarstr1.indexOf(arr[len - 2][0] + arr[len - 1][0]) > -1) {
+                    const x = [];
+                    x[0] = arr[len - 2][0];
+                    x[1] = normalize(arr[len - 2][1] + arrayAdd[1]);
+                    if (x[1] === 0) {
+                        arr.splice(-2, 1);
+                        i += 1;
+                        continue;
+                    } else {
+                        arr.splice(-2, 1, x);
+                        i += 1;
+                        continue;
+                    }
                 }
             }
         }
         if (arr.length >= 3) {
             const similarstr2 = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
-            if (similarstr2.indexOf(arr[len - 3][0] + arr[len - 2][0] + arr[len - 1][0]) > -1) {
-                if (combineTwo(arr[len - 3], arrayAdd).length === 0) {
-                    arr.splice(-3, 1);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 3], arrayAdd) === arr[len - 3][0]) {
-                    arr.splice(-3, 1, arr[len - 3][0]);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 3], arrayAdd) === `${arr[len - 3][0]}2`) {
-                    arr.splice(-3, 1, `${arr[len - 3][0]}2`);
-                    i += 1;
-                    continue;
-                }
-                if (combineTwo(arr[len - 3], arrayAdd) === `${arr[len - 3][0]}'`) {
-                    arr.splice(-3, 1, `${arr[len - 3][0]}'`);
-                    i += 1;
-                    continue;
+            if (arr[len - 1][0] === arrayAdd[0]) {
+                if (similarstr2.indexOf(arr[len - 3][0] + arr[len - 2][0] + arr[len - 1][0]) > -1) {
+                    const x = [];
+                    x[0] = arr[len - 3][0];
+                    x[1] = normalize(arr[len - 3][1] + arrayAdd[1]);
+                    if (x[1] === 0) {
+                        arr.splice(-3, 1);
+                        i += 1;
+                        continue;
+                    } else {
+                        arr.splice(-3, 1, x);
+                        i += 1;
+                        continue;
+                    }
                 }
             }
         }
@@ -797,74 +724,13 @@ function simplify(array) {
     return arr;
 }
 
-function combineTwo(str1, str2) {
-    const len1 = str1.length,
-        len2 = str2.length;
-    if (str1[0] === str2[0]) {
-        if (len1 === 1) {
-            if (len2 === 1) {
-                return `${str1}2`;
-            }
-            if (len2 === 2) {
-                if (str2[1] === "2") {
-                    return `${str1}'`;
-                }
-                if (str2[1] === "'") {
-                    return "";
-                }
-            }
-        }
-        if (len1 === 2) {
-            if (str1[1] === "'") {
-                if (len2 === 1) {
-                    return "";
-                }
-                if (len2 === 2) {
-                    if (str2[1] === "2") {
-                        return str1[0];
-                    }
-                    if (str2[1] === "'") {
-                        return `${str1[0]}2`;
-                    }
-                }
-            }
-            if (str1[1] === "2") {
-                if (len2 === 1) {
-                    return `${str1[0]}'`;
-                }
-                if (len2 === 2) {
-                    if (str2[1] === "2") {
-                        return "";
-                    }
-                    if (str2[1] === "'") {
-                        return str1[0];
-                    }
-                }
-            }
-        }
-    }
-    return "0";
-}
-
-function inverseOne(str) {
-    const len = str.length;
-    if (len === 1) {
-        return `${str}'`;
-    }
-    if (len === 2) {
-        if (str[1] === "2") {
-            return str;
-        }
-        if (str[1] === "'") {
-            return str[0];
-        }
-    }
-    return null;
-}
-
 function swaparr(arr, index1, index2) {
     arr[index1] = arr.splice(index2, 1, arr[index1])[0];
     return arr;
+}
+
+function normalize(num) {
+    return (num % order + order - minAmount) % order + minAmount;
 }
 
 file.addEventListener("change", handleFile, false);
