@@ -280,7 +280,6 @@ function preprocessing(algValue) {
     x = x.replace(/\s+/igu, " ");
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
-    x = x.replace(/ '/gu, "'");
     const arr1 = x.split(" ");
     const arr = [];
     for (let i = 0; i < arr1.length; i++) {
@@ -294,7 +293,7 @@ function preprocessing(algValue) {
         if (arr[i][1] > maxAlgAmount) {
             maxAlgAmount = arr[i][1];
         }
-        if (arr1[i][arr1[i].length - 1] === "'") {
+        if (arr1[i].indexOf("'") > -1) {
             arr[i][1] = -arr[i][1];
         }
     }

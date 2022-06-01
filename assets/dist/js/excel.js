@@ -259,11 +259,6 @@ function preprocessing(algValue) {
     x = x.replace(/\s+/igu, " ");
     x = x.replace(/[‘]/gu, "'");
     x = x.replace(/[’]/gu, "'");
-    x = x.replace(/3/gu, "'");
-    x = x.replace(/ '/gu, "'");
-    x = x.replace(/ 2/gu, "2");
-    x = x.replace(/2'/gu, "2");
-    x = x.replace(/'2/gu, "2");
     if (x.indexOf("R") > -1 || x.indexOf("M") > -1) {
         x = x.replace(/r2/gu, "R2 M2");
         x = x.replace(/r'/gu, "R' M");
@@ -304,7 +299,7 @@ function preprocessing(algValue) {
             temp = 1;
         }
         arr[i][1] = Number(temp);
-        if (arr1[i][arr1[i].length - 1] === "'") {
+        if (arr1[i].indexOf("'") > -1) {
             arr[i][1] = -arr[i][1];
         }
     }
@@ -371,9 +366,9 @@ function commutatormain(array, depth, maxdepth) {
             // For M U2 D' S U' S' D' S' U' S D2 M' = M U2 D' S U' S':[D' S' U',S U D]
             let maxi = 0;
             if (depth === 1) {
-                maxi = len / 2;
+                maxi = len / 2 - 1;
             } else {
-                maxi = len / 2;
+                maxi = len / 2 - 1;
             }
             for (let i = 1; i <= maxi; i++) {
                 let minj = 0;
