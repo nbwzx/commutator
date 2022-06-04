@@ -140,9 +140,9 @@ function calculateTwo(i, j, sign) {
     case "+":
         return simplifyfinal(arr1.concat(arr2));
     case ":":
-        return simplifyfinal(arr1.concat(arr2, inverse(arr1)));
+        return simplifyfinal(arr1.concat(arr2, invert(arr1)));
     case ",":
-        return simplifyfinal(arr1.concat(arr2, inverse(arr1), inverse(arr2)));
+        return simplifyfinal(arr1.concat(arr2, invert(arr1), invert(arr2)));
     default:
         return false;
     }
@@ -369,7 +369,7 @@ function commutatorpre(arr1, depth, maxdepth) {
 function commutatormain(array, depth, maxdepth) {
     const arr0 = array.concat(),
         partc = conjugate(arr0);
-    let arr1 = simplify(inverse(partc).concat(arr0, partc)),
+    let arr1 = simplify(invert(partc).concat(arr0, partc)),
         text1 = "",
         text0 = "";
     const arrbak = arr1.concat(),
@@ -428,13 +428,13 @@ function commutatormain(array, depth, maxdepth) {
                             part2x = [];
                         if (ir === "") {
                             part1x = simplify(arr1.slice(0, i));
-                            part2x = simplify(inverse(part1x).concat(arr1.slice(0, i + j)));
+                            part2x = simplify(invert(part1x).concat(arr1.slice(0, i + j)));
                         } else {
                             const jr = normalize(arr1[i + j - 1][1] + ir);
                             part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                            part2x = simplify(inverse(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
+                            part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
                         }
-                        const arra = simplify(part2x.concat(part1x, inverse(part2x), inverse(part1x))),
+                        const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
                             arrb = simplify(arra.concat(arr1));
                         let partb = "";
                         if (depth > 1) {
@@ -453,7 +453,7 @@ function commutatormain(array, depth, maxdepth) {
                                     part2y = party;
                                 } else {
                                     // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                                    part1y = inverse(part2x);
+                                    part1y = invert(part2x);
                                     part2y = party;
                                 }
                             }
@@ -465,7 +465,7 @@ function commutatormain(array, depth, maxdepth) {
                                 const partz = simplify(part0.concat(part2y));
                                 if (partz.length < part0.length) {
                                     part0 = partz;
-                                    part1 = inverse(part2y);
+                                    part1 = invert(part2y);
                                     part2 = part1y;
                                 }
                             }
@@ -556,7 +556,7 @@ function singleOutput(setup, commutatora, commutatorb) {
 function displace(array, d, dr) {
     const arr = array.concat(),
         arr1 = repeatEnd(arr.slice(0, d), dr);
-    return simplify(inverse(arr1).concat(arr, arr1));
+    return simplify(invert(arr1).concat(arr, arr1));
 }
 
 function conjugate(array) {
@@ -565,7 +565,7 @@ function conjugate(array) {
         t = 0;
     for (let i = 1; i < array.length; i++) {
         const arr1 = arr.slice(0, i),
-            arr2 = inverse(arr1),
+            arr2 = invert(arr1),
             len = simplify(arr2.concat(arr, arr1)).length;
         if (len < minlen) {
             t = i;
@@ -579,9 +579,9 @@ function conjugate(array) {
             const output0 = simplify(arr.slice(0, t)),
                 output1 = simplify(repeatEnd(arr.slice(0, t), 1)),
                 output2 = simplify(repeatEnd(arr.slice(0, t), -1)),
-                len0 = simplify(inverse(output0).concat(arr, output0)).length,
-                len1 = simplify(inverse(output1).concat(arr, output1)).length,
-                len2 = simplify(inverse(output2).concat(arr, output2)).length;
+                len0 = simplify(invert(output0).concat(arr, output0)).length,
+                len1 = simplify(invert(output1).concat(arr, output1)).length,
+                len2 = simplify(invert(output2).concat(arr, output2)).length;
             if (len0 < len1 && len0 < len2) {
                 return output0;
             }
@@ -594,7 +594,7 @@ function conjugate(array) {
     return arr.slice(0, t);
 }
 
-function inverse(array) {
+function invert(array) {
     const arr = array.concat();
     for (let i = 0; i < arr.length; i++) {
         arr[i] = [array[i][0], normalize(-array[i][1])];
