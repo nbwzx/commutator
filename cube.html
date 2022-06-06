@@ -80,23 +80,19 @@
     </div>
   </nav>
   <main class="container">
-    <br>
+    <br />
     <h2 class="border-1">Decompose a Rubik's cube algorithm in commutator notation.</h2>
     <div class="col">
-      <br>
+      <br />
       <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm" aria-label="Enter an algorithm"
         style="font-size: 30px;">
-      <br>
+      <br />
       Settings:
       <input type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket for all commutators
-      <!-- <input type="text" style="width:500px; height:20px;" id="y" value="" /> -->
-      <br><br>
+      <br /><br />
       <button type="button" id="cube" class="btn btn-danger">Decompose Me</button>&nbsp;&nbsp;
       <button type="button" id="expand" class="btn btn-danger">Expand Me</button>
-      <!-- <div style="font-size: 30px;white-space: pre-line;" class="alert alert-danger mt-5 invisible fade show" id="alert"
-        role="alert" onkeydown="this.onkeyup();" >
-      </div> -->
-      <br><br>
+      <br /><br />
       <twisty-player id="player" alg="" experimental-setup-anchor="end"></twisty-player>
       <div id="out" style="font-size: 30px;white-space: pre-line;"></div>
     </div>
