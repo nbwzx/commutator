@@ -440,22 +440,22 @@ function commutatormain(array, depth, maxdepth) {
                                     part2 = part1y;
                                 }
                             }
-                            // Avoid (b c Ux,Dy)
-                            if (part2.length === 1 && simplifyfinal([part1[part1.length - 1], part2[0]]) === simplifyfinal([part2[0], part1[part1.length - 1]])){
-                                continue;
-                            }
-                            // Avoid (Dy,b c Ux)
-                            if (part1.length === 1 && simplifyfinal([part2[part2.length - 1], part1[0]]) === simplifyfinal([part1[0], part2[part2.length - 1]])){
-                                continue;
-                            }
-                            // Avoid (Ux b c,Dy)
-                            if (part2.length === 1 && simplifyfinal([part2[0], part1[0]]) === simplifyfinal([part1[0], part2[0]])){
-                                continue;
-                            }
-                            // Avoid (Dy,Ux b c)
-                            if (part1.length === 1 && simplifyfinal([part2[0], part1[0]]) === simplifyfinal([part1[0], part2[0]])){
-                                continue;
-                            }
+                            // // Avoid (b c Ux,Dy)
+                            // if (part2.length === 1 && simplifyfinal([part1[part1.length - 1], part2[0]]) === simplifyfinal([part2[0], part1[part1.length - 1]])){
+                            //     continue;
+                            // }
+                            // // Avoid (Dy,b c Ux)
+                            // if (part1.length === 1 && simplifyfinal([part2[part2.length - 1], part1[0]]) === simplifyfinal([part1[0], part2[part2.length - 1]])){
+                            //     continue;
+                            // }
+                            // // Avoid (Ux b c,Dy)
+                            // if (part2.length === 1 && simplifyfinal([part2[0], part1[0]]) === simplifyfinal([part1[0], part2[0]])){
+                            //     continue;
+                            // }
+                            // // Avoid (Dy,Ux b c)
+                            // if (part1.length === 1 && simplifyfinal([part2[0], part1[0]]) === simplifyfinal([part1[0], part2[0]])){
+                            //     continue;
+                            // }
                             const part1Output = simplifyfinal(part1),
                                 part2Output = simplifyfinal(part2),
                                 part0Output = simplifyfinal(part0);
