@@ -301,46 +301,61 @@ function preprocessing(algValue) {
 }
 
 function commutatormain(array, depth, maxdepth) {
-    const arr0 = array.concat(),
-        partc = conjugate(arr0);
-    let arr1 = simplify(invert(partc).concat(arr0, partc)),
+    let arr1 = simplify(array),
         text1 = "",
         text0 = "";
     const arrbak = arr1.concat(),
         len = arr1.length;
-    if (len < 3 * depth + 1) {
+    if (arr1.length < 3 * depth + 1) {
         return "Not found.";
     }
-    for (let d = 0; d <= len - 1; d++) {
-        let drmin = 0,
-            drmax = 0;
+    for (let d = 0; d <= (len + arr1.length + 1) / 2 - 1; d++) {
+        const drList = [];
         if (d > 0) {
-            if (arrbak[d - 1][1] > 0) {
-                drmin = 1;
-                drmax = arrbak[d - 1][1];
+            if (order % 2 === 0 && arrbak[d - 1][1] === Math.floor(order / 2)) {
+                for (let drValue = -arrbak[d - 1][1]; drValue <= -1; drValue++) {
+                    drList.push(drValue);
+                }
+                for (let drValue = 1; drValue <= arrbak[d - 1][1]; drValue++) {
+                    drList.push(drValue);
+                }
+            } else {
+                if (arrbak[d - 1][1] > 0) {
+                    for (let drValue = 1; drValue <= arrbak[d - 1][1]; drValue++) {
+                        drList.push(drValue);
+                    }
+                }
+                if (arrbak[d - 1][1] < 0) {
+                    for (let drValue = arrbak[d - 1][1]; drValue <= -1; drValue++) {
+                        drList.push(drValue);
+                    }
+                }
             }
-            if (arrbak[d - 1][1] < 0) {
-                drmin = arrbak[d - 1][1];
-                drmax = -1;
-            }
+        } else {
+            drList.push(0);
         }
-        for (let dr = drmin; dr <= drmax; dr++) {
+        for (let drKey = 0; drKey <= order; drKey++) {
+            // 0, 1, -1, 2, -2...
+            const dr = (drKey % 2 * 2 - 1) * Math.floor((drKey + 1) / 2);
+            if (drList.indexOf(dr) === -1) {
+                continue;
+            }
             arr1 = displace(arrbak, d, dr);
             // For a b c b' a' d c' d' = a b:[c,b' a' d]
             let maxi = 0;
             if (depth === 1) {
-                maxi = len / 2 - Math.max(d, 2) + 1;
+                maxi = arr1.length / 2 - 1;
             } else {
-                maxi = len / 2 - 1;
+                maxi = arr1.length / 2 - 1;
             }
             for (let i = 1; i <= maxi; i++) {
                 let minj = 0;
                 if (depth === 1) {
-                    minj = Math.max(1, Math.ceil(len / 2 - i));
+                    minj = Math.max(1, Math.ceil(arr1.length / 2 - i));
                 } else {
                     minj = 1;
                 }
-                for (let j = minj; j <= len / 2 - 1; j++) {
+                for (let j = minj; j <= arr1.length / 2 - 1; j++) {
                     let irList = [];
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
                         // (a bx,by c bz)
@@ -349,7 +364,7 @@ function commutatormain(array, depth, maxdepth) {
                             irList.push(irValue);
                         }
                     } else {
-                        if (depth === 1 && arr1[i][0] !== arr1[len - 1][0]) {
+                        if (depth === 1 && arr1[i][0] !== arr1[arr1.length - 1][0]) {
                             continue;
                         }
                         irList = [""];
@@ -390,7 +405,7 @@ function commutatormain(array, depth, maxdepth) {
                                 }
                             }
                             // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
-                            let part0 = simplify(partc.concat(repeatEnd(arrbak.slice(0, d), dr))),
+                            let part0 = simplify(repeatEnd(arrbak.slice(0, d), dr)),
                                 part1 = part1y,
                                 part2 = part2y;
                             if (part0.length > 0 && maxdepth === 1) {
