@@ -266,7 +266,7 @@ function commutator(x) {
         arrex = [];
     const locationud = [];
     for (let i = 0; i < arr.length - 1; i++) {
-        if (commute[arr[i][0]] === commute[arr[i + 1][0]]) {
+        if (commute[arr[i][0]] === commute[arr[i + 1][0]] && arr[i][0] in commute && arr[i + 1][0] in commute) {
             locationud[count] = i;
             count += 1;
         }
@@ -352,7 +352,7 @@ function commutatorpre(arr1, depth, maxdepth) {
         arrex = [];
     const locationud = [];
     for (let i = 0; i < arr1.length - 1; i++) {
-        if (commute[arr1[i][0]] === commute[arr1[i + 1][0]]) {
+        if (commute[arr1[i][0]] === commute[arr1[i + 1][0]] && arr1[i][0] in commute && arr1[i + 1][0] in commute) {
             locationud[count] = i;
             count += 1;
         }
