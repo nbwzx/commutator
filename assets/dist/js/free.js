@@ -358,7 +358,7 @@ function commutatormain(array, depth, maxdepth) {
                 for (let j = minj; j <= arr1.length / 2 - 1; j++) {
                     let irList = [];
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                        // (a bx,by c bz)
+                        // [a bx,by c bz]
                         irList = [];
                         for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
                             irList.push(irValue);
@@ -489,22 +489,6 @@ function displace(array, d, dr) {
     const arr = array.concat(),
         arr1 = repeatEnd(arr.slice(0, d), dr);
     return simplify(invert(arr1).concat(arr, arr1));
-}
-
-function conjugate(array) {
-    const arr = array.concat();
-    let minlen = arr.length,
-        t = 0;
-    for (let i = 1; i < array.length; i++) {
-        const arr1 = arr.slice(0, i),
-            arr2 = invert(arr1),
-            len = simplify(arr2.concat(arr, arr1)).length;
-        if (len < minlen) {
-            t = i;
-            minlen = len;
-        }
-    }
-    return arr.slice(0, t);
 }
 
 function invert(array) {
