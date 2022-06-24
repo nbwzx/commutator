@@ -686,6 +686,11 @@ function simplify(array) {
             if (arr.length >= j) {
                 if (arr[len - j][0] === arrayAdd[0]) {
                     let canCommute = true;
+                    for (let k = 1; k <= j; k++) {
+                        if (arr[len - k][0] in commute === false) {
+                            canCommute = false;
+                        }
+                    }
                     for (let k = 2; k <= j; k++) {
                         if (commute[arr[len - k][0]] !== commute[arr[len - (k - 1)][0]]) {
                             canCommute = false;
