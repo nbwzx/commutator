@@ -4,7 +4,18 @@ let countResult = 0,
     result = [];
 const order = 4,
     minAmount = -1,
-    maxAmount = 2;
+    maxAmount = 2,
+    commute = {
+        "U": 1,
+        "D": 1,
+        "E": 1,
+        "R": 2,
+        "L": 2,
+        "M": 2,
+        "F": 3,
+        "B": 3,
+        "S": 3
+    };
 
 function expand() {
     let algValue = String(document.getElementById("alg").value);
@@ -255,8 +266,7 @@ function commutator(x) {
         arrex = [];
     const locationud = [];
     for (let i = 0; i < arr.length - 1; i++) {
-        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-        if (similarstr.indexOf(arr[i][0] + arr[i + 1][0]) > -1) {
+        if (commute[arr[i][0]] === commute[arr[i + 1][0]]) {
             locationud[count] = i;
             count += 1;
         }
@@ -342,8 +352,7 @@ function commutatorpre(arr1, depth, maxdepth) {
         arrex = [];
     const locationud = [];
     for (let i = 0; i < arr1.length - 1; i++) {
-        const similarstr = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-        if (similarstr.indexOf(arr1[i][0] + arr1[i + 1][0]) > -1) {
+        if (commute[arr1[i][0]] === commute[arr1[i + 1][0]]) {
             locationud[count] = i;
             count += 1;
         }
@@ -494,7 +503,7 @@ function commutatormain(array, depth, maxdepth) {
                             if (text0 === "") {
                                 text0 = text1;
                             }
-                            if (score(text1) < score(text0)){
+                            if (score(text1) < score(text0)) {
                                 text0 = text1;
                             }
                             if (depth === maxdepth && result.indexOf(text1) === -1) {
@@ -672,62 +681,39 @@ function simplify(array) {
             i += 1;
             continue;
         }
-        if (arr.length >= 1) {
-            if (arr[len - 1][0] === arrayAdd[0]) {
-                const x = [];
-                x[0] = arr[len - 1][0];
-                x[1] = normalize(arr[len - 1][1] + arrayAdd[1]);
-                if (x[1] === 0) {
-                    arr.splice(-1, 1);
-                    i += 1;
-                    continue;
-                } else {
-                    arr.splice(-1, 1, x);
-                    i += 1;
-                    continue;
-                }
-            }
-        }
-        if (arr.length >= 2) {
-            const similarstr1 = "UD DU UE EU DE ED RM MR RL LR LM ML FS SF FB BF SB BS";
-            if (arr[len - 2][0] === arrayAdd[0]) {
-                if (similarstr1.indexOf(arr[len - 2][0] + arr[len - 1][0]) > -1) {
-                    const x = [];
-                    x[0] = arr[len - 2][0];
-                    x[1] = normalize(arr[len - 2][1] + arrayAdd[1]);
-                    if (x[1] === 0) {
-                        arr.splice(-2, 1);
-                        i += 1;
-                        continue;
-                    } else {
-                        arr.splice(-2, 1, x);
-                        i += 1;
-                        continue;
+        let hasChanged = false;
+        for (let j = 1; j <= 3; j++) {
+            if (arr.length >= j) {
+                if (arr[len - j][0] === arrayAdd[0]) {
+                    let canCommute = true;
+                    for (let k = 2; k <= j; k++) {
+                        if (commute[arr[len - k][0]] !== commute[arr[len - (k - 1)][0]]) {
+                            canCommute = false;
+                        }
+                    }
+                    if (canCommute) {
+                        const x = [];
+                        x[0] = arr[len - j][0];
+                        x[1] = normalize(arr[len - j][1] + arrayAdd[1]);
+                        if (x[1] === 0) {
+                            arr.splice(-j, 1);
+                            i += 1;
+                            hasChanged = true;
+                            break;
+                        } else {
+                            arr.splice(-j, 1, x);
+                            i += 1;
+                            hasChanged = true;
+                            break;
+                        }
                     }
                 }
             }
         }
-        if (arr.length >= 3) {
-            const similarstr2 = "UDE DUE UED EUD DEU EDU RML MRL RLM LRM LMR MLR FSB SFB FBS BFS SBF BSF";
-            if (arr[len - 3][0] === arrayAdd[0]) {
-                if (similarstr2.indexOf(arr[len - 3][0] + arr[len - 2][0] + arr[len - 1][0]) > -1) {
-                    const x = [];
-                    x[0] = arr[len - 3][0];
-                    x[1] = normalize(arr[len - 3][1] + arrayAdd[1]);
-                    if (x[1] === 0) {
-                        arr.splice(-3, 1);
-                        i += 1;
-                        continue;
-                    } else {
-                        arr.splice(-3, 1, x);
-                        i += 1;
-                        continue;
-                    }
-                }
-            }
+        if (hasChanged === false) {
+            arr[len] = arrayAdd;
+            i += 1;
         }
-        arr[len] = arrayAdd;
-        i += 1;
     }
     return arr;
 }
