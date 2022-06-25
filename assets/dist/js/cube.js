@@ -409,7 +409,7 @@ function commutatormain(array, depth, maxdepth) {
         } else {
             drList.push(0);
         }
-        for (let drKey = 0; drKey <= order; drKey++) {
+        for (let drKey = 0; drKey < order; drKey++) {
             // 0, 1, -1, 2, -2...
             const dr = (drKey % 2 * 2 - 1) * Math.floor((drKey + 1) / 2);
             if (drList.indexOf(dr) === -1) {
@@ -456,19 +456,21 @@ function commutatormain(array, depth, maxdepth) {
                             part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
                             part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
                         }
-                        if (part1x.length === 0 || part2x.length === 0) {
+                        if (part1x.length < i || part2x.length < j) {
                             continue;
                         }
                         const commuteAddList = [part2x];
                         let commuteCase = [];
-                        if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute) {
+                        if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
                             // L b R c L' b' R' c' = [L b R,c L' R]
                             commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
                             commuteAddList.push(commuteCase);
                             // L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                             if (part1x.length >= 2) {
-                                commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
-                                commuteAddList.push(commuteCase);
+                                if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
+                                    commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
+                                    commuteAddList.push(commuteCase);
+                                }
                             }
                         }
                         for (const commuteAddKey in commuteAddList) {

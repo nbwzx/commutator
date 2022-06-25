@@ -334,7 +334,7 @@ function commutatormain(array, depth, maxdepth) {
         } else {
             drList.push(0);
         }
-        for (let drKey = 0; drKey <= order; drKey++) {
+        for (let drKey = 0; drKey < order; drKey++) {
             // 0, 1, -1, 2, -2...
             const dr = (drKey % 2 * 2 - 1) * Math.floor((drKey + 1) / 2);
             if (drList.indexOf(dr) === -1) {
@@ -380,6 +380,9 @@ function commutatormain(array, depth, maxdepth) {
                             const jr = normalize(arr1[i + j - 1][1] + ir);
                             part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
                             part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
+                        }
+                        if (part1x.length < i || part2x.length < j) {
+                            continue;
                         }
                         const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
                             arrb = simplify(arra.concat(arr1));
