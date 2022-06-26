@@ -459,22 +459,42 @@ function commutatormain(array, depth, maxdepth) {
                         if (part1x.length < i || part2x.length < j) {
                             continue;
                         }
-                        const commuteAddList = [part2x];
+                        const commuteAddList1 = [part1x];
+                        const commuteAddList2 = [part2x];
                         let commuteCase = [];
                         if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
                             // L b R c L' b' R' c' = [L b R,c L' R]
                             commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
-                            commuteAddList.push(commuteCase);
+                            commuteAddList1.push(part1x);
+                            commuteAddList2.push(commuteCase);
                             // L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                             if (part1x.length >= 2) {
                                 if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
                                     commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
-                                    commuteAddList.push(commuteCase);
+                                    commuteAddList1.push(part1x);
+                                    commuteAddList2.push(commuteCase);
                                 }
                             }
                         }
-                        for (const commuteAddKey in commuteAddList) {
-                            part2x = commuteAddList[commuteAddKey];
+                        if (commute[arr1[i + j][0]] === commute[part2x[0][0]] && part2x[0][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== part2x[0][0]) {
+                            // c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                            commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
+                            commuteAddList1.push(commuteCase);
+                            commuteCase = simplify([arr1[i + j]].concat(part2x));
+                            commuteAddList2.push(commuteCase);
+                            // c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                            if (arr1.length >= i + j + 2) {
+                                if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
+                                    commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
+                                    commuteAddList1.push(commuteCase);
+                                    commuteCase = simplify(arr1.slice(i + j, i + j + 2).concat(part2x));
+                                    commuteAddList2.push(commuteCase);
+                                }
+                            }
+                        }
+                        for (const commuteAddKey in commuteAddList1) {
+                            part1x = commuteAddList1[commuteAddKey];
+                            part2x = commuteAddList2[commuteAddKey];
                             const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
                                 arrb = simplify(arra.concat(arr1));
                             let partb = "";
