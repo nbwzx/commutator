@@ -90,7 +90,6 @@
             result = [];
         const order = 4,
             minAmount = -1,
-            maxAmount = 2,
             commute = {
                 "U": 1,
                 "D": 1,
@@ -517,126 +516,118 @@
                             minj = 1;
                         }
                         for (let j = minj; j <= arr1.length / 2 - 1; j++) {
-                            let irList = [];
+                            let ir = 0,
+                                part1x = [],
+                                part2x = [];
                             if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
                                 // For [a bx,by c bz]
-                                irList = [];
-                                for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
-                                    irList.push(irValue);
+                                if (depth === 1 && arr1[i - 1][0] !== arr1[arr1.length - 1][0]) {
+                                    continue;
                                 }
+                                ir = normalize(arr1[i - 1][1] + arr1[arr1.length - 1][1]);
+                                if (ir === 0) {
+                                    continue;
+                                }
+                                const jr = normalize(arr1[i + j - 1][1] + ir);
+                                part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
+                                part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
                             } else {
                                 if (depth === 1 && arr1[i][0] !== arr1[arr1.length - 1][0]) {
                                     continue;
                                 }
-                                irList = [""];
+                                part1x = simplify(arr1.slice(0, i));
+                                part2x = simplify(invert(part1x).concat(arr1.slice(0, i + j)));
                             }
-                            for (const irKey in irList) {
-                                const ir = irList[irKey];
-                                let part1x = [],
-                                    part2x = [];
-                                if (ir === "") {
-                                    part1x = simplify(arr1.slice(0, i));
-                                    part2x = simplify(invert(part1x).concat(arr1.slice(0, i + j)));
-                                } else {
-                                    const jr = normalize(arr1[i + j - 1][1] + ir);
-                                    part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                                    part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
+                            const commuteAddList1 = [part1x];
+                            const commuteAddList2 = [part2x];
+                            let commuteCase = [];
+                            if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
+                                // For L b R c L' b' R' c' = [L b R,c L' R]
+                                commuteAddList1.push(part1x);
+                                commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
+                                commuteAddList2.push(commuteCase);
+                                // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
+                                if (part1x.length >= 2) {
+                                    if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
+                                        commuteAddList1.push(part1x);
+                                        commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
+                                        commuteAddList2.push(commuteCase);
+                                    }
                                 }
-                                if (part1x.length < i || part2x.length < j) {
+                            }
+                            if (commute[arr1[i + j][0]] === commute[part2x[0][0]] && part2x[0][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== part2x[0][0]) {
+                                // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                                commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
+                                commuteAddList1.push(commuteCase);
+                                commuteCase = simplify([arr1[i + j]].concat(part2x));
+                                commuteAddList2.push(commuteCase);
+                                // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                                if (arr1.length >= i + j + 2) {
+                                    if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
+                                        commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
+                                        commuteAddList1.push(commuteCase);
+                                        commuteCase = simplify(arr1.slice(i + j, i + j + 2).concat(part2x));
+                                        commuteAddList2.push(commuteCase);
+                                    }
+                                }
+                            }
+                            for (const commuteAddKey in commuteAddList1) {
+                                part1x = commuteAddList1[commuteAddKey];
+                                part2x = commuteAddList2[commuteAddKey];
+                                const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
+                                    arrb = simplify(arra.concat(arr1));
+                                let partb = "";
+                                if (depth > 1) {
+                                    partb = commutatorpre(arrb, depth - 1, maxdepth);
+                                } else if (arrb.length > 0) {
                                     continue;
                                 }
-                                const commuteAddList1 = [part1x];
-                                const commuteAddList2 = [part2x];
-                                let commuteCase = [];
-                                if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
-                                    // For L b R c L' b' R' c' = [L b R,c L' R]
-                                    commuteAddList1.push(part1x);
-                                    commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
-                                    commuteAddList2.push(commuteCase);
-                                    // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
-                                    if (part1x.length >= 2) {
-                                        if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
-                                            commuteAddList1.push(part1x);
-                                            commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
-                                            commuteAddList2.push(commuteCase);
-                                        }
-                                    }
-                                }
-                                if (commute[arr1[i + j][0]] === commute[part2x[0][0]] && part2x[0][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== part2x[0][0]) {
-                                    // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
-                                    commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
-                                    commuteAddList1.push(commuteCase);
-                                    commuteCase = simplify([arr1[i + j]].concat(part2x));
-                                    commuteAddList2.push(commuteCase);
-                                    // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
-                                    if (arr1.length >= i + j + 2) {
-                                        if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
-                                            commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
-                                            commuteAddList1.push(commuteCase);
-                                            commuteCase = simplify(arr1.slice(i + j, i + j + 2).concat(part2x));
-                                            commuteAddList2.push(commuteCase);
-                                        }
-                                    }
-                                }
-                                for (const commuteAddKey in commuteAddList1) {
-                                    part1x = commuteAddList1[commuteAddKey];
-                                    part2x = commuteAddList2[commuteAddKey];
-                                    const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
-                                        arrb = simplify(arra.concat(arr1));
-                                    let partb = "";
-                                    if (depth > 1) {
-                                        partb = commutatorpre(arrb, depth - 1, maxdepth);
-                                    } else if (arrb.length > 0) {
-                                        continue;
-                                    }
-                                    if (partb !== "Not found.") {
-                                        let part1y = part1x,
-                                            part2y = part2x;
-                                        const party = simplify(part2x.concat(part1x));
-                                        if (party.length < Math.max(part1x.length, part2x.length)) {
-                                            if (part1x.length <= part2x.length) {
-                                                // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
-                                                part1y = part1x;
-                                                part2y = party;
-                                            } else {
-                                                // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
-                                                part1y = invert(part2x);
-                                                part2y = party;
-                                            }
-                                        }
-                                        // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
-                                        let part0 = simplify(repeatEnd(arrbak.slice(0, d), dr)),
-                                            part1 = part1y,
-                                            part2 = part2y;
-                                        if (part0.length > 0 && maxdepth === 1) {
-                                            const partz = simplify(part0.concat(part2y));
-                                            // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
-                                            if (partz.length < part0.length - 1) {
-                                                part0 = partz;
-                                                part1 = invert(part2y);
-                                                part2 = part1y;
-                                            }
-                                        }
-                                        const part1Output = simplifyfinal(part1),
-                                            part2Output = simplifyfinal(part2),
-                                            part0Output = simplifyfinal(part0);
-                                        if (depth === 1) {
-                                            text1 = singleOutput(part0Output, part1Output, part2Output);
+                                if (partb !== "Not found.") {
+                                    let part1y = part1x,
+                                        part2y = part2x;
+                                    const party = simplify(part2x.concat(part1x));
+                                    if (party.length < Math.max(part1x.length, part2x.length)) {
+                                        if (part1x.length <= part2x.length) {
+                                            // For a b c d e b' a' c' e' d' = [a b c,d e b' a'] = [a b c,d e c]
+                                            part1y = part1x;
+                                            part2y = party;
                                         } else {
-                                            text1 = multiOutput(part0Output, part1Output, part2Output, partb);
-                                        }
-                                        if (text0 === "") {
-                                            text0 = text1;
-                                        }
-                                        if (score(text1) < score(text0)) {
-                                            text0 = text1;
-                                        }
-                                        if (depth === maxdepth && result.indexOf(text1) === -1) {
-                                            countResult += 1;
-                                            result.push(text1);
+                                            // For a b c d e b' a' d' c' e' = [a b c,d e b' a'] = [a b c d,e b' a']
+                                            part1y = invert(part2x);
+                                            part2y = party;
                                         }
                                     }
-        
+                                    // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
+                                    let part0 = simplify(repeatEnd(arrbak.slice(0, d), dr)),
+                                        part1 = part1y,
+                                        part2 = part2y;
+                                    if (part0.length > 0 && maxdepth === 1) {
+                                        const partz = simplify(part0.concat(part2y));
+                                        // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
+                                        if (partz.length < part0.length - 1) {
+                                            part0 = partz;
+                                            part1 = invert(part2y);
+                                            part2 = part1y;
+                                        }
+                                    }
+                                    const part1Output = simplifyfinal(part1),
+                                        part2Output = simplifyfinal(part2),
+                                        part0Output = simplifyfinal(part0);
+                                    if (depth === 1) {
+                                        text1 = singleOutput(part0Output, part1Output, part2Output);
+                                    } else {
+                                        text1 = multiOutput(part0Output, part1Output, part2Output, partb);
+                                    }
+                                    if (text0 === "") {
+                                        text0 = text1;
+                                    }
+                                    if (score(text1) < score(text0)) {
+                                        text0 = text1;
+                                    }
+                                    if (depth === maxdepth && result.indexOf(text1) === -1) {
+                                        countResult += 1;
+                                        result.push(text1);
+                                    }
                                 }
                             }
                         }
