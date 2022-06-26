@@ -433,7 +433,7 @@ function commutatormain(array, depth, maxdepth) {
                 for (let j = minj; j <= arr1.length / 2 - 1; j++) {
                     let irList = [];
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                        // [a bx,by c bz]
+                        // For [a bx,by c bz]
                         irList = [];
                         for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
                             irList.push(irValue);
@@ -463,26 +463,26 @@ function commutatormain(array, depth, maxdepth) {
                         const commuteAddList2 = [part2x];
                         let commuteCase = [];
                         if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
-                            // L b R c L' b' R' c' = [L b R,c L' R]
-                            commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
+                            // For L b R c L' b' R' c' = [L b R,c L' R]
                             commuteAddList1.push(part1x);
+                            commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
                             commuteAddList2.push(commuteCase);
-                            // L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
+                            // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                             if (part1x.length >= 2) {
                                 if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
-                                    commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
                                     commuteAddList1.push(part1x);
+                                    commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
                                     commuteAddList2.push(commuteCase);
                                 }
                             }
                         }
                         if (commute[arr1[i + j][0]] === commute[part2x[0][0]] && part2x[0][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== part2x[0][0]) {
-                            // c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                            // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
                             commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
                             commuteAddList1.push(commuteCase);
                             commuteCase = simplify([arr1[i + j]].concat(part2x));
                             commuteAddList2.push(commuteCase);
-                            // c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                            // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
                             if (arr1.length >= i + j + 2) {
                                 if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
                                     commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
@@ -524,7 +524,7 @@ function commutatormain(array, depth, maxdepth) {
                                     part2 = part2y;
                                 if (part0.length > 0 && maxdepth === 1) {
                                     const partz = simplify(part0.concat(part2y));
-                                    // Avoid S U' R E R' U R' E' R S' = R':[R U' R,E]
+                                    // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
                                     if (partz.length < part0.length - 1) {
                                         part0 = partz;
                                         part1 = invert(part2y);
