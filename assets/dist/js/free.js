@@ -358,7 +358,7 @@ function commutatormain(array, depth, maxdepth) {
                 for (let j = minj; j <= arr1.length / 2 - 1; j++) {
                     let irList = [];
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
-                        // [a bx,by c bz]
+                        // For [a bx,by c bz]
                         irList = [];
                         for (let irValue = minAmount; irValue <= maxAmount; irValue++) {
                             irList.push(irValue);
@@ -413,7 +413,7 @@ function commutatormain(array, depth, maxdepth) {
                                 part2 = part2y;
                             if (part0.length > 0 && maxdepth === 1) {
                                 const partz = simplify(part0.concat(part2y));
-                                // Avoid S U' R E R' U R' E' R S' = R':[R U' R,E]
+                                // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
                                 if (partz.length < part0.length - 1) {
                                     part0 = partz;
                                     part1 = invert(part2y);
