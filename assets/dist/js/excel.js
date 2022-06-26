@@ -426,21 +426,21 @@ function commutatormain(array, depth, maxdepth) {
                     const commuteAddList1 = [part1x];
                     const commuteAddList2 = [part2x];
                     let commuteCase = [];
-                    if (commute[part2x[part2x.length - 1][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part2x[part2x.length - 1][0] in commute && part2x[part2x.length - 1][0] !== part1x[part1x.length - 1][0]) {
+                    if (commute[arr1[i + j - 1][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i + j - 1][0] in commute && arr1[i + j - 1][0] !== arr1[i - 1][0]) {
                         // For L b R c L' b' R' c' = [L b R,c L' R]
                         commuteAddList1.push(part1x);
                         commuteCase = simplify(part2x.concat([part1x[part1x.length - 1]]));
                         commuteAddList2.push(commuteCase);
                         // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
-                        if (part1x.length >= 2) {
-                            if (commute[part1x[part1x.length - 2][0]] === commute[part1x[part1x.length - 1][0]] && part1x[part1x.length - 1][0] in commute && part1x[part1x.length - 2][0] in commute) {
+                        if (i >= 2) {
+                            if (commute[arr1[i - 2][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i - 2][0] in commute) {
                                 commuteAddList1.push(part1x);
                                 commuteCase = simplify(part2x.concat(part1x.slice(part1x.length - 2, part1x.length)));
                                 commuteAddList2.push(commuteCase);
                             }
                         }
                     }
-                    if (commute[arr1[i + j][0]] === commute[part2x[0][0]] && part2x[0][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== part2x[0][0]) {
+                    if (commute[arr1[i + j][0]] === commute[arr1[i][0]] && arr1[i][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== arr1[i][0]) {
                         // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
                         commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
                         commuteAddList1.push(commuteCase);
