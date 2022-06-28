@@ -458,7 +458,7 @@ function commutatormain(array, depth, maxdepth) {
                     if (commute[arr1[i + j - 1][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i + j - 1][0] in commute && arr1[i + j - 1][0] !== arr1[i - 1][0]) {
                         // For L b R c L' b' R' c' = [L b R,c L' R]
                         commuteAddList1.push(part1x);
-                        commuteCase = simplify(part2x.concat([arr1[i - 1][0]]));
+                        commuteCase = simplify(part2x.concat([arr1[i - 1]]));
                         commuteAddList2.push(commuteCase);
                         // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                         if (i >= 2) {
