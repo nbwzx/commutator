@@ -375,8 +375,7 @@ function commutatormain(array, depth, maxdepth) {
                         part1x = simplify(arr1.slice(0, i));
                         part2x = simplify(invert(part1x).concat(arr1.slice(0, i + j)));
                     }
-                    const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
-                        arrb = simplify(arra.concat(arr1));
+                    const arrb = simplify(part2x.concat(part1x, invert(part2x), invert(part1x), arr1));
                     let partb = "";
                     if (depth > 1) {
                         partb = commutatormain(arrb, depth - 1, maxdepth);

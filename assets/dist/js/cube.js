@@ -488,8 +488,7 @@ function commutatormain(array, depth, maxdepth) {
                     for (const commuteAddKey in commuteAddList1) {
                         part1x = commuteAddList1[commuteAddKey];
                         part2x = commuteAddList2[commuteAddKey];
-                        const arra = simplify(part2x.concat(part1x, invert(part2x), invert(part1x))),
-                            arrb = simplify(arra.concat(arr1));
+                        const arrb = simplify(part2x.concat(part1x, invert(part2x), invert(part1x), arr1));
                         let partb = "";
                         if (depth > 1) {
                             partb = commutatorpre(arrb, depth - 1, maxdepth);
