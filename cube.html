@@ -84,18 +84,18 @@
     <h2 class="border-1">Decompose a Rubik's cube algorithm in commutator notation.</h2>
     <div class="col">
       <br />
-      <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm" aria-label="Enter an algorithm"
-        style="font-size: 30px;">
-      <br />
       Settings:
       <input type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket for all commutators
       <br />
       Sorting rules:
       The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
-        type="text" maxlength="3" style="text-align:center;width:3em"> * stm(A)+<input type="text" placeholder="5"
-        id="settingsSortScoreb" onkeyup="changeCookie()" type="text" maxlength="3" style="text-align:center;width:3em"> *
-      stm(B) + stm(c) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
+        type="text" style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5"
+        id="settingsSortScoreb" onkeyup="changeCookie()" type="text" style="text-align:center;width:2.5em"> *
+      stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
       <br /><br />
+      <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm" aria-label="Enter an algorithm"
+        style="font-size: 30px;">
+      <br />
       <button type="button" id="cube" class="btn btn-danger">Decompose Me</button>&nbsp;&nbsp;
       <button type="button" id="expand" class="btn btn-danger">Expand Me</button>
       <br /><br />
