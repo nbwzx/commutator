@@ -184,9 +184,15 @@ function score(algValueOrigin) {
 }
 
 function scoreTwo(i, j, sign) {
-    const abMaxScore = 2.5,
-        abMinScore = 5,
-        cScore = 1;
+    const cScore = 1;
+    let abMaxScore = 2.5,
+        abMinScore = 5;
+    if (document.getElementById("settingsSortScorea").value !== "") {
+        abMaxScore = document.getElementById("settingsSortScorea").value;
+    }
+    if (document.getElementById("settingsSortScoreb").value !== "") {
+        abMinScore = document.getElementById("settingsSortScoreb").value;
+    }
     switch (sign) {
     case "+":
         return i + j;

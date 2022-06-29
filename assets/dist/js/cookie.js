@@ -27,6 +27,12 @@ window.onload = function onload() {
     if (getCookie("settingsOuterBracket") === "true") {
         byid("settingsOuterBracket").checked = true;
     }
+    if (getCookie("settingsSortScorea") !== "") {
+        byid("settingsSortScorea").value = getCookie("settingsSortScorea");
+    }
+    if (getCookie("settingsSortScoreb") !== "") {
+        byid("settingsSortScoreb").value = getCookie("settingsSortScoreb");
+    }
 };
 
 function changeCookie() {
@@ -34,6 +40,12 @@ function changeCookie() {
         setCookie("settingsOuterBracket", "true", 30);
     } else {
         setCookie("settingsOuterBracket", "", -1);
+    }
+    if (byid("settingsSortScoreb").value !== "") {
+        setCookie("settingsSortScorea", byid("settingsSortScorea").value, 30);
+    }
+    if (byid("settingsSortScoreb").value !== "") {
+        setCookie("settingsSortScoreb", byid("settingsSortScoreb").value, 30);
     }
 }
 
