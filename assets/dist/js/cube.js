@@ -4,6 +4,7 @@ let countResult = 0,
     result = [];
 const order = 4,
     minAmount = -1,
+    maxAmount = 2,
     commute = {
         "U": 1,
         "D": 1,
@@ -430,58 +431,59 @@ function commutatormain(array, depth, maxdepth) {
                     minj = 1;
                 }
                 for (let j = minj; j <= arr1.length / 2 - 1; j++) {
-                    let ir = 0,
-                        part1x = [],
+                    let part1x = [],
                         part2x = [];
+                    const commuteAddList1 = [],
+                        commuteAddList2 = [];
+                    let commuteCase = [];
                     if (arr1[i - 1][0] === arr1[i + j - 1][0]) {
                         // For [a bx,by c bz]
-                        if (depth === 1 && arr1[i - 1][0] !== arr1[arr1.length - 1][0]) {
-                            continue;
+                        for (let ir = minAmount; ir <= maxAmount; ir++) {
+                            if (ir === 0) {
+                                continue;
+                            }
+                            const jr = normalize(arr1[i + j - 1][1] + ir);
+                            part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
+                            commuteAddList1.push(part1x);
+                            part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
+                            commuteAddList2.push(part2x);
                         }
-                        ir = normalize(arr1[i - 1][1] + arr1[arr1.length - 1][1]);
-                        if (ir === 0) {
-                            continue;
-                        }
-                        const jr = normalize(arr1[i + j - 1][1] + ir);
-                        part1x = simplify(repeatEnd(arr1.slice(0, i), ir));
-                        part2x = simplify(invert(part1x).concat(repeatEnd(arr1.slice(0, i + j), jr)));
                     } else {
                         if (depth === 1 && arr1[i][0] !== arr1[arr1.length - 1][0]) {
                             continue;
                         }
                         part1x = simplify(arr1.slice(0, i));
-                        part2x = simplify(invert(part1x).concat(arr1.slice(0, i + j)));
-                    }
-                    const commuteAddList1 = [part1x];
-                    const commuteAddList2 = [part2x];
-                    let commuteCase = [];
-                    if (commute[arr1[i + j - 1][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i + j - 1][0] in commute && arr1[i + j - 1][0] !== arr1[i - 1][0]) {
-                        // For L b R c L' b' R' c' = [L b R,c L' R]
                         commuteAddList1.push(part1x);
-                        commuteCase = simplify(part2x.concat([arr1[i - 1]]));
-                        commuteAddList2.push(commuteCase);
-                        // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
-                        if (i >= 2) {
-                            if (commute[arr1[i - 2][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i - 2][0] in commute) {
-                                commuteAddList1.push(part1x);
-                                commuteCase = simplify(part2x.concat(arr1.slice(i - 2, i)));
-                                commuteAddList2.push(commuteCase);
+                        part2x = simplify(arr1.slice(i, i + j));
+                        commuteAddList2.push(part2x);
+                        if (commute[arr1[i + j - 1][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i + j - 1][0] in commute && arr1[i + j - 1][0] !== arr1[i - 1][0]) {
+                            // For L b R c L' b' R' c' = [L b R,c L' R]
+                            commuteAddList1.push(part1x);
+                            commuteCase = simplify(part2x.concat([arr1[i - 1]]));
+                            commuteAddList2.push(commuteCase);
+                            // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
+                            if (i >= 2) {
+                                if (commute[arr1[i - 2][0]] === commute[arr1[i - 1][0]] && arr1[i - 1][0] in commute && arr1[i - 2][0] in commute) {
+                                    commuteAddList1.push(part1x);
+                                    commuteCase = simplify(part2x.concat(arr1.slice(i - 2, i)));
+                                    commuteAddList2.push(commuteCase);
+                                }
                             }
                         }
-                    }
-                    if (commute[arr1[i + j][0]] === commute[arr1[i][0]] && arr1[i][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== arr1[i][0]) {
-                        // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
-                        commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
-                        commuteAddList1.push(commuteCase);
-                        commuteCase = simplify([arr1[i + j]].concat(part2x));
-                        commuteAddList2.push(commuteCase);
-                        // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
-                        if (arr1.length >= i + j + 2) {
-                            if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
-                                commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
-                                commuteAddList1.push(commuteCase);
-                                commuteCase = simplify(arr1.slice(i + j, i + j + 2).concat(part2x));
-                                commuteAddList2.push(commuteCase);
+                        if (commute[arr1[i + j][0]] === commute[arr1[i][0]] && arr1[i][0] in commute && arr1[i + j][0] in commute && arr1[i + j][0] !== arr1[i][0]) {
+                            // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                            commuteCase = simplify(part1x.concat(invert([arr1[i + j]])));
+                            commuteAddList1.push(commuteCase);
+                            commuteCase = simplify([arr1[i + j]].concat(part2x));
+                            commuteAddList2.push(commuteCase);
+                            // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                            if (arr1.length >= i + j + 2) {
+                                if (commute[arr1[i + j + 1][0]] === commute[arr1[i + j][0]] && arr1[i + j][0] in commute && arr1[i + j + 1][0] in commute) {
+                                    commuteCase = simplify(part1x.concat(invert(arr1.slice(i + j, i + j + 2))));
+                                    commuteAddList1.push(commuteCase);
+                                    commuteCase = simplify(arr1.slice(i + j, i + j + 2).concat(part2x));
+                                    commuteAddList2.push(commuteCase);
+                                }
                             }
                         }
                     }
