@@ -41,10 +41,14 @@ function changeCookie() {
     } else {
         setCookie("settingsOuterBracket", "", -1);
     }
-    if (byid("settingsSortScoreb").value !== "") {
+    if (byid("settingsSortScoreb").value === "") {
+        setCookie("settingsSortScorea", "", -1);
+    } else {
         setCookie("settingsSortScorea", byid("settingsSortScorea").value, 30);
     }
-    if (byid("settingsSortScoreb").value !== "") {
+    if (byid("settingsSortScoreb").value === "") {
+        setCookie("settingsSortScoreb", "", -1);
+    } else {
         setCookie("settingsSortScoreb", byid("settingsSortScoreb").value, 30);
     }
 }
