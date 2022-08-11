@@ -800,12 +800,10 @@
                 return [];
             }
             const arr = [];
-            let i = 0;
-            while (i < array.length) {
+            for (let i = 0; i < array.length; i++) {
                 const arrayAdd = [array[i][0], normalize(array[i][1])],
                     len = arr.length;
                 if (normalize(arrayAdd[1]) === 0) {
-                    i += 1;
                     continue;
                 }
                 let hasChanged = false;
@@ -817,36 +815,31 @@
                                 for (let k = 1; k <= j; k++) {
                                     if (arr[len - k][0] in commute === false) {
                                         canCommute = false;
+                                        break;
+                                    }
+                                }
+                                for (let k = 2; k <= j; k++) {
+                                    if (commute[arr[len - k][0]] !== commute[arr[len - (k - 1)][0]]) {
+                                        canCommute = false;
+                                        break;
                                     }
                                 }
                             }
-                            for (let k = 2; k <= j; k++) {
-                                if (commute[arr[len - k][0]] !== commute[arr[len - (k - 1)][0]]) {
-                                    canCommute = false;
-                                }
-                            }
                             if (canCommute) {
-                                const x = [];
-                                x[0] = arr[len - j][0];
-                                x[1] = normalize(arr[len - j][1] + arrayAdd[1]);
+                                const x = [arr[len - j][0], normalize(arr[len - j][1] + arrayAdd[1])];
                                 if (x[1] === 0) {
                                     arr.splice(-j, 1);
-                                    i += 1;
-                                    hasChanged = true;
-                                    break;
                                 } else {
                                     arr.splice(-j, 1, x);
-                                    i += 1;
-                                    hasChanged = true;
-                                    break;
                                 }
+                                hasChanged = true;
+                                break;
                             }
                         }
                     }
                 }
                 if (hasChanged === false) {
                     arr[len] = arrayAdd;
-                    i += 1;
                 }
             }
             return arr;

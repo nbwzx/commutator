@@ -436,7 +436,7 @@ function commutatormain(array, depth, maxdepth) {
                             if (text0 === "") {
                                 text0 = text1;
                             }
-                            if (score(text1) < score(text0)){
+                            if (score(text1) < score(text0)) {
                                 text0 = text1;
                             }
                             if (depth === maxdepth && result.indexOf(text1) === -1) {
@@ -535,32 +535,24 @@ function simplify(array) {
         return [];
     }
     const arr = [];
-    let i = 0;
-    while (i < array.length) {
+    for (let i = 0; i < array.length; i++) {
         const arrayAdd = [array[i][0], normalize(array[i][1])],
             len = arr.length;
-        if (normalize(arrayAdd[1]) === 0) {
-            i += 1;
+        if (arrayAdd[1] === 0) {
             continue;
         }
-        if (arr.length >= 1) {
+        if (len >= 1) {
             if (arr[len - 1][0] === arrayAdd[0]) {
-                const x = [];
-                x[0] = arr[len - 1][0];
-                x[1] = normalize(arr[len - 1][1] + arrayAdd[1]);
+                const x = [arr[len - 1][0], normalize(arr[len - 1][1] + arrayAdd[1])];
                 if (x[1] === 0) {
-                    arr.splice(-1, 1);
-                    i += 1;
-                    continue;
+                    arr.pop();
                 } else {
-                    arr.splice(-1, 1, x);
-                    i += 1;
-                    continue;
+                    arr[len - 1] = x;
                 }
+                continue;
             }
         }
-        arr[len] = arrayAdd;
-        i += 1;
+        arr.push(arrayAdd);
     }
     return arr;
 }
