@@ -592,11 +592,11 @@ function displace(array, d, dr) {
 }
 
 function invert(array) {
-    const arr = array.concat();
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = [array[i][0], normalize(-array[i][1])];
+    const arr = [];
+    for (let i = array.length - 1; i >= 0; i--) {
+        arr.push([array[i][0], normalize(-array[i][1])]);
     }
-    return arr.map((x) => x).reverse();
+    return arr;
 }
 
 function simplifyfinal(array) {
