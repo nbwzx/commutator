@@ -315,35 +315,22 @@ function commutatormain(array, depth, maxdepth) {
         return "Not found.";
     }
     for (let d = 0; d <= (len + arr1.length + 1) / 2 - 1; d++) {
-        const drList = [];
-        if (d > 0) {
-            if (order % 2 === 0 && arrbak[d - 1][1] === Math.floor(order / 2)) {
-                for (let drValue = -arrbak[d - 1][1]; drValue <= -1; drValue++) {
-                    drList.push(drValue);
-                }
-                for (let drValue = 1; drValue <= arrbak[d - 1][1]; drValue++) {
-                    drList.push(drValue);
+        for (let drKey = 1; drKey < order; drKey++) {
+            // 1, -1, 2, -2...
+            const dr = (drKey % 2 * 2 - 1) * Math.floor((drKey + 1) / 2);
+            if (d === 0) {
+                if (drKey > 1) {
+                    break;
                 }
             } else {
-                if (arrbak[d - 1][1] > 0) {
-                    for (let drValue = 1; drValue <= arrbak[d - 1][1]; drValue++) {
-                        drList.push(drValue);
+                if (Math.abs(dr) > Math.abs(arrbak[d - 1][1])) {
+                    break;
+                }
+                if (order % 2 === 1 || arrbak[d - 1][1] !== Math.floor(order / 2)) {
+                    if (arrbak[d - 1][1] < 0 && dr > 0 || arrbak[d - 1][1] > 0 && dr < 0) {
+                        continue;
                     }
                 }
-                if (arrbak[d - 1][1] < 0) {
-                    for (let drValue = arrbak[d - 1][1]; drValue <= -1; drValue++) {
-                        drList.push(drValue);
-                    }
-                }
-            }
-        } else {
-            drList.push(0);
-        }
-        for (let drKey = 0; drKey < order; drKey++) {
-            // 0, 1, -1, 2, -2...
-            const dr = (drKey % 2 * 2 - 1) * Math.floor((drKey + 1) / 2);
-            if (drList.indexOf(dr) === -1) {
-                continue;
             }
             arr1 = displace(arrbak, d, dr);
             // For a b c b' a' d c' d' = a b:[c,b' a' d]
@@ -456,17 +443,16 @@ function commutatormain(array, depth, maxdepth) {
 }
 
 function repeatEnd(array, attempt) {
-    if (array.length === 0) {
+    const arr = array.concat();
+    if (arr.length === 0) {
         return [];
     }
-    const arr = array.slice(0, array.length - 1);
+    const popped = arr.pop();
     if (attempt === 0) {
         return arr;
     }
-    const x = [];
-    x[0] = array[array.length - 1][0];
-    x[1] = attempt;
-    return arr.concat([x]);
+    arr.push([popped[0], attempt]);
+    return arr;
 }
 
 function multiOutput(setup, commutatora, commutatorb, partb) {
