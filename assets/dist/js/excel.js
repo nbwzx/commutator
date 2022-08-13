@@ -381,13 +381,7 @@ function commutatormain(array, depth, maxdepth) {
             }
             arr1 = displace(arrbak, d, dr);
             // For a b c b' a' d c' d' = a b:[c,b' a' d]
-            let maxi = 0;
-            if (depth === 1) {
-                maxi = arr1.length / 2 - 1;
-            } else {
-                maxi = arr1.length / 2 - 1;
-            }
-            for (let i = 1; i <= maxi; i++) {
+            for (let i = 1; i <= arr1.length / 2 - 1; i++) {
                 let minj = 0;
                 if (depth === 1) {
                     minj = Math.max(1, Math.ceil(arr1.length / 2 - i));
