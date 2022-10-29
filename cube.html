@@ -56,9 +56,6 @@
             <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Rubik's cube&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="free.html">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="excel.html">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
@@ -72,43 +69,92 @@
             <a class="nav-link" href="about.html">&nbsp;&nbsp;About&nbsp;&nbsp;</a>
           </li>
         </ul>
-        <!-- <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
       </div>
     </div>
   </nav>
   <main class="container">
     <br />
-    <h2 class="border-1">Decompose a Rubik's cube algorithm in commutator notation.</h2>
+    <h2 class="border-1">Decompose an algorithm in commutator notation.</h2>
     <div class="col">
       <br />
-      Settings:
-      <input type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket for all commutators
+      <strong>Settings:</strong>
+      <br />
+      Order: <input type="text" placeholder="4" id="order" onkeyup="changeCookie()"
+        style="text-align:center;width:2.5em">
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket
+      for all commutators
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsInitialReplace" onclick="changeCookie()" checked>
+      Initial Replace
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsFinalReplace" onclick="changeCookie()" checked> Final
+      Replace
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsCommute" onclick="changeCookie()" checked> Commute
       <br />
       Sorting rules:
+      <br />
       The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
-        type="text" style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5"
-        id="settingsSortScoreb" onkeyup="changeCookie()" type="text" style="text-align:center;width:2.5em"> *
+        style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5" id="settingsSortScoreb"
+        onkeyup="changeCookie()" style="text-align:center;width:2.5em"> *
       stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
       <br /><br />
-      <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm" aria-label="Enter an algorithm"
-        style="font-size: 30px;">
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label"><strong>Input:</strong></label>
+        <input id="alg" type="text" class="form-control" placeholder="Enter an algorithm"
+          aria-label="Enter an algorithm" style="font-size: 30px;">
+      </div>
+      <button type="button" id="cube" class="btn btn-danger" onclick="commutatorclick()">Decompose
+        Me</button>&nbsp;&nbsp;
+      <button type="button" id="expand" class="btn btn-danger" onclick="expandclick()">Expand Me</button>
       <br />
-      <button type="button" id="cube" class="btn btn-danger">Decompose Me</button>&nbsp;&nbsp;
-      <button type="button" id="expand" class="btn btn-danger">Expand Me</button>
-      <br /><br />
-      <twisty-player id="player" alg="" experimental-setup-anchor="end"></twisty-player>
-      <div id="out" style="font-size: 30px;white-space: pre-line;"></div>
+      <br />
+      <div class="mb-3">
+        <label class="form-label"><strong>Output:</strong></label>
+        <textarea class="form-control" id="out" rows="1" style="font-size: 30px;" disabled readonly></textarea>
+      </div>
+      <br />
     </div>
     </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/dist/js/prism.js"></script>
-  <script src="assets/dist/js/cube.js"></script>
+  <script src="assets/dist/js/commutator.js"></script>
   <script src="assets/dist/js/cookie.js"></script>
-  <script src="https://cdn.cubing.net/js/cubing/twisty" type="module"></script>
+  <script>
+    function commutatorclick() {
+      const outlist = commutator
+        .search({
+          "algorithm": document.getElementById("alg").value,
+          "order": document.getElementById("order").value > 0 ? document.getElementById("order").value : 4,
+          "outerBracket": document.getElementById("settingsOuterBracket").checked,
+          "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
+          "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
+          "commute": document.getElementById("settingsCommute").checked ? undefined : {},
+        });
+      let outstr = "";
+      for (const i in outlist) {
+        outstr = outstr + outlist[i];
+        if (i < outlist.length - 1) {
+          outstr = outstr + "\n";
+        }
+      }
+      document.getElementById("out").innerHTML = outstr;
+      document.getElementById("out").setAttribute("rows", outlist.length);
+    }
+
+    function expandclick() {
+      document.getElementById("out").innerHTML = commutator
+        .expand({
+          "algorithm": document.getElementById("alg").value,
+          "order": document.getElementById("order").value > 0 ? document.getElementById("order").value : 4,
+          "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
+          "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
+          "commute": document.getElementById("settingsCommute").checked ? undefined : {},
+        })
+      document.getElementById("out").setAttribute("rows", 1);
+    }
+  </script>
 </body>
 
 </html>

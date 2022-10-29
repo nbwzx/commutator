@@ -9,10 +9,6 @@ In mathematics, the free group $F_{S}$ over a given set $S$ consists of all word
 
 It is worth researching since many 3-cycle and 5-cycle algorithms in a Rubik's cube can be decomposed into commutators.
 
-Currently, the time complexity of this algorithm is $O(n^2)$. It is still unknown if there is a faster algorithm or if this algorithm can detect all possible commutators.
-
-If you have a better algorithm, please let me know. Thank you.
-
 Example 1:
 
 ```

@@ -24,8 +24,20 @@ function getCookie(cname) {
 }
 
 window.onload = function onload() {
-    if (getCookie("settingsOuterBracket") === "true") {
+    if (getCookie("order") !== "") {
+        byid("order").value = getCookie("order");
+    }
+    if (getCookie("settingsOuterBracket") !== "") {
         byid("settingsOuterBracket").checked = true;
+    }
+    if (getCookie("settingsInitialReplace") !== "") {
+        byid("settingsInitialReplace").checked = false;
+    }
+    if (getCookie("settingsFinalReplace") !== "") {
+        byid("settingsFinalReplace").checked = false;
+    }
+    if (getCookie("settingsCommute") !== "") {
+        byid("settingsCommute").checked = false;
     }
     if (getCookie("settingsSortScorea") !== "") {
         byid("settingsSortScorea").value = getCookie("settingsSortScorea");
@@ -36,10 +48,30 @@ window.onload = function onload() {
 };
 
 function changeCookie() {
-    if (byid("settingsOuterBracket").checked === true) {
-        setCookie("settingsOuterBracket", "true", 30);
+    if (byid("order").value === "") {
+        setCookie("order", "", -1);
     } else {
-        setCookie("settingsOuterBracket", "", -1);
+        setCookie("order", byid("order").value, 30);
+    }
+    if (byid("settingsOuterBracket").checked === true) {
+        setCookie("settingsOuterBracket", "true", -1 );
+    } else {
+        setCookie("settingsOuterBracket", "", 30);
+    }
+    if (byid("settingsInitialReplace").checked === true) {
+        setCookie("settingsInitialReplace", "", -1);
+    } else {
+        setCookie("settingsInitialReplace", "false", 30);
+    }
+    if (byid("settingsFinalReplace").checked === true) {
+        setCookie("settingsFinalReplace", "", -1);
+    } else {
+        setCookie("settingsFinalReplace", "false", 30 );
+    }
+    if (byid("settingsCommute").checked === true) {
+        setCookie("settingsCommute", "", -1);
+    } else {
+        setCookie("settingsCommute", "false", 30);
     }
     if (byid("settingsSortScoreb").value === "") {
         setCookie("settingsSortScorea", "", -1);

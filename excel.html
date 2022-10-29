@@ -66,9 +66,6 @@
             <a class="nav-link" href="cube.html">&nbsp;&nbsp;Rubik's cube&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="free.html">&nbsp;&nbsp;Free group&nbsp;&nbsp;</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">&nbsp;&nbsp;Excel&nbsp;&nbsp;</a>
           </li>
           <li class="nav-item">
@@ -82,36 +79,117 @@
             <a class="nav-link" href="about.html">&nbsp;&nbsp;About&nbsp;&nbsp;</a>
           </li>
         </ul>
-        <!-- <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
       </div>
     </div>
   </nav>
   <main class="container">
     <br />
-    <h2 class="border-1">Decompose Rubik's cube algorithms in commutator notation.</h5>
+    <h2 class="border-1">Decompose algorithms in commutator notation.</h5>
       <br />
-      Settings:
-      <input type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket for all commutators
+      <strong>Settings:</strong>
+      <br />
+      Order: <input type="text" placeholder="4" id="order" onkeyup="changeCookie()"
+        style="text-align:center;width:2.5em">
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket
+      for all commutators
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsInitialReplace" onclick="changeCookie()" checked>
+      Initial Replace
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsFinalReplace" onclick="changeCookie()" checked> Final
+      Replace
+      <br />
+      <input class="form-check-input" type="checkbox" id="settingsCommute" onclick="changeCookie()" checked> Commute
       <br />
       Sorting rules:
+      <br />
       The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
-        type="text" style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5"
-        id="settingsSortScoreb" onkeyup="changeCookie()" type="text" style="text-align:center;width:2.5em"> *
+        style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5" id="settingsSortScoreb"
+        onkeyup="changeCookie()" style="text-align:center;width:2.5em"> *
       stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
       <br /><br />
       <p>Input a excel file(*.xlsx), decompose all the algorithms in commutator notation.</p>
       <p>Please download the input excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
       <input type="file" id="upfile" />
-      <div id="out"></div>
+      <br />
+      <br />
+      <div id="out">
+      </div>
       </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/dist/js/prism.js"></script>
-  <script src="assets/dist/js/excel.js"></script>
+  <script src="assets/dist/js/commutator.js"></script>
   <script src="assets/dist/js/cookie.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.1/xlsx.full.min.js"></script>
+  <script>
+    function commutatorclick(alg) {
+      const outlist = commutator
+        .search({
+          "algorithm": alg,
+          "order": document.getElementById("order").value > 0 ? document.getElementById("order").value : 4,
+          "outerBracket": document.getElementById("settingsOuterBracket").checked,
+          "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
+          "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
+          "commute": document.getElementById("settingsCommute").checked ? undefined : {},
+        });
+      return outlist[0];
+    }
+    const X = XLSX;
+    const file = document.getElementById("upfile");
+    const out = document.getElementById("out");
+
+    function handleFile(ee) {
+      const files = ee.target.files;
+      for (let index = 0, f = files[index]; index !== files.length; ++index) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = e.target.result;
+          const workbook = XLSX.read(data, {
+            "type": "binary"
+          });
+          // DO SOMETHING WITH workbook HERE
+          let excelResult = "";
+          const tmp = X.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
+          let maxRowCount = 0;
+          let tmpRowCount = 0;
+          let arrayTitle = [];
+          const obj = {};
+          for (let i = 0; i < tmp.length; i++) {
+            tmpRowCount = parseInt(tmp[i].split("=")[0].substr(1, tmp[i].split("=")[0].length - 1), 10);
+            if (tmpRowCount >= maxRowCount) {
+              maxRowCount = tmpRowCount;
+            }
+            obj[tmp[i].split("=")[0]] = tmp[i].split("=")[1];
+            arrayTitle.push(tmp[i].split("=")[0].charAt(0));
+          }
+          arrayTitle = Array.from(new Set(arrayTitle)); //Array deduplication
+          excelResult += "<table class=\"productInfo\">";
+          for (let i = 1; i <= maxRowCount; i++) {
+            excelResult += "<tr>";
+            for (let j = 0; j < arrayTitle.length; j++) {
+              if (obj.hasOwnProperty(arrayTitle[j] + i)) {
+                excelResult += `<td>${obj[arrayTitle[j] + i].replace("'", "")}</td>`;
+                if (obj[arrayTitle[j] + i].replace("'", "").length > 8) {
+                  // console.time("Time");
+                  console.log(`${i}:${obj[arrayTitle[j] + i].replace("'", "")}`);
+                  excelResult += `<td>${commutatorclick(obj[arrayTitle[j] + i].replace("'", ""))}</td>`;
+                  // console.timeEnd("Time");
+                }
+              } else {
+                excelResult += "<td></td>";
+              }
+            }
+            excelResult += "</tr>";
+          }
+          excelResult += "</table>";
+          out.innerHTML = excelResult;
+        };
+        reader.readAsBinaryString(f);
+      }
+    }
+    file.addEventListener("change", handleFile, false);
+  </script>
 </body>
 
 </html>
