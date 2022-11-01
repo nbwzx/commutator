@@ -111,7 +111,6 @@ const commutator = (function () {
         if (order === 0) {
             order = 2 * (maxAlgAmount + 2);
         }
-        // See https://github.com/cubing/cubing.js/blob/main/src/cubing/alg/traversal.ts
         // Examples:
         // • order 4 → min -1 (e.g. cube)
         // • order 5 → min -2 (e.g. Megaminx)
@@ -315,7 +314,6 @@ const commutator = (function () {
         if (order === 0) {
             order = 2 * (maxAlgAmount + 2);
         }
-        // See https://github.com/cubing/cubing.js/blob/main/src/cubing/alg/traversal.ts
         // Examples:
         // • order 4 → min -1 (e.g. cube)
         // • order 5 → min -2 (e.g. Megaminx)
