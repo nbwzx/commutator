@@ -9,6 +9,7 @@ const commutator = (function () {
         outerBracket = false,
         abMaxScore = 2.5,
         abMinScore = 5,
+        maxDepth = 0,
         limit = 0;
     let commute = {},
         initialReplace = {},
@@ -17,6 +18,7 @@ const commutator = (function () {
         outerBracketInit = false,
         abMaxScoreInit = 2.5,
         abMinScoreInit = 5,
+        maxDepthInit = 0,
         limitInit = 0;
     const commuteInit = {
         "U": { "class": 1, "priority": 1 },
@@ -305,6 +307,7 @@ const commutator = (function () {
         initialReplace = input.initialReplace ?? initialReplaceInit;
         finalReplace = input.finalReplace ?? finalReplaceInit;
         commute = input.commute ?? commuteInit;
+        maxDepth = Number(input.maxDepth ?? maxDepthInit);
         limit = Number(input.limit ?? limitInit);
         result = [];
         if (algorithm.length === 0) {
@@ -351,7 +354,13 @@ const commutator = (function () {
         const number = 2 ** count;
         let commutatorResult = ["Not found."],
             flag = false;
-        for (let ii = 1; ii <= Math.floor((len - 1) / 3); ii++) {
+        let searchDepth = 0;
+        if (maxDepth === 0) {
+            searchDepth = Math.floor((len - 1) / 3);
+        } else {
+            searchDepth = maxDepth;
+        }
+        for (let ii = 1; ii <= searchDepth; ii++) {
             for (let i = 0; i <= number - 1; i++) {
                 const text = String(i.toString(2));
                 arrex = arr.concat();
@@ -365,7 +374,7 @@ const commutator = (function () {
                     flag = true;
                 }
             }
-            if (flag) {
+            if (flag && (ii === maxDepth || maxDepth === 0)) {
                 result.sort(sortRule);
                 if (limit === 0) {
                     return result;
@@ -595,6 +604,9 @@ const commutator = (function () {
                                 const part1Output = simplifyfinal(part1),
                                     part2Output = simplifyfinal(part2),
                                     part0Output = simplifyfinal(part0);
+                                if (part1Output === "" || part2Output === "") {
+                                    continue;
+                                }
                                 if (depth === 1) {
                                     text1 = singleOutput(part0Output, part1Output, part2Output);
                                 } else {

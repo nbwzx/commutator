@@ -84,6 +84,9 @@
       <br />
       <input class="form-check-input" type="checkbox" id="settingsCommute" onclick="changeCookie()" checked> Commute
       <br />
+      Max Depth: <input type="text" placeholder="0" id="settingsMaxDepth" onkeyup="changeCookie()"
+        style="text-align:center;width:2.5em">
+      <br />
       Sorting rules:
       <br />
       The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
@@ -114,6 +117,8 @@
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
+          "maxDepth": document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
+            "settingsMaxDepth").value : 0
         });
       return outlist[0];
     }
