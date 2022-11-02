@@ -106,7 +106,7 @@
       const outlist = commutator
         .search({
           "algorithm": document.getElementById("alg").value,
-          "order": document.getElementById("order").value > 0 ? document.getElementById("order").value : 4,
+          "order": document.getElementById("order").value !== "" ? document.getElementById("order").value : 4,
           "outerBracket": document.getElementById("settingsOuterBracket").checked,
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
@@ -127,7 +127,7 @@
       document.getElementById("out").innerHTML = commutator
         .expand({
           "algorithm": document.getElementById("alg").value,
-          "order": document.getElementById("order").value > 0 ? document.getElementById("order").value : 4,
+          "order": document.getElementById("order").value !== "" ? document.getElementById("order").value : 4,
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
