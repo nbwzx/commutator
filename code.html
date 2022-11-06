@@ -62,20 +62,7 @@
                 "use strict";
 
                 const commutator = (function () {
-                    let result = [],
-                        order = 0,
-                        minAmount = 0,
-                        maxAmount = 0,
-                        maxAlgAmount = 0,
-                        outerBracket = false,
-                        abMaxScore = 2.5,
-                        abMinScore = 5,
-                        maxDepth = 0,
-                        limit = 0;
-                    let commute = {},
-                        initialReplace = {},
-                        finalReplace = {};
-                    const orderInit = 0,
+                    const orderInit = 4,
                         outerBracketInit = false,
                         abMaxScoreInit = 2.5,
                         abMinScoreInit = 5,
@@ -154,6 +141,19 @@
                         "M2 R": "r M'",
                         "M2 R'": "r' M"
                     };
+                    let result = [],
+                        order = orderInit,
+                        minAmount = -1,
+                        maxAmount = 2,
+                        maxAlgAmount = 0,
+                        outerBracket = outerBracketInit,
+                        abMaxScore = abMaxScoreInit,
+                        abMinScore = abMinScoreInit,
+                        maxDepth = maxDepthInit,
+                        limit = limitInit;
+                    let commute = commuteInit,
+                        initialReplace = initialReplaceInit,
+                        finalReplace = finalReplaceInit;
                 
                     function expand(input) {
                         const algorithm = input.algorithm;
@@ -162,14 +162,25 @@
                         finalReplace = input.finalReplace ?? finalReplaceInit;
                         commute = input.commute ?? commuteInit;
                         let algValue = algorithm;
-                        algValue = algValue.replace(/\s/gu, " ");
-                        algValue = algValue.replace(/\(/gu, "[");
-                        algValue = algValue.replace(/\)/gu, "]");
-                        algValue = algValue.replace(/（/gu, "[");
-                        algValue = algValue.replace(/）/gu, "]");
+                        algValue = algValue.replace(/[‘]/gu, "'");
+                        algValue = algValue.replace(/[’]/gu, "'");
+                        algValue = algValue.replace(/\(/gu, "");
+                        algValue = algValue.replace(/\)/gu, "");
+                        algValue = algValue.replace(/（/gu, "");
+                        algValue = algValue.replace(/）/gu, "");
+                        algValue = algValue.replace(/\s/gu, "");
+                        algValue = algValue.split("").join(" ");
                         algValue = algValue.replace(/【/gu, "[");
                         algValue = algValue.replace(/】/gu, "]");
                         algValue = algValue.replace(/，/gu, ",");
+                        algValue = algValue.replace(/: /gu, ":");
+                        algValue = algValue.replace(/, /gu, ",");
+                        algValue = algValue.replace(/\[ /gu, "[");
+                        algValue = algValue.replace(/\] /gu, "]");
+                        algValue = algValue.replace(/ :/gu, ":");
+                        algValue = algValue.replace(/ ,/gu, ",");
+                        algValue = algValue.replace(/ \[/gu, "[");
+                        algValue = algValue.replace(/ \]/gu, "]");
                         algValue = algValue.replace(/\]\[/gu, "]+[");
                         if (algValue === "") {
                             return "Empty input.";
