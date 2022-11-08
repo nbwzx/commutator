@@ -113,6 +113,10 @@
           "outerBracket": document.getElementById("settingsOuterBracket").checked,
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
+          "abMaxScore": document.getElementById("settingsSortScorea").value !== "" ? document.getElementById(
+            "settingsSortScorea").value : 2.5,
+          "abMinScore": document.getElementById("settingsSortScoreb").value !== "" ? document.getElementById(
+            "settingsSortScoreb").value : 5,
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
           "maxDepth": document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
             "settingsMaxDepth").value : 0
