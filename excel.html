@@ -96,7 +96,7 @@
       <br /><br />
       <p>Input a excel file(*.xlsx), decompose all the algorithms in commutator notation.</p>
       <p>Please download the input excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
-      <input type="file" id="upfile" accept=".xlsx, .xls, .csv"/>
+      <input type="file" id="upfile" accept=".xlsx, .xls, .csv" />
       <br />
       <br />
       <div id="out">
@@ -104,7 +104,7 @@
       </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/dist/js/commutator.js"></script>
+  <script src="assets/dist/js/commutator.min.js"></script>
   <script src="assets/dist/js/cookie.js"></script>
   <script src="assets/dist/js/xlsx.full.min.js"></script>
   <script>
@@ -178,6 +178,7 @@
         };
         reader.readAsBinaryString(f);
       }
+      document.getElementById("upfile").value = null;
     }
     file.addEventListener("change", handleFile, false);
   </script>
