@@ -132,6 +132,7 @@ const commutator = (function () {
     algValue = algValue.replace(/ ,/gu, ",");
     algValue = algValue.replace(/ \[/gu, "[");
     algValue = algValue.replace(/ \]/gu, "]");
+    algValue = `[${algValue.replace(/\+/gu, "]+[")}]`;
     algValue = algValue.replace(/\]\[/gu, "]+[");
     if (algValue === "") {
       return "Empty input.";
@@ -284,6 +285,7 @@ const commutator = (function () {
     algValue = algValue.replace(/【/gu, "[");
     algValue = algValue.replace(/】/gu, "]");
     algValue = algValue.replace(/，/gu, ",");
+    algValue = `[${algValue.replace(/\+/gu, "]+[")}]`;
     algValue = algValue.replace(/\]\[/gu, "]+[");
     const expression = rpn(initializeExperssion(algValue)),
       rpnExpression: string[] = [];
