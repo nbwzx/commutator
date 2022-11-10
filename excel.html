@@ -126,7 +126,6 @@
         });
       return outlist[0];
     }
-    const X = XLSX;
     const file = document.getElementById("upfile");
     const out = document.getElementById("out");
 
@@ -141,11 +140,13 @@
           });
           // DO SOMETHING WITH workbook HERE
           let excelResult = "";
-          const tmp = X.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
+          const tmp = XLSX.utils.sheet_to_formulae(workbook.Sheets[workbook.SheetNames[0]]);
           let maxRowCount = 0;
           let tmpRowCount = 0;
           let arrayTitle = [];
           const obj = {};
+          const arrOut = [];
+          const wb = XLSX.utils.book_new();
           for (let i = 0; i < tmp.length; i++) {
             tmpRowCount = parseInt(tmp[i].split("=")[0].substr(1, tmp[i].split("=")[0].length - 1), 10);
             if (tmpRowCount >= maxRowCount) {
@@ -158,14 +159,19 @@
           excelResult += "<table class=\"productInfo\">";
           for (let i = 1; i <= maxRowCount; i++) {
             excelResult += "<tr>";
+            arrOut.push([]);
             for (let j = 0; j < arrayTitle.length; j++) {
               if (obj.hasOwnProperty(arrayTitle[j] + i)) {
-                excelResult += `<td>${obj[arrayTitle[j] + i].replace("'", "")}</td>`;
-                if (obj[arrayTitle[j] + i].replace("'", "").length > 8) {
+                const algorithmResult = obj[arrayTitle[j] + i].replace("'", "")
+                excelResult += `<td>${algorithmResult}</td>`;
+                arrOut[i - 1].push(algorithmResult);
+                if (algorithmResult.length >= 4) {
                   // console.time("Time");
-                  console.log(`${i}:${obj[arrayTitle[j] + i].replace("'", "")}`);
-                  excelResult += `<td>${commutatorclick(obj[arrayTitle[j] + i].replace("'", ""))}</td>`;
+                  console.log(`${i}:${algorithmResult}`);
+                  const commutatorResult = commutatorclick(algorithmResult)
+                  excelResult += `<td>${commutatorResult}</td>`;
                   // console.timeEnd("Time");
+                  arrOut[i - 1].push(commutatorResult);
                 }
               } else {
                 excelResult += "<td></td>";
@@ -175,6 +181,30 @@
           }
           excelResult += "</table>";
           out.innerHTML = excelResult;
+          const Sheet1 = XLSX.utils.aoa_to_sheet(arrOut);
+          XLSX.utils.book_append_sheet(wb, Sheet1, "Sheet1");
+          const myDate = new Date();
+          const year = myDate.getFullYear();
+          let month = myDate.getMonth() + 1;
+          let ddate = myDate.getDate();
+          let Sheet2 = "";
+          const monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Spt", "Oct", "Nov", "Dec"];
+          const suffix = ["st", "nd", "rd", "th"];
+          if (ddate % 10 < 1 || ddate % 10 > 3) {
+            ddate = ddate + suffix[3];
+          } else if (ddate % 10 === 1) {
+            ddate = ddate + suffix[0];
+          } else if (ddate % 10 === 2) {
+            ddate = ddate + suffix[1];
+          } else {
+            ddate = ddate + suffix[2];
+          }
+          Sheet2 = XLSX.utils.aoa_to_sheet([
+            ["This file is post processed by https://zixingwang.cn/commutator"],
+            [`Latest update on ${ddate} ${monthArr[month - 1]} ${year}`]
+          ]);
+          XLSX.utils.book_append_sheet(wb, Sheet2, "Readme");
+          XLSX.writeFile(wb, `output.xlsx`);
         };
         reader.readAsBinaryString(f);
       }
