@@ -85,7 +85,7 @@ const commutator = (function () {
     "M2 R": "r M'",
     "M2 R'": "r' M",
   };
-  type Move = [string, number];
+  type Move = { base: string; amount: number };
   let result: string[] = [],
     order = orderInit,
     minAmount = -1,
@@ -372,8 +372,8 @@ const commutator = (function () {
     for (let i = 0; i <= len - 1; i++) {
       sum = 0;
       for (let j = 0; j <= len - 1; j++) {
-        if (arr[i][0] === arr[j][0]) {
-          sum = sum + arr[j][1];
+        if (arr[i].base === arr[j].base) {
+          sum = sum + arr[j].amount;
         }
       }
       if (sum % order !== 0) {
@@ -383,8 +383,8 @@ const commutator = (function () {
     let count = 0;
     const locationud: number[] = [];
     for (let i = 0; i < len - 1; i++) {
-      if (arr[i][0] in commute && arr[i + 1][0] in commute) {
-        if (commute[arr[i][0]].class === commute[arr[i + 1][0]].class) {
+      if (arr[i].base in commute && arr[i + 1].base in commute) {
+        if (commute[arr[i].base].class === commute[arr[i + 1].base].class) {
           locationud[count] = i;
           count += 1;
         }
@@ -452,18 +452,18 @@ const commutator = (function () {
     const arr1 = x.split(" ");
     const arr: Move[] = [];
     for (let i = 0; i < arr1.length; i++) {
-      arr[i] = [arr1[i][0], 0];
+      arr[i] = { base: arr1[i][0], amount: 0 };
       const temp = arr1[i].replace(/[^0-9]/gu, "");
       if (temp === "") {
-        arr[i][1] = 1;
+        arr[i].amount = 1;
       } else {
-        arr[i][1] = Number(temp);
+        arr[i].amount = Number(temp);
       }
-      if (arr[i][1] > maxAlgAmount) {
-        maxAlgAmount = arr[i][1];
+      if (arr[i].amount > maxAlgAmount) {
+        maxAlgAmount = arr[i].amount;
       }
       if (arr1[i].indexOf("'") > -1) {
-        arr[i][1] = -arr[i][1];
+        arr[i].amount = -arr[i].amount;
       }
     }
     return arr;
@@ -477,8 +477,8 @@ const commutator = (function () {
     let count = 0;
     const locationud: number[] = [];
     for (let i = 0; i < array.length - 1; i++) {
-      if (array[i][0] in commute && array[i + 1][0] in commute) {
-        if (commute[array[i][0]].class === commute[array[i + 1][0]].class) {
+      if (array[i].base in commute && array[i + 1].base in commute) {
+        if (commute[array[i].base].class === commute[array[i + 1].base].class) {
           locationud[count] = i;
           count += 1;
         }
@@ -523,13 +523,16 @@ const commutator = (function () {
             break;
           }
         } else {
-          if (Math.abs(dr) > Math.abs(arrbak[d - 1][1])) {
+          if (Math.abs(dr) > Math.abs(arrbak[d - 1].amount)) {
             break;
           }
-          if (order % 2 === 1 || arrbak[d - 1][1] !== Math.floor(order / 2)) {
+          if (
+            order % 2 === 1 ||
+            arrbak[d - 1].amount !== Math.floor(order / 2)
+          ) {
             if (
-              (arrbak[d - 1][1] < 0 && dr > 0) ||
-              (arrbak[d - 1][1] > 0 && dr < 0)
+              (arrbak[d - 1].amount < 0 && dr > 0) ||
+              (arrbak[d - 1].amount > 0 && dr < 0)
             ) {
               continue;
             }
@@ -549,13 +552,13 @@ const commutator = (function () {
               part2x: Move[] = [];
             const commuteAddList1: [Move[]] = [[]],
               commuteAddList2: [Move[]] = [[]];
-            if (arr[i - 1][0] === arr[i + j - 1][0]) {
+            if (arr[i - 1].base === arr[i + j - 1].base) {
               // For [a bx,by c bz]
               for (let ir = minAmount; ir <= maxAmount; ir++) {
                 if (ir === 0) {
                   continue;
                 }
-                const jr = normalize(arr[i + j - 1][1] + ir);
+                const jr = normalize(arr[i + j - 1].amount + ir);
                 part1x = simplify(repeatEnd(arr.slice(0, i), ir));
                 commuteAddList1.push(part1x);
                 part2x = simplify(
@@ -564,7 +567,7 @@ const commutator = (function () {
                 commuteAddList2.push(part2x);
               }
             } else {
-              if (depth === 1 && arr[i][0] !== arr[arr.length - 1][0]) {
+              if (depth === 1 && arr[i].base !== arr[arr.length - 1].base) {
                 continue;
               }
               part1x = simplify(arr.slice(0, i));
@@ -572,11 +575,14 @@ const commutator = (function () {
               part2x = simplify(arr.slice(i, i + j));
               commuteAddList2.push(part2x);
               let commuteCase: Move[] = [];
-              if (arr[i - 1][0] in commute && arr[i + j - 1][0] in commute) {
+              if (
+                arr[i - 1].base in commute &&
+                arr[i + j - 1].base in commute
+              ) {
                 if (
-                  commute[arr[i + j - 1][0]].class ===
-                    commute[arr[i - 1][0]].class &&
-                  arr[i + j - 1][0] !== arr[i - 1][0]
+                  commute[arr[i + j - 1].base].class ===
+                    commute[arr[i - 1].base].class &&
+                  arr[i + j - 1].base !== arr[i - 1].base
                 ) {
                   // For L b R c L' b' R' c' = [L b R,c L' R]
                   commuteAddList1.push(part1x);
@@ -584,10 +590,13 @@ const commutator = (function () {
                   commuteAddList2.push(commuteCase);
                   // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                   if (i >= 2) {
-                    if (arr[i - 1][0] in commute && arr[i - 2][0] in commute) {
+                    if (
+                      arr[i - 1].base in commute &&
+                      arr[i - 2].base in commute
+                    ) {
                       if (
-                        commute[arr[i - 2][0]].class ===
-                        commute[arr[i - 1][0]].class
+                        commute[arr[i - 2].base].class ===
+                        commute[arr[i - 1].base].class
                       ) {
                         commuteAddList1.push(part1x);
                         commuteCase = simplify(
@@ -599,10 +608,11 @@ const commutator = (function () {
                   }
                 }
               }
-              if (arr[i][0] in commute && arr[i + j][0] in commute) {
+              if (arr[i].base in commute && arr[i + j].base in commute) {
                 if (
-                  commute[arr[i + j][0]].class === commute[arr[i][0]].class &&
-                  arr[i + j][0] !== arr[i][0]
+                  commute[arr[i + j].base].class ===
+                    commute[arr[i].base].class &&
+                  arr[i + j].base !== arr[i].base
                 ) {
                   // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
                   commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
@@ -612,12 +622,12 @@ const commutator = (function () {
                   // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
                   if (arr.length >= i + j + 2) {
                     if (
-                      arr[i + j][0] in commute &&
-                      arr[i + j + 1][0] in commute
+                      arr[i + j].base in commute &&
+                      arr[i + j + 1].base in commute
                     ) {
                       if (
-                        commute[arr[i + j + 1][0]].class ===
-                        commute[arr[i + j][0]].class
+                        commute[arr[i + j + 1].base].class ===
+                        commute[arr[i + j].base].class
                       ) {
                         commuteCase = simplify(
                           part1x.concat(invert(arr.slice(i + j, i + j + 2)))
@@ -716,11 +726,11 @@ const commutator = (function () {
     if (arr.length === 0) {
       return [];
     }
-    const popped = arr.pop() ?? "";
+    const popped = arr.pop() ?? { base: "", amount: 0 };
     if (attempt === 0) {
       return arr;
     }
-    arr.push([popped[0], attempt]);
+    arr.push({ base: popped.base, amount: attempt });
     return arr;
   }
 
@@ -761,7 +771,7 @@ const commutator = (function () {
   function invert(array: Move[]): Move[] {
     const arr: Move[] = [];
     for (let i = array.length - 1; i >= 0; i--) {
-      arr.push([array[i][0], normalize(-array[i][1])]);
+      arr.push({ base: array[i].base, amount: normalize(-array[i].amount) });
     }
     return arr;
   }
@@ -774,12 +784,12 @@ const commutator = (function () {
     }
     for (let times = 0; times <= 1; times++) {
       for (let i = 0; i < arr.length - 1; i++) {
-        if (!(arr[i][0] in commute && arr[i + 1][0] in commute)) {
+        if (!(arr[i].base in commute && arr[i + 1].base in commute)) {
           continue;
         }
         if (
-          commute[arr[i][0]].class === commute[arr[i + 1][0]].class &&
-          commute[arr[i][0]].priority > commute[arr[i + 1][0]].priority
+          commute[arr[i].base].class === commute[arr[i + 1].base].class &&
+          commute[arr[i].base].priority > commute[arr[i + 1].base].priority
         ) {
           arr = swaparr(arr, i, i + 1);
         }
@@ -787,16 +797,16 @@ const commutator = (function () {
     }
     const arrOutput1: string[] = [];
     for (let i = 0; i < arr.length; i++) {
-      if (arr[i][1] < 0) {
-        if (arr[i][1] === -1) {
-          arrOutput1[i] = `${arr[i][0]}'`;
+      if (arr[i].amount < 0) {
+        if (arr[i].amount === -1) {
+          arrOutput1[i] = `${arr[i].base}'`;
         } else {
-          arrOutput1[i] = `${arr[i][0] + -arr[i][1]}'`;
+          arrOutput1[i] = `${arr[i].base + -arr[i].amount}'`;
         }
-      } else if (arr[i][1] === 1) {
-        arrOutput1[i] = arr[i][0];
+      } else if (arr[i].amount === 1) {
+        arrOutput1[i] = arr[i].base;
       } else {
-        arrOutput1[i] = arr[i][0] + arr[i][1];
+        arrOutput1[i] = arr[i].base + arr[i].amount;
       }
     }
     let arrOutput = `${arrOutput1.join(" ")} `;
@@ -814,19 +824,22 @@ const commutator = (function () {
     }
     const arr: Move[] = [];
     for (let i = 0; i < array.length; i++) {
-      const arrayAdd: Move = [array[i][0], normalize(array[i][1])],
+      const arrayAdd: Move = {
+          base: array[i].base,
+          amount: normalize(array[i].amount),
+        },
         len = arr.length;
-      if (normalize(arrayAdd[1]) === 0) {
+      if (normalize(arrayAdd.amount) === 0) {
         continue;
       }
       let hasChanged = false;
       for (let j = 1; j <= 3; j++) {
         if (arr.length >= j) {
-          if (arr[len - j][0] === arrayAdd[0]) {
+          if (arr[len - j].base === arrayAdd.base) {
             let canCommute = true;
             if (j >= 2) {
               for (let k = 1; k <= j; k++) {
-                if (!(arr[len - k][0] in commute)) {
+                if (!(arr[len - k].base in commute)) {
                   canCommute = false;
                   break;
                 }
@@ -834,16 +847,16 @@ const commutator = (function () {
               for (let k = 2; k <= j; k++) {
                 if (
                   !(
-                    arr[len - k][0] in commute &&
-                    arr[len - (k - 1)][0] in commute
+                    arr[len - k].base in commute &&
+                    arr[len - (k - 1)].base in commute
                   )
                 ) {
                   canCommute = false;
                   break;
                 }
                 if (
-                  commute[arr[len - k][0]].class !==
-                  commute[arr[len - (k - 1)][0]].class
+                  commute[arr[len - k].base].class !==
+                  commute[arr[len - (k - 1)].base].class
                 ) {
                   canCommute = false;
                   break;
@@ -851,11 +864,11 @@ const commutator = (function () {
               }
             }
             if (canCommute) {
-              const x: [string, number] = [
-                arr[len - j][0],
-                normalize(arr[len - j][1] + arrayAdd[1]),
-              ];
-              if (x[1] === 0) {
+              const x: Move = {
+                base: arr[len - j].base,
+                amount: normalize(arr[len - j].amount + arrayAdd.amount),
+              };
+              if (x.amount === 0) {
                 arr.splice(-j, 1);
               } else {
                 arr.splice(-j, 1, x);
