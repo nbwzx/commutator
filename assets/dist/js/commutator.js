@@ -79,12 +79,12 @@ var commutator = (function () {
         "M2 R": "r M'",
         "M2 R'": "r' M"
     };
-    var result = [], order = orderInit, minAmount = -1, maxAmount = 2, maxAlgAmount = 0, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, maxDepth = maxDepthInit, limit = limitInit;
+    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
     function expand(input) {
         var _a, _b, _c, _d;
         var algorithm = input.algorithm;
-        order = Number((_a = input.order) !== null && _a !== void 0 ? _a : orderInit);
+        order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         initialReplace = (_b = input.initialReplace) !== null && _b !== void 0 ? _b : initialReplaceInit;
         finalReplace = (_c = input.finalReplace) !== null && _c !== void 0 ? _c : finalReplaceInit;
         commute = (_d = input.commute) !== null && _d !== void 0 ? _d : commuteInit;
@@ -166,19 +166,18 @@ var commutator = (function () {
         return -1;
     }
     function rpn(inputStack) {
-        var _a, _b, _c, _d;
         // Reverse Polish Notation
         var outputStack = [], operatorStack = [];
         var match = false, tempOperator = "";
         while (inputStack.length > 0) {
-            var sign = (_a = inputStack.shift()) !== null && _a !== void 0 ? _a : "";
+            var sign = inputStack.shift();
             if (!isOperator(sign)) {
                 outputStack.push(sign);
             }
             else if (operatorLevel(sign) === 4) {
                 match = false;
                 while (operatorStack.length > 0) {
-                    tempOperator = (_b = operatorStack.pop()) !== null && _b !== void 0 ? _b : "";
+                    tempOperator = operatorStack.pop();
                     if (tempOperator === "[") {
                         match = true;
                         break;
@@ -193,15 +192,15 @@ var commutator = (function () {
             }
             else {
                 while (operatorStack.length > 0 &&
-                    operatorStack.slice(-1).toString() !== "[".toString() &&
+                    operatorStack.slice(-1)[0] !== "[" &&
                     operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1)[0])) {
-                    outputStack.push((_c = operatorStack.pop()) !== null && _c !== void 0 ? _c : "");
+                    outputStack.push(operatorStack.pop());
                 }
                 operatorStack.push(sign);
             }
         }
         while (operatorStack.length > 0) {
-            tempOperator = (_d = operatorStack.pop()) !== null && _d !== void 0 ? _d : "";
+            tempOperator = operatorStack.pop();
             if (tempOperator === "[") {
                 return ["Lack right parenthesis."];
             }
@@ -210,14 +209,12 @@ var commutator = (function () {
         return outputStack;
     }
     function calculate(expression) {
-        var _a, _b, _c;
-        var i = "", j = "";
         var rpnExpression = [];
         while (expression.length > 0) {
-            var sign = (_a = expression.shift()) !== null && _a !== void 0 ? _a : "";
+            var sign = expression.shift();
             if (isOperator(sign)) {
-                j = (_b = rpnExpression.pop()) !== null && _b !== void 0 ? _b : "";
-                i = (_c = rpnExpression.pop()) !== null && _c !== void 0 ? _c : "";
+                var j = rpnExpression.pop();
+                var i = rpnExpression.pop();
                 rpnExpression.push(calculateTwo(i, j, sign));
             }
             else {
@@ -242,25 +239,15 @@ var commutator = (function () {
         }
     }
     function score(algValueOrigin) {
-        var _a, _b, _c;
-        var i = "", j = "";
         var algValue = algValueOrigin;
-        algValue = algValue.replace(/\s/gu, " ");
-        algValue = algValue.replace(/\(/gu, "[");
-        algValue = algValue.replace(/\)/gu, "]");
-        algValue = algValue.replace(/（/gu, "[");
-        algValue = algValue.replace(/）/gu, "]");
-        algValue = algValue.replace(/【/gu, "[");
-        algValue = algValue.replace(/】/gu, "]");
-        algValue = algValue.replace(/，/gu, ",");
         algValue = "[".concat(algValue.replace(/\+/gu, "]+["), "]");
         algValue = algValue.replace(/\]\[/gu, "]+[");
         var expression = rpn(initializeExperssion(algValue)), rpnExpression = [];
         while (expression.length > 0) {
-            var sign = (_a = expression.shift()) !== null && _a !== void 0 ? _a : "";
+            var sign = expression.shift();
             if (isOperator(sign)) {
-                j = (_b = rpnExpression.pop()) !== null && _b !== void 0 ? _b : "";
-                i = (_c = rpnExpression.pop()) !== null && _c !== void 0 ? _c : "";
+                var j = rpnExpression.pop();
+                var i = rpnExpression.pop();
                 var inum = Number(i), jnum = Number(j);
                 if (isNaN(inum)) {
                     inum = i.split(" ").length;
@@ -294,15 +281,14 @@ var commutator = (function () {
     function search(input) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         var algorithm = input.algorithm;
-        order = Number((_a = input.order) !== null && _a !== void 0 ? _a : orderInit);
+        order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         outerBracket = (_b = input.outerBracket) !== null && _b !== void 0 ? _b : outerBracketInit;
-        abMaxScore = Number((_c = input.abMaxScore) !== null && _c !== void 0 ? _c : abMaxScoreInit);
-        abMinScore = Number((_d = input.abMinScore) !== null && _d !== void 0 ? _d : abMinScoreInit);
+        abMaxScore = (_c = input.abMaxScore) !== null && _c !== void 0 ? _c : abMaxScoreInit;
+        abMinScore = (_d = input.abMinScore) !== null && _d !== void 0 ? _d : abMinScoreInit;
         initialReplace = (_e = input.initialReplace) !== null && _e !== void 0 ? _e : initialReplaceInit;
         finalReplace = (_f = input.finalReplace) !== null && _f !== void 0 ? _f : finalReplaceInit;
         commute = (_g = input.commute) !== null && _g !== void 0 ? _g : commuteInit;
-        maxDepth = Number((_h = input.maxDepth) !== null && _h !== void 0 ? _h : maxDepthInit);
-        limit = Number((_j = input.limit) !== null && _j !== void 0 ? _j : limitInit);
+        var maxDepth = (_h = input.maxDepth) !== null && _h !== void 0 ? _h : maxDepthInit, limit = (_j = input.limit) !== null && _j !== void 0 ? _j : limitInit;
         result = [];
         if (algorithm === "") {
             return ["Empty input."];
@@ -322,9 +308,8 @@ var commutator = (function () {
         if (len === 0) {
             return ["Empty input."];
         }
-        var sum = 0;
         for (var i = 0; i <= len - 1; i++) {
-            sum = 0;
+            var sum = 0;
             for (var j = 0; j <= len - 1; j++) {
                 if (arr[i].base === arr[j].base) {
                     sum = sum + arr[j].amount;
@@ -625,12 +610,11 @@ var commutator = (function () {
         return [textOutput];
     }
     function repeatEnd(array, attempt) {
-        var _a;
         var arr = array.concat();
         if (arr.length === 0) {
             return [];
         }
-        var popped = (_a = arr.pop()) !== null && _a !== void 0 ? _a : { base: "", amount: 0 };
+        var popped = arr.pop();
         if (attempt === 0) {
             return arr;
         }

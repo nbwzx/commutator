@@ -88,14 +88,12 @@ const commutator = (function () {
   type Move = { base: string; amount: number };
   let result: string[] = [],
     order = orderInit,
-    minAmount = -1,
-    maxAmount = 2,
+    minAmount = Math.floor(orderInit / 2) + 1 - orderInit,
+    maxAmount = Math.floor(orderInit / 2),
     maxAlgAmount = 0,
     outerBracket = outerBracketInit,
     abMaxScore = abMaxScoreInit,
-    abMinScore = abMinScoreInit,
-    maxDepth = maxDepthInit,
-    limit = limitInit;
+    abMinScore = abMinScoreInit;
   let commute = commuteInit,
     initialReplace = initialReplaceInit,
     finalReplace = finalReplaceInit;
@@ -107,12 +105,12 @@ const commutator = (function () {
     finalReplace?: { [id: string]: string };
     commute?: { [id: string]: { class: number; priority: number } };
   }): string {
-    const algorithm: string = input.algorithm;
-    order = Number(input.order ?? orderInit);
+    const algorithm = input.algorithm;
+    order = input.order ?? orderInit;
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
-    let algValue: string = algorithm;
+    let algValue = algorithm;
     algValue = algValue.replace(/[‘]/gu, "'");
     algValue = algValue.replace(/[’]/gu, "'");
     algValue = algValue.replace(/\(/gu, "");
@@ -147,7 +145,7 @@ const commutator = (function () {
     // • order 3 → min -1 (e.g. Pyraminx)
     minAmount = Math.floor(order / 2) + 1 - order;
     maxAmount = Math.floor(order / 2);
-    const expression: string[] = rpn(initializeExperssion(algValue));
+    const expression = rpn(initializeExperssion(algValue));
     if (
       expression[0] === "Lack left parenthesis." ||
       expression[0] === "Lack right parenthesis."
@@ -201,13 +199,13 @@ const commutator = (function () {
     let match = false,
       tempOperator = "";
     while (inputStack.length > 0) {
-      const sign = inputStack.shift() ?? "";
+      const sign = inputStack.shift() as string;
       if (!isOperator(sign)) {
         outputStack.push(sign);
       } else if (operatorLevel(sign) === 4) {
         match = false;
         while (operatorStack.length > 0) {
-          tempOperator = operatorStack.pop() ?? "";
+          tempOperator = operatorStack.pop() as string;
           if (tempOperator === "[") {
             match = true;
             break;
@@ -221,16 +219,16 @@ const commutator = (function () {
       } else {
         while (
           operatorStack.length > 0 &&
-          operatorStack.slice(-1).toString() !== "[".toString() &&
+          operatorStack.slice(-1)[0] !== "[" &&
           operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1)[0])
         ) {
-          outputStack.push(operatorStack.pop() ?? "");
+          outputStack.push(operatorStack.pop() as string);
         }
         operatorStack.push(sign);
       }
     }
     while (operatorStack.length > 0) {
-      tempOperator = operatorStack.pop() ?? "";
+      tempOperator = operatorStack.pop() as string;
       if (tempOperator === "[") {
         return ["Lack right parenthesis."];
       }
@@ -240,14 +238,12 @@ const commutator = (function () {
   }
 
   function calculate(expression: string[]): string {
-    let i: string = "",
-      j: string = "";
     const rpnExpression: string[] = [];
     while (expression.length > 0) {
-      const sign: string = expression.shift() ?? "";
+      const sign = expression.shift() as string;
       if (isOperator(sign)) {
-        j = rpnExpression.pop() ?? "";
-        i = rpnExpression.pop() ?? "";
+        let j = rpnExpression.pop() as string;
+        let i = rpnExpression.pop() as string;
         rpnExpression.push(calculateTwo(i, j, sign));
       } else {
         rpnExpression.push(sign);
@@ -274,26 +270,16 @@ const commutator = (function () {
   }
 
   function score(algValueOrigin: string): number {
-    let i = "",
-      j = "";
     let algValue = algValueOrigin;
-    algValue = algValue.replace(/\s/gu, " ");
-    algValue = algValue.replace(/\(/gu, "[");
-    algValue = algValue.replace(/\)/gu, "]");
-    algValue = algValue.replace(/（/gu, "[");
-    algValue = algValue.replace(/）/gu, "]");
-    algValue = algValue.replace(/【/gu, "[");
-    algValue = algValue.replace(/】/gu, "]");
-    algValue = algValue.replace(/，/gu, ",");
     algValue = `[${algValue.replace(/\+/gu, "]+[")}]`;
     algValue = algValue.replace(/\]\[/gu, "]+[");
     const expression = rpn(initializeExperssion(algValue)),
       rpnExpression: string[] = [];
     while (expression.length > 0) {
-      const sign = expression.shift() ?? "";
+      const sign = expression.shift() as string;
       if (isOperator(sign)) {
-        j = rpnExpression.pop() ?? "";
-        i = rpnExpression.pop() ?? "";
+        let j = rpnExpression.pop() as string;
+        let i = rpnExpression.pop() as string;
         let inum = Number(i),
           jnum = Number(j);
         if (isNaN(inum)) {
@@ -340,15 +326,15 @@ const commutator = (function () {
     limit?: number;
   }): string[] {
     const algorithm = input.algorithm;
-    order = Number(input.order ?? orderInit);
+    order = input.order ?? orderInit;
     outerBracket = input.outerBracket ?? outerBracketInit;
-    abMaxScore = Number(input.abMaxScore ?? abMaxScoreInit);
-    abMinScore = Number(input.abMinScore ?? abMinScoreInit);
+    abMaxScore = input.abMaxScore ?? abMaxScoreInit;
+    abMinScore = input.abMinScore ?? abMinScoreInit;
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
-    maxDepth = Number(input.maxDepth ?? maxDepthInit);
-    limit = Number(input.limit ?? limitInit);
+    let maxDepth = input.maxDepth ?? maxDepthInit,
+      limit = input.limit ?? limitInit;
     result = [];
     if (algorithm === "") {
       return ["Empty input."];
@@ -368,9 +354,8 @@ const commutator = (function () {
     if (len === 0) {
       return ["Empty input."];
     }
-    let sum = 0;
     for (let i = 0; i <= len - 1; i++) {
-      sum = 0;
+      let sum = 0;
       for (let j = 0; j <= len - 1; j++) {
         if (arr[i].base === arr[j].base) {
           sum = sum + arr[j].amount;
@@ -726,7 +711,7 @@ const commutator = (function () {
     if (arr.length === 0) {
       return [];
     }
-    const popped = arr.pop() ?? { base: "", amount: 0 };
+    const popped = arr.pop() as Move;
     if (attempt === 0) {
       return arr;
     }
