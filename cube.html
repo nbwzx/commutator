@@ -109,17 +109,17 @@
       const outlist = commutator
         .search({
           "algorithm": document.getElementById("alg").value,
-          "order": document.getElementById("order").value !== "" ? document.getElementById("order").value : 4,
+          "order": Number(document.getElementById("order").value !== "" ? document.getElementById("order").value : 4),
           "outerBracket": document.getElementById("settingsOuterBracket").checked,
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
-          "abMaxScore": document.getElementById("settingsSortScorea").value !== "" ? document.getElementById(
-            "settingsSortScorea").value : 2.5,
-          "abMinScore": document.getElementById("settingsSortScoreb").value !== "" ? document.getElementById(
-            "settingsSortScoreb").value : 5,
+          "abMaxScore": Number(document.getElementById("settingsSortScorea").value !== "" ? document.getElementById(
+            "settingsSortScorea").value : 2.5),
+          "abMinScore": Number(document.getElementById("settingsSortScoreb").value !== "" ? document.getElementById(
+            "settingsSortScoreb").value : 5),
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
-          "maxDepth": document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
-            "settingsMaxDepth").value : 0
+          "maxDepth": Number(document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
+            "settingsMaxDepth").value : 0)
         });
       let outstr = "";
       for (const i in outlist) {
@@ -136,12 +136,12 @@
       document.getElementById("out").innerHTML = commutator
         .expand({
           "algorithm": document.getElementById("alg").value,
-          "order": document.getElementById("order").value !== "" ? document.getElementById("order").value : 4,
+          "order": Number(document.getElementById("order").value !== "" ? document.getElementById("order").value : 4),
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
-          "maxDepth": document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
-            "settingsMaxDepth").value : 0
+          "maxDepth": Number(document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
+            "settingsMaxDepth").value : 0)
         })
       document.getElementById("out").setAttribute("rows", 1);
     }
