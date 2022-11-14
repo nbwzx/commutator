@@ -160,8 +160,7 @@ const commutator = (function () {
   }
 
   function initStack(algorithm: string): string[] {
-    const stack: string[] = [];
-    stack.push(algorithm[0]);
+    const stack: string[] = [algorithm[0]];
     for (let i = 1; i < algorithm.length; i++) {
       if (isOperator(algorithm[i]) || isOperator(stack.slice(-1)[0])) {
         stack.push(algorithm[i]);
@@ -673,7 +672,10 @@ const commutator = (function () {
                 if (score(commutatorStr) < score(commutatorOutput)) {
                   commutatorOutput = commutatorStr;
                 }
-                if (depth === maxSubDepth && result.indexOf(commutatorStr) === -1) {
+                if (
+                  depth === maxSubDepth &&
+                  result.indexOf(commutatorStr) === -1
+                ) {
                   result.push(commutatorStr);
                 }
               }

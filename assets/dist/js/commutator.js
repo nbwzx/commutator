@@ -134,8 +134,7 @@ var commutator = (function () {
         return operatorString.indexOf(sign) > -1;
     }
     function initStack(algorithm) {
-        var stack = [];
-        stack.push(algorithm[0]);
+        var stack = [algorithm[0]];
         for (var i = 1; i < algorithm.length; i++) {
             if (isOperator(algorithm[i]) || isOperator(stack.slice(-1)[0])) {
                 stack.push(algorithm[i]);
@@ -575,7 +574,8 @@ var commutator = (function () {
                                 if (score(commutatorStr) < score(commutatorOutput)) {
                                     commutatorOutput = commutatorStr;
                                 }
-                                if (depth === maxSubDepth && result.indexOf(commutatorStr) === -1) {
+                                if (depth === maxSubDepth &&
+                                    result.indexOf(commutatorStr) === -1) {
                                     result.push(commutatorStr);
                                 }
                             }
