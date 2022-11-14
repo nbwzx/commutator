@@ -368,11 +368,9 @@ const commutator = (function () {
     let count = 0;
     const locationud: number[] = [];
     for (let i = 0; i < len - 1; i++) {
-      if (arr[i].base in commute && arr[i + 1].base in commute) {
-        if (commute[arr[i].base].class === commute[arr[i + 1].base].class) {
-          locationud[count] = i;
-          count += 1;
-        }
+      if (isSameClass(arr[i], arr[i + 1])) {
+        locationud[count] = i;
+        count += 1;
       }
     }
     const number = 2 ** count;
@@ -462,11 +460,9 @@ const commutator = (function () {
     let count = 0;
     const locationud: number[] = [];
     for (let i = 0; i < array.length - 1; i++) {
-      if (array[i].base in commute && array[i + 1].base in commute) {
-        if (commute[array[i].base].class === commute[array[i + 1].base].class) {
-          locationud[count] = i;
-          count += 1;
-        }
+      if (isSameClass(array[i], array[i + 1])) {
+        locationud[count] = i;
+        count += 1;
       }
     }
     const number = 2 ** count;
@@ -560,70 +556,37 @@ const commutator = (function () {
               part2x = simplify(arr.slice(i, i + j));
               commuteAddList2.push(part2x);
               let commuteCase: Move[] = [];
-              if (
-                arr[i - 1].base in commute &&
-                arr[i + j - 1].base in commute
-              ) {
-                if (
-                  commute[arr[i + j - 1].base].class ===
-                    commute[arr[i - 1].base].class &&
-                  arr[i + j - 1].base !== arr[i - 1].base
-                ) {
-                  // For L b R c L' b' R' c' = [L b R,c L' R]
-                  commuteAddList1.push(part1x);
-                  commuteCase = simplify(part2x.concat([arr[i - 1]]));
-                  commuteAddList2.push(commuteCase);
-                  // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
-                  if (i >= 2) {
-                    if (
-                      arr[i - 1].base in commute &&
-                      arr[i - 2].base in commute
-                    ) {
-                      if (
-                        commute[arr[i - 2].base].class ===
-                        commute[arr[i - 1].base].class
-                      ) {
-                        commuteAddList1.push(part1x);
-                        commuteCase = simplify(
-                          part2x.concat(arr.slice(i - 2, i))
-                        );
-                        commuteAddList2.push(commuteCase);
-                      }
-                    }
+              if (isSameClass(arr[i - 1], arr[i + j - 1])) {
+                // For L b R c L' b' R' c' = [L b R,c L' R]
+                commuteAddList1.push(part1x);
+                commuteCase = simplify(part2x.concat([arr[i - 1]]));
+                commuteAddList2.push(commuteCase);
+                // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
+                if (i >= 2) {
+                  if (isSameClass(arr[i - 1], arr[i - 2])) {
+                    commuteAddList1.push(part1x);
+                    commuteCase = simplify(part2x.concat(arr.slice(i - 2, i)));
+                    commuteAddList2.push(commuteCase);
                   }
                 }
               }
-              if (arr[i].base in commute && arr[i + j].base in commute) {
-                if (
-                  commute[arr[i + j].base].class ===
-                    commute[arr[i].base].class &&
-                  arr[i + j].base !== arr[i].base
-                ) {
-                  // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
-                  commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
-                  commuteAddList1.push(commuteCase);
-                  commuteCase = simplify([arr[i + j]].concat(part2x));
-                  commuteAddList2.push(commuteCase);
-                  // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
-                  if (arr.length >= i + j + 2) {
-                    if (
-                      arr[i + j].base in commute &&
-                      arr[i + j + 1].base in commute
-                    ) {
-                      if (
-                        commute[arr[i + j + 1].base].class ===
-                        commute[arr[i + j].base].class
-                      ) {
-                        commuteCase = simplify(
-                          part1x.concat(invert(arr.slice(i + j, i + j + 2)))
-                        );
-                        commuteAddList1.push(commuteCase);
-                        commuteCase = simplify(
-                          arr.slice(i + j, i + j + 2).concat(part2x)
-                        );
-                        commuteAddList2.push(commuteCase);
-                      }
-                    }
+              if (isSameClass(arr[i], arr[i + j])) {
+                // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
+                commuteAddList1.push(commuteCase);
+                commuteCase = simplify([arr[i + j]].concat(part2x));
+                commuteAddList2.push(commuteCase);
+                // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                if (arr.length >= i + j + 2) {
+                  if (isSameClass(arr[i + j], arr[i + j + 1])) {
+                    commuteCase = simplify(
+                      part1x.concat(invert(arr.slice(i + j, i + j + 2)))
+                    );
+                    commuteAddList1.push(commuteCase);
+                    commuteCase = simplify(
+                      arr.slice(i + j, i + j + 2).concat(part2x)
+                    );
+                    commuteAddList2.push(commuteCase);
                   }
                 }
               }
@@ -769,11 +732,8 @@ const commutator = (function () {
     }
     for (let times = 0; times <= 1; times++) {
       for (let i = 0; i < arr.length - 1; i++) {
-        if (!(arr[i].base in commute && arr[i + 1].base in commute)) {
-          continue;
-        }
         if (
-          commute[arr[i].base].class === commute[arr[i + 1].base].class &&
+          isSameClass(arr[i], arr[i + 1]) &&
           commute[arr[i].base].priority > commute[arr[i + 1].base].priority
         ) {
           arr = swaparr(arr, i, i + 1);
@@ -830,19 +790,7 @@ const commutator = (function () {
                 }
               }
               for (let k = 2; k <= j; k++) {
-                if (
-                  !(
-                    arr[len - k].base in commute &&
-                    arr[len - (k - 1)].base in commute
-                  )
-                ) {
-                  canCommute = false;
-                  break;
-                }
-                if (
-                  commute[arr[len - k].base].class !==
-                  commute[arr[len - (k - 1)].base].class
-                ) {
+                if (!isSameClass(arr[len - k], arr[len - (k - 1)])) {
                   canCommute = false;
                   break;
                 }
@@ -869,6 +817,15 @@ const commutator = (function () {
       }
     }
     return arr;
+  }
+
+  function isSameClass(array1: Move, array2: Move): boolean {
+    if (array1.base in commute && array2.base in commute) {
+      if (commute[array1.base].class === commute[array2.base].class) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function swaparr(array: Move[], index1: number, index2: number): Move[] {
