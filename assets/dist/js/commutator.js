@@ -88,33 +88,32 @@ var commutator = (function () {
         initialReplace = (_b = input.initialReplace) !== null && _b !== void 0 ? _b : initialReplaceInit;
         finalReplace = (_c = input.finalReplace) !== null && _c !== void 0 ? _c : finalReplaceInit;
         commute = (_d = input.commute) !== null && _d !== void 0 ? _d : commuteInit;
-        var algValue = algorithm;
-        algValue = algValue.replace(/[‘]/gu, "'");
-        algValue = algValue.replace(/[’]/gu, "'");
-        algValue = algValue.replace(/\(/gu, "");
-        algValue = algValue.replace(/\)/gu, "");
-        algValue = algValue.replace(/（/gu, "");
-        algValue = algValue.replace(/）/gu, "");
-        algValue = algValue.replace(/\s/gu, "");
-        algValue = algValue.split("").join(" ");
-        algValue = algValue.replace(/【/gu, "[");
-        algValue = algValue.replace(/】/gu, "]");
-        algValue = algValue.replace(/，/gu, ",");
-        algValue = algValue.replace(/: /gu, ":");
-        algValue = algValue.replace(/, /gu, ",");
-        algValue = algValue.replace(/\[ /gu, "[");
-        algValue = algValue.replace(/\] /gu, "]");
-        algValue = algValue.replace(/ :/gu, ":");
-        algValue = algValue.replace(/ ,/gu, ",");
-        algValue = algValue.replace(/ \[/gu, "[");
-        algValue = algValue.replace(/ \]/gu, "]");
-        algValue = "[".concat(algValue.replace(/\+/gu, "]+["), "]");
-        algValue = algValue.replace(/\]\[/gu, "]+[");
-        if (algValue === "") {
+        algorithm = algorithm.replace(/[‘]/gu, "'");
+        algorithm = algorithm.replace(/[’]/gu, "'");
+        algorithm = algorithm.replace(/\(/gu, "");
+        algorithm = algorithm.replace(/\)/gu, "");
+        algorithm = algorithm.replace(/（/gu, "");
+        algorithm = algorithm.replace(/）/gu, "");
+        algorithm = algorithm.replace(/\s/gu, "");
+        algorithm = algorithm.split("").join(" ");
+        algorithm = algorithm.replace(/【/gu, "[");
+        algorithm = algorithm.replace(/】/gu, "]");
+        algorithm = algorithm.replace(/，/gu, ",");
+        algorithm = algorithm.replace(/: /gu, ":");
+        algorithm = algorithm.replace(/, /gu, ",");
+        algorithm = algorithm.replace(/\[ /gu, "[");
+        algorithm = algorithm.replace(/\] /gu, "]");
+        algorithm = algorithm.replace(/ :/gu, ":");
+        algorithm = algorithm.replace(/ ,/gu, ",");
+        algorithm = algorithm.replace(/ \[/gu, "[");
+        algorithm = algorithm.replace(/ \]/gu, "]");
+        algorithm = "[".concat(algorithm.replace(/\+/gu, "]+["), "]");
+        algorithm = algorithm.replace(/\]\[/gu, "]+[");
+        if (algorithm === "") {
             return "Empty input.";
         }
         if (order === 0) {
-            preprocessing(algValue);
+            algToArray(algorithm);
             order = 2 * (maxAlgAmount + 2);
         }
         // Examples:
@@ -123,29 +122,29 @@ var commutator = (function () {
         // • order 3 → min -1 (e.g. Pyraminx)
         minAmount = Math.floor(order / 2) + 1 - order;
         maxAmount = Math.floor(order / 2);
-        var expression = rpn(initializeExperssion(algValue));
-        if (expression[0] === "Lack left parenthesis." ||
-            expression[0] === "Lack right parenthesis.") {
-            return expression[0];
+        var rpnStack = rpn(initStack(algorithm));
+        if (rpnStack[0] === "Lack left parenthesis." ||
+            rpnStack[0] === "Lack right parenthesis.") {
+            return rpnStack[0];
         }
-        return simplifyfinal(preprocessing(calculate(expression)));
+        return arrayToStr(algToArray(calc(rpnStack)));
     }
-    function isOperator(val) {
+    function isOperator(sign) {
         var operatorString = "+:,[]";
-        return operatorString.indexOf(val) > -1;
+        return operatorString.indexOf(sign) > -1;
     }
-    function initializeExperssion(expression) {
-        var inputStack = [];
-        inputStack.push(expression[0]);
-        for (var i = 1; i < expression.length; i++) {
-            if (isOperator(expression[i]) || isOperator(inputStack.slice(-1)[0])) {
-                inputStack.push(expression[i]);
+    function initStack(algorithm) {
+        var stack = [];
+        stack.push(algorithm[0]);
+        for (var i = 1; i < algorithm.length; i++) {
+            if (isOperator(algorithm[i]) || isOperator(stack.slice(-1)[0])) {
+                stack.push(algorithm[i]);
             }
             else {
-                inputStack.push(inputStack.pop() + expression[i]);
+                stack.push(stack.pop() + algorithm[i]);
             }
         }
-        return inputStack;
+        return stack;
     }
     function operatorLevel(operator) {
         if (operator === ",") {
@@ -165,28 +164,28 @@ var commutator = (function () {
         }
         return -1;
     }
-    function rpn(inputStack) {
+    function rpn(stackInput) {
         // Reverse Polish Notation
-        var outputStack = [], operatorStack = [];
-        var match = false, tempOperator = "";
-        while (inputStack.length > 0) {
-            var sign = inputStack.shift();
+        var stackOutput = [], operatorStack = [];
+        var isMatch = false, operatorStackPop = "";
+        while (stackInput.length > 0) {
+            var sign = stackInput.shift();
             if (!isOperator(sign)) {
-                outputStack.push(sign);
+                stackOutput.push(sign);
             }
             else if (operatorLevel(sign) === 4) {
-                match = false;
+                isMatch = false;
                 while (operatorStack.length > 0) {
-                    tempOperator = operatorStack.pop();
-                    if (tempOperator === "[") {
-                        match = true;
+                    operatorStackPop = operatorStack.pop();
+                    if (operatorStackPop === "[") {
+                        isMatch = true;
                         break;
                     }
                     else {
-                        outputStack.push(tempOperator);
+                        stackOutput.push(operatorStackPop);
                     }
                 }
-                if (!match) {
+                if (!isMatch) {
                     return ["Lack left parenthesis."];
                 }
             }
@@ -194,89 +193,90 @@ var commutator = (function () {
                 while (operatorStack.length > 0 &&
                     operatorStack.slice(-1)[0] !== "[" &&
                     operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1)[0])) {
-                    outputStack.push(operatorStack.pop());
+                    stackOutput.push(operatorStack.pop());
                 }
                 operatorStack.push(sign);
             }
         }
         while (operatorStack.length > 0) {
-            tempOperator = operatorStack.pop();
-            if (tempOperator === "[") {
+            operatorStackPop = operatorStack.pop();
+            if (operatorStackPop === "[") {
                 return ["Lack right parenthesis."];
             }
-            outputStack.push(tempOperator);
+            stackOutput.push(operatorStackPop);
         }
-        return outputStack;
+        return stackOutput;
     }
-    function calculate(expression) {
-        var rpnExpression = [];
-        while (expression.length > 0) {
-            var sign = expression.shift();
+    function calc(stack) {
+        var calcOutput = [];
+        while (stack.length > 0) {
+            var sign = stack.shift();
             if (isOperator(sign)) {
-                var j = rpnExpression.pop();
-                var i = rpnExpression.pop();
-                rpnExpression.push(calculateTwo(i, j, sign));
+                var calcPop2 = calcOutput.pop();
+                var calcPop1 = calcOutput.pop();
+                calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
             }
             else {
-                rpnExpression.push(sign);
+                calcOutput.push(sign);
             }
         }
-        return rpnExpression[0];
+        return calcOutput[0];
     }
-    function calculateTwo(i, j, sign) {
-        var arr1 = [], arr2 = [];
-        arr1 = preprocessing(i);
-        arr2 = preprocessing(j);
+    function calcTwo(algorithm1, algorithm2, sign) {
+        var array1 = [], array2 = [];
+        array1 = algToArray(algorithm1);
+        array2 = algToArray(algorithm2);
         switch (sign) {
             case "+":
-                return simplifyfinal(arr1.concat(arr2));
+                return arrayToStr(array1.concat(array2));
             case ":":
-                return simplifyfinal(arr1.concat(arr2, invert(arr1)));
+                return arrayToStr(array1.concat(array2, invert(array1)));
             case ",":
-                return simplifyfinal(arr1.concat(arr2, invert(arr1), invert(arr2)));
+                return arrayToStr(array1.concat(array2, invert(array1), invert(array2)));
             default:
-                return simplifyfinal(arr1.concat(arr2));
+                return arrayToStr(array1.concat(array2));
         }
     }
-    function score(algValueOrigin) {
-        var algValue = algValueOrigin;
-        algValue = "[".concat(algValue.replace(/\+/gu, "]+["), "]");
-        algValue = algValue.replace(/\]\[/gu, "]+[");
-        var expression = rpn(initializeExperssion(algValue)), rpnExpression = [];
-        while (expression.length > 0) {
-            var sign = expression.shift();
+    function score(algorithm) {
+        var alg = algorithm;
+        alg = "[".concat(alg.replace(/\+/gu, "]+["), "]");
+        alg = alg.replace(/\]\[/gu, "]+[");
+        var rpnStack = rpn(initStack(alg)), scoreOutput = [];
+        while (rpnStack.length > 0) {
+            var sign = rpnStack.shift();
             if (isOperator(sign)) {
-                var j = rpnExpression.pop();
-                var i = rpnExpression.pop();
-                var inum = Number(i), jnum = Number(j);
-                if (isNaN(inum)) {
-                    inum = i.split(" ").length;
+                var scorePop2 = scoreOutput.pop();
+                var scorePop1 = scoreOutput.pop();
+                var score1 = Number(scorePop1), score2 = Number(scorePop2);
+                if (isNaN(score1)) {
+                    score1 = scorePop1.split(" ").length;
                 }
-                if (isNaN(jnum)) {
-                    jnum = j.split(" ").length;
+                if (isNaN(score2)) {
+                    score2 = scorePop2.split(" ").length;
                 }
-                rpnExpression.push(scoreTwo(inum, jnum, sign).toString());
+                scoreOutput.push(scoreTwo(score1, score2, sign).toString());
             }
             else {
-                rpnExpression.push(sign);
+                scoreOutput.push(sign);
             }
         }
-        return Number(rpnExpression[0]);
+        return Number(scoreOutput[0]);
     }
-    function scoreTwo(i, j, sign) {
+    function scoreTwo(score1, score2, sign) {
         switch (sign) {
             case "+":
-                return i + j;
+                return score1 + score2;
             case ":":
-                return i + j;
+                return score1 + score2;
             case ",":
-                return abMaxScore * Math.max(i, j) + abMinScore * Math.min(i, j);
+                return (abMaxScore * Math.max(score1, score2) +
+                    abMinScore * Math.min(score1, score2));
             default:
                 return Infinity;
         }
     }
-    function sortRule(a, b) {
-        return score(a) - score(b);
+    function sortRule(algorithm1, algorithm2) {
+        return score(algorithm1) - score(algorithm2);
     }
     function search(input) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
@@ -293,7 +293,7 @@ var commutator = (function () {
         if (algorithm === "") {
             return ["Empty input."];
         }
-        var arr = preprocessing(algorithm);
+        var arr = algToArray(algorithm);
         if (order === 0) {
             order = 2 * (maxAlgAmount + 2);
         }
@@ -304,53 +304,53 @@ var commutator = (function () {
         minAmount = Math.floor(order / 2) + 1 - order;
         maxAmount = Math.floor(order / 2);
         arr = simplify(arr);
-        var len = arr.length;
-        if (len === 0) {
+        var arrLen = arr.length;
+        if (arrLen === 0) {
             return ["Empty input."];
         }
-        for (var i = 0; i <= len - 1; i++) {
-            var sum = 0;
-            for (var j = 0; j <= len - 1; j++) {
+        for (var i = 0; i < arrLen; i++) {
+            var amountCount = 0;
+            for (var j = 0; j < arrLen; j++) {
                 if (arr[i].base === arr[j].base) {
-                    sum = sum + arr[j].amount;
+                    amountCount = amountCount + arr[j].amount;
                 }
             }
-            if (sum % order !== 0) {
+            if (amountCount % order !== 0) {
                 return ["Not found."];
             }
         }
-        var count = 0;
-        var locationud = [];
-        for (var i = 0; i < len - 1; i++) {
+        var commuteCount = 0;
+        var commuteIndex = [];
+        for (var i = 0; i < arrLen - 1; i++) {
             if (isSameClass(arr[i], arr[i + 1])) {
-                locationud[count] = i;
-                count += 1;
+                commuteIndex[commuteCount] = i;
+                commuteCount += 1;
             }
         }
-        var number = Math.pow(2, count);
-        var commutatorResult = ["Not found."], flag = false;
+        var commuteTotal = Math.pow(2, commuteCount);
+        var commutatorOutput = ["Not found."], isFind = false;
         var searchDepth = 0;
         if (maxDepth === 0) {
-            searchDepth = Math.floor((len - 1) / 3);
+            searchDepth = Math.floor((arrLen - 1) / 3);
         }
         else {
             searchDepth = maxDepth;
         }
         for (var depth = 1; depth <= searchDepth; depth++) {
-            for (var i = 0; i <= number - 1; i++) {
-                var text = String(i.toString(2));
-                var arrex = arr.concat();
-                for (var j = 0; j < text.length; j++) {
-                    if (text[text.length - 1 - j] === "1") {
-                        arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+            for (var i = 0; i < commuteTotal; i++) {
+                var commutBinary = String(i.toString(2));
+                var commuteArr = arr.concat();
+                for (var j = 0; j < commutBinary.length; j++) {
+                    if (commutBinary[commutBinary.length - 1 - j] === "1") {
+                        commuteArr = swapArray(commuteArr, commuteIndex[j], commuteIndex[j] + 1);
                     }
                 }
-                commutatorResult = commutatormain(arrex, depth, depth);
-                if (commutatorResult[0] !== "Not found.") {
-                    flag = true;
+                commutatorOutput = commutatorMain(commuteArr, depth, depth);
+                if (commutatorOutput[0] !== "Not found.") {
+                    isFind = true;
                 }
             }
-            if (flag && (depth === maxDepth || maxDepth === 0)) {
+            if (isFind && (depth === maxDepth || maxDepth === 0)) {
                 result.sort(sortRule);
                 if (limit === 0) {
                     return result;
@@ -360,21 +360,22 @@ var commutator = (function () {
         }
         return ["Not found."];
     }
-    function preprocessing(algValue) {
-        var xold = algValue;
-        xold = xold.replace(/\s+/giu, "");
-        xold = xold.replace(/[‘]/gu, "'");
-        xold = xold.replace(/[’]/gu, "'");
-        if (xold === "") {
+    function algToArray(algorithm) {
+        var algTemp = algorithm;
+        algTemp = algTemp.replace(/\s+/giu, "");
+        algTemp = algTemp.replace(/[‘]/gu, "'");
+        algTemp = algTemp.replace(/[’]/gu, "'");
+        if (algTemp === "") {
             return [];
         }
-        var x = "";
-        for (var i = 0; i < xold.length; i++) {
-            if ((xold[i + 1] < "0" || xold[i + 1] > "9") && xold[i + 1] !== "'") {
-                x = "".concat(x + xold[i], " ");
+        var alg = "";
+        for (var i = 0; i < algTemp.length; i++) {
+            if ((algTemp[i + 1] < "0" || algTemp[i + 1] > "9") &&
+                algTemp[i + 1] !== "'") {
+                alg = "".concat(alg + algTemp[i], " ");
             }
             else {
-                x = x + xold[i];
+                alg = alg + algTemp[i];
             }
         }
         for (var i in initialReplace) {
@@ -382,64 +383,64 @@ var commutator = (function () {
             var testStr = initialReplace[i].replace(/[^a-zA-Z]/gu, "").split("");
             for (var _i = 0, testStr_1 = testStr; _i < testStr_1.length; _i++) {
                 var testChar = testStr_1[_i];
-                if (x.indexOf(testChar) > -1) {
-                    x = x.replace(re, initialReplace[i]);
+                if (alg.indexOf(testChar) > -1) {
+                    alg = alg.replace(re, initialReplace[i]);
                 }
             }
         }
-        var arr1 = x.split(" ");
+        var algSplit = alg.split(" ");
         var arr = [];
-        for (var i = 0; i < arr1.length; i++) {
-            arr[i] = { base: arr1[i][0], amount: 0 };
-            var temp = arr1[i].replace(/[^0-9]/gu, "");
-            if (temp === "") {
+        for (var i = 0; i < algSplit.length; i++) {
+            arr[i] = { base: algSplit[i][0], amount: 0 };
+            var algNumber = algSplit[i].replace(/[^0-9]/gu, "");
+            if (algNumber === "") {
                 arr[i].amount = 1;
             }
             else {
-                arr[i].amount = Number(temp);
+                arr[i].amount = Number(algNumber);
             }
             if (arr[i].amount > maxAlgAmount) {
                 maxAlgAmount = arr[i].amount;
             }
-            if (arr1[i].indexOf("'") > -1) {
+            if (algSplit[i].indexOf("'") > -1) {
                 arr[i].amount = -arr[i].amount;
             }
         }
         return arr;
     }
-    function commutatorpre(array, depth, maxSubDepth) {
-        var count = 0;
-        var locationud = [];
+    function commutatorPre(array, depth, maxSubDepth) {
+        var commuteCount = 0;
+        var commuteIndex = [];
         for (var i = 0; i < array.length - 1; i++) {
             if (isSameClass(array[i], array[i + 1])) {
-                locationud[count] = i;
-                count += 1;
+                commuteIndex[commuteCount] = i;
+                commuteCount += 1;
             }
         }
-        var number = Math.pow(2, count);
+        var commuteTotal = Math.pow(2, commuteCount);
         var commutatorResult = ["Not found."];
-        for (var i = 0; i <= number - 1; i++) {
-            var text = String(i.toString(2));
-            var arrex = array.concat();
-            for (var j = 0; j < text.length; j++) {
-                if (text[text.length - 1 - j] === "1") {
-                    arrex = swaparr(arrex, locationud[j], locationud[j] + 1);
+        for (var i = 0; i < commuteTotal; i++) {
+            var commutBinary = String(i.toString(2));
+            var commuteArr = array.concat();
+            for (var j = 0; j < commutBinary.length; j++) {
+                if (commutBinary[commutBinary.length - 1 - j] === "1") {
+                    commuteArr = swapArray(commuteArr, commuteIndex[j], commuteIndex[j] + 1);
                 }
             }
-            commutatorResult = commutatormain(arrex, depth, maxSubDepth);
+            commutatorResult = commutatorMain(commuteArr, depth, maxSubDepth);
             if (commutatorResult[0] !== "Not found.") {
                 return commutatorResult;
             }
         }
         return ["Not found."];
     }
-    function commutatormain(array, depth, maxSubDepth) {
-        var arr = simplify(array), textOutput = "";
-        var arrbak = arr.concat(), len = arr.length;
+    function commutatorMain(array, depth, maxSubDepth) {
+        var arr = simplify(array), commutatorOutput = "";
+        var arrBak = arr.concat(), arrLen = arr.length;
         if (arr.length < 3 * depth + 1) {
             return ["Not found."];
         }
-        for (var d = 0; d <= (len + arr.length + 1) / 2 - 1; d++) {
+        for (var d = 0; d <= (arrLen + arr.length + 1) / 2 - 1; d++) {
             for (var drKey = 1; drKey < order; drKey++) {
                 // 1, -1, 2, -2...
                 var dr = ((drKey % 2) * 2 - 1) * Math.floor((drKey + 1) / 2);
@@ -449,18 +450,18 @@ var commutator = (function () {
                     }
                 }
                 else {
-                    if (Math.abs(dr) > Math.abs(arrbak[d - 1].amount)) {
+                    if (Math.abs(dr) > Math.abs(arrBak[d - 1].amount)) {
                         break;
                     }
                     if (order % 2 === 1 ||
-                        arrbak[d - 1].amount !== Math.floor(order / 2)) {
-                        if ((arrbak[d - 1].amount < 0 && dr > 0) ||
-                            (arrbak[d - 1].amount > 0 && dr < 0)) {
+                        arrBak[d - 1].amount !== Math.floor(order / 2)) {
+                        if ((arrBak[d - 1].amount < 0 && dr > 0) ||
+                            (arrBak[d - 1].amount > 0 && dr < 0)) {
                             continue;
                         }
                     }
                 }
-                arr = displace(arrbak, d, dr);
+                arr = displace(arrBak, d, dr);
                 // For a b c b' a' d c' d' = a b:[c,b' a' d]
                 for (var i = 1; i <= arr.length / 2 - 1; i++) {
                     var minj = 0;
@@ -472,7 +473,7 @@ var commutator = (function () {
                     }
                     for (var j = minj; j <= arr.length / 2 - 1; j++) {
                         var part1x = [], part2x = [];
-                        var commuteAddList1 = [[]], commuteAddList2 = [[]];
+                        var commuteAdd1 = [[]], commuteAdd2 = [[]];
                         if (arr[i - 1].base === arr[i + j - 1].base) {
                             // For [a bx,by c bz]
                             for (var ir = minAmount; ir <= maxAmount; ir++) {
@@ -481,9 +482,9 @@ var commutator = (function () {
                                 }
                                 var jr = normalize(arr[i + j - 1].amount + ir);
                                 part1x = simplify(repeatEnd(arr.slice(0, i), ir));
-                                commuteAddList1.push(part1x);
+                                commuteAdd1.push(part1x);
                                 part2x = simplify(invert(part1x).concat(repeatEnd(arr.slice(0, i + j), jr)));
-                                commuteAddList2.push(part2x);
+                                commuteAdd2.push(part2x);
                             }
                         }
                         else {
@@ -491,53 +492,53 @@ var commutator = (function () {
                                 continue;
                             }
                             part1x = simplify(arr.slice(0, i));
-                            commuteAddList1.push(part1x);
+                            commuteAdd1.push(part1x);
                             part2x = simplify(arr.slice(i, i + j));
-                            commuteAddList2.push(part2x);
+                            commuteAdd2.push(part2x);
                             var commuteCase = [];
                             if (isSameClass(arr[i - 1], arr[i + j - 1])) {
                                 // For L b R c L' b' R' c' = [L b R,c L' R]
-                                commuteAddList1.push(part1x);
+                                commuteAdd1.push(part1x);
                                 commuteCase = simplify(part2x.concat([arr[i - 1]]));
-                                commuteAddList2.push(commuteCase);
+                                commuteAdd2.push(commuteCase);
                                 // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
                                 if (i >= 2) {
                                     if (isSameClass(arr[i - 1], arr[i - 2])) {
-                                        commuteAddList1.push(part1x);
+                                        commuteAdd1.push(part1x);
                                         commuteCase = simplify(part2x.concat(arr.slice(i - 2, i)));
-                                        commuteAddList2.push(commuteCase);
+                                        commuteAdd2.push(commuteCase);
                                     }
                                 }
                             }
                             if (isSameClass(arr[i], arr[i + j])) {
                                 // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
                                 commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
-                                commuteAddList1.push(commuteCase);
+                                commuteAdd1.push(commuteCase);
                                 commuteCase = simplify([arr[i + j]].concat(part2x));
-                                commuteAddList2.push(commuteCase);
+                                commuteAdd2.push(commuteCase);
                                 // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
                                 if (arr.length >= i + j + 2) {
                                     if (isSameClass(arr[i + j], arr[i + j + 1])) {
                                         commuteCase = simplify(part1x.concat(invert(arr.slice(i + j, i + j + 2))));
-                                        commuteAddList1.push(commuteCase);
+                                        commuteAdd1.push(commuteCase);
                                         commuteCase = simplify(arr.slice(i + j, i + j + 2).concat(part2x));
-                                        commuteAddList2.push(commuteCase);
+                                        commuteAdd2.push(commuteCase);
                                     }
                                 }
                             }
                         }
-                        for (var commuteAddKey = 1; commuteAddKey < commuteAddList1.length; commuteAddKey++) {
-                            part1x = commuteAddList1[commuteAddKey];
-                            part2x = commuteAddList2[commuteAddKey];
-                            var arrb = simplify(part2x.concat(part1x, invert(part2x), invert(part1x), arr));
-                            var partb = "";
+                        for (var commuteAddKey = 1; commuteAddKey < commuteAdd1.length; commuteAddKey++) {
+                            part1x = commuteAdd1[commuteAddKey];
+                            part2x = commuteAdd2[commuteAddKey];
+                            var subArr = simplify(part2x.concat(part1x, invert(part2x), invert(part1x), arr));
+                            var subPart = "";
                             if (depth > 1) {
-                                partb = commutatorpre(arrb, depth - 1, maxSubDepth)[0];
+                                subPart = commutatorPre(subArr, depth - 1, maxSubDepth)[0];
                             }
-                            else if (arrb.length > 0) {
+                            else if (subArr.length > 0) {
                                 continue;
                             }
-                            if (partb !== "Not found.") {
+                            if (subPart !== "Not found.") {
                                 var part1y = part1x, part2y = part2x;
                                 var party = simplify(part2x.concat(part1x));
                                 if (party.length < Math.max(part1x.length, part2x.length)) {
@@ -553,7 +554,7 @@ var commutator = (function () {
                                     }
                                 }
                                 // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
-                                var part0 = simplify(repeatEnd(arrbak.slice(0, d), dr)), part1 = part1y, part2 = part2y;
+                                var part0 = simplify(repeatEnd(arrBak.slice(0, d), dr)), part1 = part1y, part2 = part2y;
                                 if (part0.length > 0 && maxSubDepth === 1) {
                                     var partz = simplify(part0.concat(part2y));
                                     // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
@@ -563,19 +564,19 @@ var commutator = (function () {
                                         part2 = part1y;
                                     }
                                 }
-                                var part1Output = simplifyfinal(part1), part2Output = simplifyfinal(part2), part0Output = simplifyfinal(part0);
+                                var part1Output = arrayToStr(part1), part2Output = arrayToStr(part2), part0Output = arrayToStr(part0);
                                 if (part1Output === "" || part2Output === "") {
                                     continue;
                                 }
-                                var text = pairToStr(part0Output, part1Output, part2Output, partb);
-                                if (textOutput === "") {
-                                    textOutput = text;
+                                var commutatorStr = pairToStr(part0Output, part1Output, part2Output, subPart);
+                                if (commutatorOutput === "") {
+                                    commutatorOutput = commutatorStr;
                                 }
-                                if (score(text) < score(textOutput)) {
-                                    textOutput = text;
+                                if (score(commutatorStr) < score(commutatorOutput)) {
+                                    commutatorOutput = commutatorStr;
                                 }
-                                if (depth === maxSubDepth && result.indexOf(text) === -1) {
-                                    result.push(text);
+                                if (depth === maxSubDepth && result.indexOf(commutatorStr) === -1) {
+                                    result.push(commutatorStr);
                                 }
                             }
                         }
@@ -583,50 +584,50 @@ var commutator = (function () {
                 }
             }
         }
-        if (textOutput === "") {
+        if (commutatorOutput === "") {
             return ["Not found."];
         }
-        return [textOutput];
+        return [commutatorOutput];
     }
     function repeatEnd(array, attempt) {
         var arr = array.concat();
         if (arr.length === 0) {
             return [];
         }
-        var popped = arr.pop();
+        var arrPop = arr.pop();
         if (attempt === 0) {
             return arr;
         }
-        arr.push({ base: popped.base, amount: attempt });
+        arr.push({ base: arrPop.base, amount: attempt });
         return arr;
     }
-    function pairToStr(setup, commutatora, commutatorb, partb) {
-        if (partb === "") {
+    function pairToStr(part0, part1, part2, subPart) {
+        if (subPart === "") {
             if (!outerBracket) {
-                if (setup === "") {
-                    return "[".concat(commutatora, ",").concat(commutatorb, "]");
+                if (part0 === "") {
+                    return "[".concat(part1, ",").concat(part2, "]");
                 }
-                return "".concat(setup, ":[").concat(commutatora, ",").concat(commutatorb, "]");
+                return "".concat(part0, ":[").concat(part1, ",").concat(part2, "]");
             }
-            else if (setup === "") {
-                return "[".concat(commutatora, ",").concat(commutatorb, "]");
+            else if (part0 === "") {
+                return "[".concat(part1, ",").concat(part2, "]");
             }
-            return "[".concat(setup, ":[").concat(commutatora, ",").concat(commutatorb, "]]");
+            return "[".concat(part0, ":[").concat(part1, ",").concat(part2, "]]");
         }
         if (!outerBracket) {
-            if (setup === "") {
-                return "[".concat(commutatora, ",").concat(commutatorb, "]+").concat(partb);
+            if (part0 === "") {
+                return "[".concat(part1, ",").concat(part2, "]+").concat(subPart);
             }
-            return "".concat(setup, ":[[").concat(commutatora, ",").concat(commutatorb, "]+").concat(partb, "]");
+            return "".concat(part0, ":[[").concat(part1, ",").concat(part2, "]+").concat(subPart, "]");
         }
-        else if (setup === "") {
-            return "[".concat(commutatora, ",").concat(commutatorb, "]").concat(partb);
+        else if (part0 === "") {
+            return "[".concat(part1, ",").concat(part2, "]").concat(subPart);
         }
-        return "[".concat(setup, ":[").concat(commutatora, ",").concat(commutatorb, "]").concat(partb, "]");
+        return "[".concat(part0, ":[").concat(part1, ",").concat(part2, "]").concat(subPart, "]");
     }
     function displace(array, d, dr) {
-        var arr = array.concat(), arr1 = repeatEnd(arr.slice(0, d), dr);
-        return simplify(invert(arr1).concat(arr, arr1));
+        var arr = array.concat(), arrEnd = repeatEnd(arr.slice(0, d), dr);
+        return simplify(invert(arrEnd).concat(arr, arrEnd));
     }
     function invert(array) {
         var arr = [];
@@ -635,7 +636,7 @@ var commutator = (function () {
         }
         return arr;
     }
-    function simplifyfinal(array) {
+    function arrayToStr(array) {
         var arr = array.concat();
         arr = simplify(arr);
         if (arr.length === 0) {
@@ -645,28 +646,28 @@ var commutator = (function () {
             for (var i = 0; i < arr.length - 1; i++) {
                 if (isSameClass(arr[i], arr[i + 1]) &&
                     commute[arr[i].base].priority > commute[arr[i + 1].base].priority) {
-                    arr = swaparr(arr, i, i + 1);
+                    arr = swapArray(arr, i, i + 1);
                 }
             }
         }
-        var arrOutput1 = [];
+        var arrTemp = [];
         for (var i = 0; i < arr.length; i++) {
             if (arr[i].amount < 0) {
                 if (arr[i].amount === -1) {
-                    arrOutput1[i] = "".concat(arr[i].base, "'");
+                    arrTemp[i] = "".concat(arr[i].base, "'");
                 }
                 else {
-                    arrOutput1[i] = "".concat(arr[i].base + -arr[i].amount, "'");
+                    arrTemp[i] = "".concat(arr[i].base + -arr[i].amount, "'");
                 }
             }
             else if (arr[i].amount === 1) {
-                arrOutput1[i] = arr[i].base;
+                arrTemp[i] = arr[i].base;
             }
             else {
-                arrOutput1[i] = arr[i].base + arr[i].amount;
+                arrTemp[i] = arr[i].base + arr[i].amount;
             }
         }
-        var arrOutput = "".concat(arrOutput1.join(" "), " ");
+        var arrOutput = "".concat(arrTemp.join(" "), " ");
         for (var i in finalReplace) {
             var re = new RegExp("".concat(i, " "), "gu");
             arrOutput = arrOutput.replace(re, "".concat(finalReplace[i], " "));
@@ -683,66 +684,66 @@ var commutator = (function () {
             var arrayAdd = {
                 base: array[i].base,
                 amount: normalize(array[i].amount)
-            }, len = arr.length;
+            }, arrLen = arr.length;
             if (normalize(arrayAdd.amount) === 0) {
                 continue;
             }
-            var hasChanged = false;
+            var isChange = false;
             for (var j = 1; j <= 3; j++) {
                 if (arr.length >= j) {
-                    if (arr[len - j].base === arrayAdd.base) {
+                    if (arr[arrLen - j].base === arrayAdd.base) {
                         var canCommute = true;
                         if (j >= 2) {
                             for (var k = 1; k <= j; k++) {
-                                if (!(arr[len - k].base in commute)) {
+                                if (!(arr[arrLen - k].base in commute)) {
                                     canCommute = false;
                                     break;
                                 }
                             }
                             for (var k = 2; k <= j; k++) {
-                                if (!isSameClass(arr[len - k], arr[len - (k - 1)])) {
+                                if (!isSameClass(arr[arrLen - k], arr[arrLen - (k - 1)])) {
                                     canCommute = false;
                                     break;
                                 }
                             }
                         }
                         if (canCommute) {
-                            var x = {
-                                base: arr[len - j].base,
-                                amount: normalize(arr[len - j].amount + arrayAdd.amount)
+                            var moveAdd = {
+                                base: arr[arrLen - j].base,
+                                amount: normalize(arr[arrLen - j].amount + arrayAdd.amount)
                             };
-                            if (x.amount === 0) {
+                            if (moveAdd.amount === 0) {
                                 arr.splice(-j, 1);
                             }
                             else {
-                                arr.splice(-j, 1, x);
+                                arr.splice(-j, 1, moveAdd);
                             }
-                            hasChanged = true;
+                            isChange = true;
                             break;
                         }
                     }
                 }
             }
-            if (!hasChanged) {
-                arr[len] = arrayAdd;
+            if (!isChange) {
+                arr[arrLen] = arrayAdd;
             }
         }
         return arr;
     }
-    function isSameClass(array1, array2) {
-        if (array1.base in commute && array2.base in commute) {
-            if (commute[array1.base]["class"] === commute[array2.base]["class"]) {
+    function isSameClass(move1, move2) {
+        if (move1.base in commute && move2.base in commute) {
+            if (commute[move1.base]["class"] === commute[move2.base]["class"]) {
                 return true;
             }
         }
         return false;
     }
-    function swaparr(array, index1, index2) {
+    function swapArray(array, index1, index2) {
         array[index1] = array.splice(index2, 1, array[index1])[0];
         return array;
     }
-    function normalize(num) {
-        return (((num % order) + order - minAmount) % order) + minAmount;
+    function normalize(amount) {
+        return (((amount % order) + order - minAmount) % order) + minAmount;
     }
     return {
         search: search,
