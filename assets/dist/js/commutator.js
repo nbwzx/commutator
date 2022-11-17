@@ -5,7 +5,7 @@
  */
 "use strict";
 var commutator = (function () {
-    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, maxDepthInit = 0, limitInit = 0;
+    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0;
     var commuteInit = {
         U: { "class": 1, priority: 1 },
         D: { "class": 1, priority: 2 },
@@ -79,7 +79,7 @@ var commutator = (function () {
         "M2 R": "r M'",
         "M2 R'": "r' M"
     };
-    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit;
+    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
     function expand(input) {
         var _a, _b, _c, _d;
@@ -264,7 +264,7 @@ var commutator = (function () {
     function scoreTwo(score1, score2, sign) {
         switch (sign) {
             case "+":
-                return score1 + score2;
+                return score1 + score2 + addScore;
             case ":":
                 return score1 + score2;
             case ",":
@@ -278,16 +278,17 @@ var commutator = (function () {
         return score(algorithm1) - score(algorithm2);
     }
     function search(input) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         var algorithm = input.algorithm;
         order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         outerBracket = (_b = input.outerBracket) !== null && _b !== void 0 ? _b : outerBracketInit;
         abMaxScore = (_c = input.abMaxScore) !== null && _c !== void 0 ? _c : abMaxScoreInit;
         abMinScore = (_d = input.abMinScore) !== null && _d !== void 0 ? _d : abMinScoreInit;
-        initialReplace = (_e = input.initialReplace) !== null && _e !== void 0 ? _e : initialReplaceInit;
-        finalReplace = (_f = input.finalReplace) !== null && _f !== void 0 ? _f : finalReplaceInit;
-        commute = (_g = input.commute) !== null && _g !== void 0 ? _g : commuteInit;
-        var maxDepth = (_h = input.maxDepth) !== null && _h !== void 0 ? _h : maxDepthInit, limit = (_j = input.limit) !== null && _j !== void 0 ? _j : limitInit;
+        addScore = (_e = input.addScore) !== null && _e !== void 0 ? _e : addScoreInit;
+        initialReplace = (_f = input.initialReplace) !== null && _f !== void 0 ? _f : initialReplaceInit;
+        finalReplace = (_g = input.finalReplace) !== null && _g !== void 0 ? _g : finalReplaceInit;
+        commute = (_h = input.commute) !== null && _h !== void 0 ? _h : commuteInit;
+        var maxDepth = (_j = input.maxDepth) !== null && _j !== void 0 ? _j : maxDepthInit, limit = (_k = input.limit) !== null && _k !== void 0 ? _k : limitInit;
         result = [];
         if (algorithm === "") {
             return ["Empty input."];

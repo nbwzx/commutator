@@ -10,6 +10,7 @@ const commutator = (function () {
     outerBracketInit = false,
     abMaxScoreInit = 2.5,
     abMinScoreInit = 5,
+    addScoreInit = 1,
     maxDepthInit = 0,
     limitInit = 0;
   const commuteInit: { [id: string]: { class: number; priority: number } } = {
@@ -93,7 +94,8 @@ const commutator = (function () {
     maxAlgAmount = 0,
     outerBracket = outerBracketInit,
     abMaxScore = abMaxScoreInit,
-    abMinScore = abMinScoreInit;
+    abMinScore = abMinScoreInit,
+    addScore = addScoreInit;
   let commute = commuteInit,
     initialReplace = initialReplaceInit,
     finalReplace = finalReplaceInit;
@@ -303,7 +305,7 @@ const commutator = (function () {
   function scoreTwo(score1: number, score2: number, sign: string): number {
     switch (sign) {
       case "+":
-        return score1 + score2;
+        return score1 + score2 + addScore;
       case ":":
         return score1 + score2;
       case ",":
@@ -329,6 +331,7 @@ const commutator = (function () {
     outerBracket?: boolean;
     abMaxScore?: number;
     abMinScore?: number;
+    addScore?: number;
     maxDepth?: number;
     limit?: number;
   }): string[] {
@@ -337,6 +340,7 @@ const commutator = (function () {
     outerBracket = input.outerBracket ?? outerBracketInit;
     abMaxScore = input.abMaxScore ?? abMaxScoreInit;
     abMinScore = input.abMinScore ?? abMinScoreInit;
+    addScore = input.addScore ?? addScoreInit;
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;

@@ -93,6 +93,9 @@
         style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5" id="settingsSortScoreb"
         onkeyup="changeCookie()" style="text-align:center;width:2.5em"> *
       stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
+      <br />
+      Addition penalty: <input type="text" placeholder="1" id="settingsSortScoreAdd" onkeyup="changeCookie()"
+        style="text-align:center;width:2.5em">
       <br /><br />
       <p>Input a excel file(*.xlsx), decompose all the algorithms in commutator notation.</p>
       <p>Please download the input excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
@@ -120,6 +123,8 @@
             "settingsSortScorea").value : 2.5),
           "abMinScore": Number(document.getElementById("settingsSortScoreb").value !== "" ? document.getElementById(
             "settingsSortScoreb").value : 5),
+          "addScore": Number(document.getElementById("settingsSortScoreAdd").value !== "" ? document.getElementById(
+            "settingsSortScoreAdd").value : 1),
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
           "maxDepth": Number(document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
             "settingsMaxDepth").value : 0)
