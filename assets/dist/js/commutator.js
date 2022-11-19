@@ -511,12 +511,12 @@ var commutator = (function () {
                                 }
                             }
                             if (isSameClass(arr[i], arr[i + j])) {
-                                // For a R b L a' R' b' L' = [a R b R, R' L a'] = [a R L',L b R]
+                                // For a R b L a' R' b' L' = [a R b R,R' L a'] = [a R L',L b R]
                                 commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
                                 commuteAdd1.push(commuteCase);
                                 commuteCase = simplify([arr[i + j]].concat(part2x));
                                 commuteAdd2.push(commuteCase);
-                                // For a R2 b R' L2 a' R' L' b' L' = [a R2 b L R,R2' L a'] = [a R2 L', L b R L]
+                                // For a R2 b R' L2 a' R' L' b' L' = [a R2 b L R,R2' L a'] = [a R2 L',L b R L]
                                 if (arr.length >= i + j + 2) {
                                     if (isSameClass(arr[i + j], arr[i + j + 1])) {
                                         commuteCase = simplify(part1x.concat(invert(arr.slice(i + j, i + j + 2))));
