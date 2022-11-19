@@ -579,11 +579,11 @@ const commutator = (function () {
               commuteAdd2.push(part2x);
               let commuteCase: Move[] = [];
               if (isSameClass(arr[i - 1], arr[i + j - 1])) {
-                // For L b R c L' b' R' c' = [L b R,c L' R]
+                // For L a R b L' a' R' b' = [L a R,b L' R]
                 commuteAdd1.push(part1x);
                 commuteCase = simplify(part2x.concat([arr[i - 1]]));
                 commuteAdd2.push(commuteCase);
-                // For L b R L c R L2 b' R2 c' = [L b R L,c R2 L']
+                // For L a R L b R L2' a' R2' b' = [L a R L,b R2 L']
                 if (i >= 2) {
                   if (isSameClass(arr[i - 1], arr[i - 2])) {
                     commuteAdd1.push(part1x);
@@ -593,12 +593,12 @@ const commutator = (function () {
                 }
               }
               if (isSameClass(arr[i], arr[i + j])) {
-                // For c R b L c' R' b' L' = [c R b R, R' L c'] = [c R L',L b R]
+                // For a R b L a' R' b' L' = [a R b R, R' L a'] = [a R L',L b R]
                 commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
                 commuteAdd1.push(commuteCase);
                 commuteCase = simplify([arr[i + j]].concat(part2x));
                 commuteAdd2.push(commuteCase);
-                // For c R2 b R' L2 c' R' L' b' L' = [c R2 b L R,R2 L c'] = [c R2 L', L b R L]
+                // For a R2 b R' L2 a' R' L' b' L' = [a R2 b L R,R2' L a'] = [a R2 L', L b R L]
                 if (arr.length >= i + j + 2) {
                   if (isSameClass(arr[i + j], arr[i + j + 1])) {
                     commuteCase = simplify(
@@ -651,7 +651,7 @@ const commutator = (function () {
                   part2 = part2y;
                 if (part0.length > 0 && maxSubDepth === 1) {
                   const partz = simplify(part0.concat(part2y));
-                  // Avoid a b c b' a' b' c' b = b':[b a b,c], use a b:[c,b' a' b'] instead.
+                  // Avoid a b c b' a' d c' d' = d:[d' a b,c], use a b:[c,b' a' d] instead.
                   if (partz.length < part0.length - 1) {
                     part0 = partz;
                     part1 = invert(part2y);
