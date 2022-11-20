@@ -5,6 +5,7 @@
  */
 "use strict";
 var commutator = (function () {
+    var MAX_INT = 4294967295;
     var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0;
     var commuteInit = {
         U: { "class": 1, priority: 1 },
@@ -79,7 +80,7 @@ var commutator = (function () {
         "M2 R": "r M'",
         "M2 R'": "r' M"
     };
-    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit;
+    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
     function expand(input) {
         var _a, _b, _c, _d;
@@ -113,8 +114,11 @@ var commutator = (function () {
             return "Empty input.";
         }
         if (order === 0) {
-            algToArray(algorithm);
-            order = 2 * (maxAlgAmount + 2);
+            isOrderZero = true;
+            order = MAX_INT;
+        }
+        else {
+            isOrderZero = false;
         }
         // Examples:
         // • order 4 → min -1 (e.g. cube)
@@ -295,7 +299,11 @@ var commutator = (function () {
         }
         var arr = algToArray(algorithm);
         if (order === 0) {
+            isOrderZero = true;
             order = 2 * (maxAlgAmount + 2);
+        }
+        else {
+            isOrderZero = false;
         }
         // Examples:
         // • order 4 → min -1 (e.g. cube)
@@ -744,7 +752,12 @@ var commutator = (function () {
         return array;
     }
     function normalize(amount) {
-        return (((amount % order) + order - minAmount) % order) + minAmount;
+        if (isOrderZero) {
+            return amount;
+        }
+        else {
+            return (((amount % order) + order - minAmount) % order) + minAmount;
+        }
     }
     return {
         search: search,

@@ -6,6 +6,7 @@
 "use strict";
 
 const commutator = (function () {
+  const MAX_INT = 4294967295;
   const orderInit = 4,
     outerBracketInit = false,
     abMaxScoreInit = 2.5,
@@ -92,6 +93,7 @@ const commutator = (function () {
     minAmount = Math.floor(orderInit / 2) + 1 - orderInit,
     maxAmount = Math.floor(orderInit / 2),
     maxAlgAmount = 0,
+    isOrderZero = false,
     outerBracket = outerBracketInit,
     abMaxScore = abMaxScoreInit,
     abMinScore = abMinScoreInit,
@@ -137,8 +139,10 @@ const commutator = (function () {
       return "Empty input.";
     }
     if (order === 0) {
-      algToArray(algorithm);
-      order = 2 * (maxAlgAmount + 2);
+      isOrderZero = true;
+      order = MAX_INT;
+    } else {
+      isOrderZero = false;
     }
     // Examples:
     // • order 4 → min -1 (e.g. cube)
@@ -352,7 +356,10 @@ const commutator = (function () {
     }
     let arr = algToArray(algorithm);
     if (order === 0) {
+      isOrderZero = true;
       order = 2 * (maxAlgAmount + 2);
+    } else {
+      isOrderZero = false;
     }
     // Examples:
     // • order 4 → min -1 (e.g. cube)
@@ -859,7 +866,11 @@ const commutator = (function () {
   }
 
   function normalize(amount: number): number {
-    return (((amount % order) + order - minAmount) % order) + minAmount;
+    if (isOrderZero) {
+      return amount;
+    } else {
+      return (((amount % order) + order - minAmount) % order) + minAmount;
+    }
   }
 
   return {
