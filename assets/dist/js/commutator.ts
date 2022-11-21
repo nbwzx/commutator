@@ -246,8 +246,8 @@ const commutator = (function () {
     while (stack.length > 0) {
       const sign = stack.shift() as string;
       if (isOperator(sign)) {
-        let calcPop2 = calcOutput.pop() as string;
-        let calcPop1 = calcOutput.pop() as string;
+        const calcPop2 = calcOutput.pop() as string;
+        const calcPop1 = calcOutput.pop() as string;
         calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
       } else {
         calcOutput.push(sign);
@@ -288,8 +288,8 @@ const commutator = (function () {
     while (rpnStack.length > 0) {
       const sign = rpnStack.shift() as string;
       if (isOperator(sign)) {
-        let scorePop2 = scoreOutput.pop() as string;
-        let scorePop1 = scoreOutput.pop() as string;
+        const scorePop2 = scoreOutput.pop() as string;
+        const scorePop1 = scoreOutput.pop() as string;
         let score1 = Number(scorePop1),
           score2 = Number(scorePop2);
         if (isNaN(score1)) {
@@ -348,7 +348,7 @@ const commutator = (function () {
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
-    let maxDepth = input.maxDepth ?? maxDepthInit,
+    const maxDepth = input.maxDepth ?? maxDepthInit,
       limit = input.limit ?? limitInit;
     result = [];
     if (algorithm === "") {
@@ -868,9 +868,8 @@ const commutator = (function () {
   function normalize(amount: number): number {
     if (isOrderZero) {
       return amount;
-    } else {
-      return (((amount % order) + order - minAmount) % order) + minAmount;
     }
+    return (((amount % order) + order - minAmount) % order) + minAmount;
   }
 
   return {

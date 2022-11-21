@@ -755,9 +755,7 @@ var commutator = (function () {
         if (isOrderZero) {
             return amount;
         }
-        else {
-            return (((amount % order) + order - minAmount) % order) + minAmount;
-        }
+        return (((amount % order) + order - minAmount) % order) + minAmount;
     }
     return {
         search: search,
