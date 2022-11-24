@@ -26,6 +26,7 @@
   </style>
   <!-- Custom styles for this template -->
   <link href="assets/dist/css/navbar-top-fixed.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
@@ -66,50 +67,79 @@
   </nav>
   <main class="container">
     <br />
-    <h2 class="border-1">Decompose algorithms in commutator notation.</h5>
-      <br />
-      <strong>Settings:</strong>
-      <br />
-      Order: <input type="text" placeholder="4" id="order" onkeyup="changeCookie()"
-        style="text-align:center;width:2.5em">
-      <br />
-      <input class="form-check-input" type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket
-      for all commutators
-      <br />
-      <input class="form-check-input" type="checkbox" id="settingsInitialReplace" onclick="changeCookie()" checked>
-      Initial Replace
-      <br />
-      <input class="form-check-input" type="checkbox" id="settingsFinalReplace" onclick="changeCookie()" checked> Final
-      Replace
-      <br />
-      <input class="form-check-input" type="checkbox" id="settingsCommute" onclick="changeCookie()" checked> Commute
-      <br />
-      Max Depth: <input type="text" placeholder="0" id="settingsMaxDepth" onkeyup="changeCookie()"
-        style="text-align:center;width:2.5em">
-      <br />
-      Sorting rules:
-      <br />
-      The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
-        style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5" id="settingsSortScoreb"
-        onkeyup="changeCookie()" style="text-align:center;width:2.5em"> *
-      stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric)
-      <br />
-      Addition penalty: <input type="text" placeholder="1" id="settingsSortScoreAdd" onkeyup="changeCookie()"
-        style="text-align:center;width:2.5em">
-      <br /><br />
-      <p>Import an excel file(*.xlsx, *.xls, *.csv), decompose all the algorithms in commutator notation.</p>
-      <p>You can download the excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
-      <input type="file" id="upfile" accept=".xlsx, .xls, .csv" />
-      <br />
-      <br />
-      <div id="out">
-      </div>
-      </div>
+    <h2 class="border-1">Decompose algorithms in commutator notation.</h2>
+    <br />
+    <strong>Settings:</strong>
+    <br />
+    Order: <input type="text" placeholder="4" id="order" onkeyup="changeCookie()" style="text-align:center;width:2.5em">
+    <i class="btn btn-default material-icons"
+      title="order = 4 (e.g. cube)<br />order = 5 (e.g. Megaminx)<br />order = 3 (e.g. Pyraminx)<br />order = 0 means free group"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    <input class="form-check-input" type="checkbox" id="settingsOuterBracket" onclick="changeCookie()"> Outer bracket
+    for all commutators
+    <i class="btn btn-default material-icons" title="Checked [a:[b,c][d,e]]<br />Unchecked a:[[b,c]+[d,e]]"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    <input class="form-check-input" type="checkbox" id="settingsInitialReplace" onclick="changeCookie()" checked>
+    Initial Replace
+    <i class="btn btn-default material-icons" title="Replace double layer turns<br />(e.g. r → R M')"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    <input class="form-check-input" type="checkbox" id="settingsFinalReplace" onclick="changeCookie()" checked> Final
+    Replace
+    <i class="btn btn-default material-icons" title="Replace double layer turns<br />(e.g. R M' → r)"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    <input class="form-check-input" type="checkbox" id="settingsCommute" onclick="changeCookie()" checked> Commute
+    <i class="btn btn-default material-icons" title="Handle commute moves<br />(e.g. R and L)"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    Max Depth: <input type="text" placeholder="0" id="settingsMaxDepth" onkeyup="changeCookie()"
+      style="text-align:center;width:2.5em"><i class="btn btn-default material-icons"
+      title="Upper bound of search depth<br />0 means first solvable depth"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    Sorting rules:
+    <br />
+    The score of C:[A,B] is <input type="text" placeholder="2.5" id="settingsSortScorea" onkeyup="changeCookie()"
+      style="text-align:center;width:2.5em"> * stm(A) + <input type="text" placeholder="5" id="settingsSortScoreb"
+      onkeyup="changeCookie()" style="text-align:center;width:2.5em"> *
+    stm(B) + stm(C) (Suppose stm(A) ≥ stm(B), stm means slice turn metric) <i class="btn btn-default material-icons"
+      title="Algs are sorted by score" style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8"
+      data-toggle="popover" data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    Addition penalty: <input type="text" placeholder="1" id="settingsSortScoreAdd" onkeyup="changeCookie()"
+      style="text-align:center;width:2.5em"> <i class="btn btn-default material-icons"
+      title="Score for commutator combo" style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8"
+      data-toggle="popover" data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br /><br />
+    <p>Import an excel file(*.xlsx, *.xls, *.csv), decompose all the algorithms in commutator notation.</p>
+    <p>You can download the excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
+    <input type="file" id="upfile" accept=".xlsx, .xls, .csv" />
+    <br />
+    <br />
+    <div id="out">
+    </div>
   </main>
   <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/dist/js/commutator.min.js"></script>
   <script src="assets/dist/js/cookie.js"></script>
   <script src="assets/dist/js/xlsx.full.min.js"></script>
+  <script>
+    let popoverTriggerList = [].slice.call(
+      document.querySelectorAll('[data-toggle="popover"]')
+    );
+    const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl);
+    });
+  </script>
   <script>
     function commutatorclick(alg) {
       const outlist = commutator
