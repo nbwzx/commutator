@@ -39,11 +39,17 @@ window.onload = function onload() {
     if (getCookie("settingsCommute") !== "") {
         byid("settingsCommute").checked = false;
     }
+    if (getCookie("settingsMaxDepth") !== "") {
+        byid("settingsMaxDepth").value = getCookie("settingsMaxDepth");
+    }
     if (getCookie("settingsSortScorea") !== "") {
         byid("settingsSortScorea").value = getCookie("settingsSortScorea");
     }
     if (getCookie("settingsSortScoreb") !== "") {
         byid("settingsSortScoreb").value = getCookie("settingsSortScoreb");
+    }
+    if (getCookie("settingsSortScoreAdd") !== "") {
+        byid("settingsSortScoreAdd").value = getCookie("settingsSortScoreAdd");
     }
 };
 
@@ -54,9 +60,9 @@ function changeCookie() {
         setCookie("order", byid("order").value, 30);
     }
     if (byid("settingsOuterBracket").checked === true) {
-        setCookie("settingsOuterBracket", "true", -1 );
+        setCookie("settingsOuterBracket", "true", 30);
     } else {
-        setCookie("settingsOuterBracket", "", 30);
+        setCookie("settingsOuterBracket", "", -1);
     }
     if (byid("settingsInitialReplace").checked === true) {
         setCookie("settingsInitialReplace", "", -1);
@@ -73,6 +79,11 @@ function changeCookie() {
     } else {
         setCookie("settingsCommute", "false", 30);
     }
+    if (byid("settingsMaxDepth").value === "") {
+        setCookie("settingsMaxDepth", "", -1);
+    } else {
+        setCookie("settingsMaxDepth", byid("settingsMaxDepth").value, 30);
+    }    
     if (byid("settingsSortScoreb").value === "") {
         setCookie("settingsSortScorea", "", -1);
     } else {
@@ -82,6 +93,11 @@ function changeCookie() {
         setCookie("settingsSortScoreb", "", -1);
     } else {
         setCookie("settingsSortScoreb", byid("settingsSortScoreb").value, 30);
+    }
+    if (byid("settingsSortScoreAdd").value === "") {
+        setCookie("settingsSortScoreAdd", "", -1);
+    } else {
+        setCookie("settingsSortScoreAdd", byid("settingsSortScoreAdd").value, 30);
     }
 }
 
