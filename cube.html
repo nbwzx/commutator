@@ -172,9 +172,7 @@
           "order": Number(document.getElementById("order").value !== "" ? document.getElementById("order").value : 4),
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
-          "commute": document.getElementById("settingsCommute").checked ? undefined : {},
-          "maxDepth": Number(document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
-            "settingsMaxDepth").value : 0)
+          "commute": document.getElementById("settingsCommute").checked ? undefined : {}
         })
       document.getElementById("out").setAttribute("rows", 1);
     }
