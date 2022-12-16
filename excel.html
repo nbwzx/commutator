@@ -119,6 +119,12 @@
       style="text-align:center;width:2.5em"> <i class="btn btn-default material-icons"
       title="Score for commutator combo" style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8"
       data-toggle="popover" data-placement="bottom" data-bs-html="true">help_outline</i>
+    <br />
+    <input class="form-check-input" type="checkbox" id="settingsFast" onclick="changeCookie()">
+    Fast
+    <i class="btn btn-default material-icons" title="Show one result only"
+      style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
+      data-placement="bottom" data-bs-html="true">help_outline</i>
     <br /><br />
     <p>Import an excel file(*.xlsx, *.xls, *.csv), decompose all the algorithms in commutator notation.</p>
     <p>You can download the excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
@@ -157,7 +163,8 @@
             "settingsSortScoreAdd").value : 1),
           "commute": document.getElementById("settingsCommute").checked ? undefined : {},
           "maxDepth": Number(document.getElementById("settingsMaxDepth").value !== "" ? document.getElementById(
-            "settingsMaxDepth").value : 0)
+            "settingsMaxDepth").value : 0),
+          "fast": document.getElementById("settingsFast").checked,
         });
       return outlist[0];
     }
@@ -223,7 +230,9 @@
           let month = myDate.getMonth() + 1;
           let ddate = myDate.getDate();
           let Sheet2 = "";
-          const monthArr = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+          const monthArr = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.",
+            "Dec."
+          ];
           const suffix = ["st", "nd", "rd", "th"];
           if (ddate % 10 < 1 || ddate % 10 > 3) {
             ddate = ddate + suffix[3];

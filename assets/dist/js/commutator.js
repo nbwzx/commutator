@@ -6,7 +6,7 @@
 "use strict";
 var commutator = (function () {
     var MAX_INT = 4294967295;
-    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0;
+    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0, fastInit = false;
     var commuteInit = {
         U: { "class": 1, priority: 1 },
         D: { "class": 1, priority: 2 },
@@ -80,7 +80,7 @@ var commutator = (function () {
         "M2 R": "r M'",
         "M2 R'": "r' M"
     };
-    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit;
+    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit, fast = false;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
     function expand(input) {
         var _a, _b, _c, _d;
@@ -99,6 +99,7 @@ var commutator = (function () {
         algorithm = algorithm.split("").join(" ");
         algorithm = algorithm.replace(/【/gu, "[");
         algorithm = algorithm.replace(/】/gu, "]");
+        algorithm = algorithm.replace(/：/gu, ":");
         algorithm = algorithm.replace(/，/gu, ",");
         algorithm = algorithm.replace(/: /gu, ":");
         algorithm = algorithm.replace(/, /gu, ",");
@@ -282,7 +283,7 @@ var commutator = (function () {
         return score(algorithm1) - score(algorithm2);
     }
     function search(input) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         var algorithm = input.algorithm;
         order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         outerBracket = (_b = input.outerBracket) !== null && _b !== void 0 ? _b : outerBracketInit;
@@ -292,7 +293,8 @@ var commutator = (function () {
         initialReplace = (_f = input.initialReplace) !== null && _f !== void 0 ? _f : initialReplaceInit;
         finalReplace = (_g = input.finalReplace) !== null && _g !== void 0 ? _g : finalReplaceInit;
         commute = (_h = input.commute) !== null && _h !== void 0 ? _h : commuteInit;
-        var maxDepth = (_j = input.maxDepth) !== null && _j !== void 0 ? _j : maxDepthInit, limit = (_k = input.limit) !== null && _k !== void 0 ? _k : limitInit;
+        fast = (_j = input.fast) !== null && _j !== void 0 ? _j : fastInit;
+        var maxDepth = (_k = input.maxDepth) !== null && _k !== void 0 ? _k : maxDepthInit, limit = (_l = input.limit) !== null && _l !== void 0 ? _l : limitInit;
         result = [];
         if (algorithm === "") {
             return ["Empty input."];
@@ -356,6 +358,9 @@ var commutator = (function () {
                 commutatorOutput = commutatorMain(commuteArr, depth, depth);
                 if (commutatorOutput[0] !== "Not found.") {
                     isFind = true;
+                }
+                if (fast && isFind) {
+                    return result;
                 }
             }
             if (isFind && (depth === maxDepth || maxDepth === 0)) {
@@ -586,6 +591,9 @@ var commutator = (function () {
                                 if (depth === maxSubDepth &&
                                     result.indexOf(commutatorStr) === -1) {
                                     result.push(commutatorStr);
+                                }
+                                if (fast) {
+                                    return [commutatorOutput];
                                 }
                             }
                         }

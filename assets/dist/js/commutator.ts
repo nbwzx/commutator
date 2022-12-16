@@ -13,7 +13,8 @@ const commutator = (function () {
     abMinScoreInit = 5,
     addScoreInit = 1,
     maxDepthInit = 0,
-    limitInit = 0;
+    limitInit = 0,
+    fastInit = false;
   const commuteInit: { [id: string]: { class: number; priority: number } } = {
     U: { class: 1, priority: 1 },
     D: { class: 1, priority: 2 },
@@ -97,7 +98,8 @@ const commutator = (function () {
     outerBracket = outerBracketInit,
     abMaxScore = abMaxScoreInit,
     abMinScore = abMinScoreInit,
-    addScore = addScoreInit;
+    addScore = addScoreInit,
+    fast = false;
   let commute = commuteInit,
     initialReplace = initialReplaceInit,
     finalReplace = finalReplaceInit;
@@ -124,6 +126,7 @@ const commutator = (function () {
     algorithm = algorithm.split("").join(" ");
     algorithm = algorithm.replace(/【/gu, "[");
     algorithm = algorithm.replace(/】/gu, "]");
+    algorithm = algorithm.replace(/：/gu, ":");
     algorithm = algorithm.replace(/，/gu, ",");
     algorithm = algorithm.replace(/: /gu, ":");
     algorithm = algorithm.replace(/, /gu, ",");
@@ -338,6 +341,7 @@ const commutator = (function () {
     addScore?: number;
     maxDepth?: number;
     limit?: number;
+    fast?: boolean;
   }): string[] {
     const algorithm = input.algorithm;
     order = input.order ?? orderInit;
@@ -348,6 +352,7 @@ const commutator = (function () {
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
+    fast = input.fast ?? fastInit;
     const maxDepth = input.maxDepth ?? maxDepthInit,
       limit = input.limit ?? limitInit;
     result = [];
@@ -416,6 +421,9 @@ const commutator = (function () {
         commutatorOutput = commutatorMain(commuteArr, depth, depth);
         if (commutatorOutput[0] !== "Not found.") {
           isFind = true;
+        }
+        if (fast && isFind) {
+          return result;
         }
       }
       if (isFind && (depth === maxDepth || maxDepth === 0)) {
@@ -688,6 +696,9 @@ const commutator = (function () {
                   result.indexOf(commutatorStr) === -1
                 ) {
                   result.push(commutatorStr);
+                }
+                if (fast) {
+                  return [commutatorOutput];
                 }
               }
             }

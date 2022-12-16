@@ -51,6 +51,9 @@ window.onload = function onload() {
     if (getCookie("settingsSortScoreAdd") !== "") {
         byid("settingsSortScoreAdd").value = getCookie("settingsSortScoreAdd");
     }
+    if (getCookie("settingsFast") !== "") {
+        byid("settingsFast").checked = true;
+    }
 };
 
 function changeCookie() {
@@ -72,7 +75,7 @@ function changeCookie() {
     if (byid("settingsFinalReplace").checked === true) {
         setCookie("settingsFinalReplace", "", -1);
     } else {
-        setCookie("settingsFinalReplace", "false", 30 );
+        setCookie("settingsFinalReplace", "false", 30);
     }
     if (byid("settingsCommute").checked === true) {
         setCookie("settingsCommute", "", -1);
@@ -98,6 +101,11 @@ function changeCookie() {
         setCookie("settingsSortScoreAdd", "", -1);
     } else {
         setCookie("settingsSortScoreAdd", byid("settingsSortScoreAdd").value, 30);
+    }
+    if (byid("settingsFast").checked === true) {
+        setCookie("settingsFast", "true", 30);
+    } else {
+        setCookie("settingsFast", "", -1);
     }
 }
 
