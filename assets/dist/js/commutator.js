@@ -111,9 +111,6 @@ var commutator = (function () {
         algorithm = algorithm.replace(/ \]/gu, "]");
         algorithm = "[".concat(algorithm.replace(/\+/gu, "]+["), "]");
         algorithm = algorithm.replace(/\]\[/gu, "]+[");
-        if (algorithm === "") {
-            return "Empty input.";
-        }
         if (order === 0) {
             isOrderZero = true;
             order = MAX_INT;
@@ -132,7 +129,11 @@ var commutator = (function () {
             rpnStack[0] === "Lack right parenthesis.") {
             return rpnStack[0];
         }
-        return arrayToStr(algToArray(calc(rpnStack)));
+        var calcTemp = calc(rpnStack);
+        if (calcTemp === "") {
+            return "Empty input.";
+        }
+        return arrayToStr(algToArray(calcTemp));
     }
     function isOperator(sign) {
         var operatorString = "+:,[]";
@@ -216,9 +217,14 @@ var commutator = (function () {
         while (stack.length > 0) {
             var sign = stack.shift();
             if (isOperator(sign)) {
-                var calcPop2 = calcOutput.pop();
-                var calcPop1 = calcOutput.pop();
-                calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
+                if (calcOutput.length >= 2) {
+                    var calcPop2 = calcOutput.pop();
+                    var calcPop1 = calcOutput.pop();
+                    calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
+                }
+                else {
+                    return "";
+                }
             }
             else {
                 calcOutput.push(sign);

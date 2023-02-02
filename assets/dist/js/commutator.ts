@@ -138,9 +138,6 @@ const commutator = (function () {
     algorithm = algorithm.replace(/ \]/gu, "]");
     algorithm = `[${algorithm.replace(/\+/gu, "]+[")}]`;
     algorithm = algorithm.replace(/\]\[/gu, "]+[");
-    if (algorithm === "") {
-      return "Empty input.";
-    }
     if (order === 0) {
       isOrderZero = true;
       order = MAX_INT;
@@ -160,7 +157,11 @@ const commutator = (function () {
     ) {
       return rpnStack[0];
     }
-    return arrayToStr(algToArray(calc(rpnStack)));
+    const calcTemp = calc(rpnStack);
+    if (calcTemp === "") {
+      return "Empty input.";
+    }
+    return arrayToStr(algToArray(calcTemp));
   }
 
   function isOperator(sign: string): boolean {
@@ -249,9 +250,13 @@ const commutator = (function () {
     while (stack.length > 0) {
       const sign = stack.shift() as string;
       if (isOperator(sign)) {
-        const calcPop2 = calcOutput.pop() as string;
-        const calcPop1 = calcOutput.pop() as string;
-        calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
+        if (calcOutput.length >= 2) {
+          const calcPop2 = calcOutput.pop() as string;
+          const calcPop1 = calcOutput.pop() as string;
+          calcOutput.push(calcTwo(calcPop1, calcPop2, sign));
+        } else {
+          return "";
+        }
       } else {
         calcOutput.push(sign);
       }
