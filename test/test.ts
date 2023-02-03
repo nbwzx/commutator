@@ -42,6 +42,17 @@ function assertCommute(
     initialReplace: {},
     finalReplace: {},
   });
+  for (const alg of res) {
+    assert(
+      comm.expand({
+        algorithm: alg,
+        order: order,
+        initialReplace: {},
+        finalReplace: {},
+      }) === algorithm,
+      algorithm + "!= " + alg
+    );
+  }
   assert(
     bool === res.indexOf(expect) > -1,
     algorithm + " = " + expect + ", " + bool
