@@ -9,14 +9,20 @@ var commutator = (function () {
     var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0, fastInit = false;
     var commuteInit = {
         U: { "class": 1, priority: 1 },
-        D: { "class": 1, priority: 2 },
+        u: { "class": 1, priority: 2 },
         E: { "class": 1, priority: 3 },
+        D: { "class": 1, priority: 4 },
+        d: { "class": 1, priority: 5 },
         R: { "class": 2, priority: 1 },
-        L: { "class": 2, priority: 2 },
+        r: { "class": 2, priority: 2 },
         M: { "class": 2, priority: 3 },
+        L: { "class": 2, priority: 4 },
+        l: { "class": 2, priority: 5 },
         F: { "class": 3, priority: 1 },
-        B: { "class": 3, priority: 2 },
-        S: { "class": 3, priority: 3 }
+        f: { "class": 3, priority: 2 },
+        S: { "class": 3, priority: 3 },
+        B: { "class": 3, priority: 4 },
+        b: { "class": 3, priority: 5 }
     };
     var initialReplaceInit = {
         r2: "R2 M2",

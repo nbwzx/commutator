@@ -70,7 +70,6 @@ assertFree("a b c b' a' d c' d'", "a b:[c,b' a' d]");
 assertFree("a b c d c' b' a' e d' e'", "e:[e' a b c,d]");
 assertFree("a b c d e b' a' c' e' d'", "[a b c,d e c]");
 assertFree("a b c d e b' a' d' c' e'", "[a b e',e c d]");
-assertFree("a b c b' a' d c' d'", "a b:[c,b' a' d]");
 assertFree("a b c d a' c' b' d'", "[a b c,d a']");
 assertFree("a b c d c' b' a' e d' e'", "e:[e' a b c,d]");
 assertFree("a b c a b' a' c' a'", "[a b c,a c]");
@@ -141,8 +140,8 @@ assertFree(
 );
 
 assertCommute("a R L a' R' L'", "[a,R L]");
-assertCommute("a R L M a' R' L' M'", "[a,R L M]");
-assertCommute("R L a M a' R' L' M'", "R L:[a,M]");
+assertCommute("a R M L a' R' M' L'", "[a,R M L]");
+assertCommute("R L a M a' R' M' L'", "R L:[a,M]");
 assertCommute("L a R b L' a' R' b'", "[L a R,b R L']");
 assertCommute("L a R b L' a' R' b'", "L a R b L' a':[R' b' L,a R L]");
 assertCommute("L a R L b R L2' a' R2' b'", "[L a R L,b R2 L']");
@@ -150,6 +149,6 @@ assertCommute("a R b L a' R' b' L'", "[a R L',L b R]");
 assertCommute("a R b L a' R' b' L'", "a R b L a':[R' b' L',a R L']");
 assertCommute("a R b L a' R' b' L'", "a R b L a' R' b':[L' a R,b R L]");
 assertCommute("a R2 b R' L2 a' R' L' b' L'", "[a R2 L',L b R L]");
-assertCommute("a R2 L2 M2 b R' a' R' L M2' b' L3'", "[a R2 L' M2,L3 b R' a']");
+assertCommute("a R2 M2 L2 b R' a' R' M2' L b' L3'", "[a R2 M2 L',L3 b R' a']");
 
 console.timeEnd("test");
