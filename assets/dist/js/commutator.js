@@ -84,7 +84,15 @@ var commutator = (function () {
         "R M2": "r M'",
         "R' M2": "r' M",
         "M2 R": "r M'",
-        "M2 R'": "r' M"
+        "M2 R'": "r' M",
+        "U2 E": "U' u'",
+        "U2 E'": "U u",
+        "E U2": "U' u'",
+        "E' U2": "U u",
+        "U E2": "U' u2",
+        "U' E2": "U u2",
+        "E2 U": "U' u2",
+        "E2 U'": "U u2"
     };
     var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit, fast = false;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
