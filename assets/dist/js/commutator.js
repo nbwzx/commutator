@@ -139,7 +139,11 @@ var commutator = (function () {
         if (calcTemp === "") {
             return "Empty input.";
         }
-        return arrayToStr(algToArray(calcTemp));
+        var expandOutput = arrayToStr(algToArray(calcTemp));
+        if (expandOutput === "") {
+            return "Empty input.";
+        }
+        return expandOutput;
     }
     function isOperator(sign) {
         var operatorString = "+:,[]";
@@ -219,6 +223,7 @@ var commutator = (function () {
         return stackOutput;
     }
     function calc(stack) {
+        var _a;
         var calcOutput = [];
         while (stack.length > 0) {
             var sign = stack.shift();
@@ -236,7 +241,7 @@ var commutator = (function () {
                 calcOutput.push(sign);
             }
         }
-        return calcOutput[0];
+        return (_a = calcOutput[0]) !== null && _a !== void 0 ? _a : "";
     }
     function calcTwo(algorithm1, algorithm2, sign) {
         var array1 = [], array2 = [];

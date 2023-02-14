@@ -167,7 +167,11 @@ const commutator = (function () {
     if (calcTemp === "") {
       return "Empty input.";
     }
-    return arrayToStr(algToArray(calcTemp));
+    const expandOutput = arrayToStr(algToArray(calcTemp));
+    if (expandOutput === "") {
+      return "Empty input.";
+    }
+    return expandOutput;
   }
 
   function isOperator(sign: string): boolean {
@@ -267,7 +271,7 @@ const commutator = (function () {
         calcOutput.push(sign);
       }
     }
-    return calcOutput[0];
+    return calcOutput[0] ?? "";
   }
 
   function calcTwo(
