@@ -398,6 +398,11 @@ var commutator = (function () {
         if (algTemp === "") {
             return [];
         }
+        if (Object.keys(initialReplace).length > 0) {
+            algTemp = algTemp.replace(/[A-Z]w/gu, function (match) {
+                return match.charAt(0).toLowerCase();
+            });
+        }
         var alg = "";
         for (var i = 0; i < algTemp.length; i++) {
             if ((algTemp[i + 1] < "0" || algTemp[i + 1] > "9") &&
