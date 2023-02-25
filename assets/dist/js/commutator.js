@@ -154,7 +154,7 @@ var commutator = (function () {
         return expandOutput;
     }
     function isOperator(sign) {
-        var operatorString = "+:,[]";
+        var operatorString = "+:,/[]";
         return operatorString.indexOf(sign) > -1;
     }
     function initStack(algorithm) {
@@ -170,20 +170,23 @@ var commutator = (function () {
         return stack;
     }
     function operatorLevel(operator) {
-        if (operator === ",") {
+        if (operator === ":") {
             return 0;
         }
-        if (operator === ":") {
+        if (operator === ",") {
             return 1;
         }
-        if (operator === "+") {
+        if (operator === "/") {
             return 2;
         }
-        if (operator === "[") {
+        if (operator === "+") {
             return 3;
         }
-        if (operator === "]") {
+        if (operator === "[") {
             return 4;
+        }
+        if (operator === "]") {
+            return 5;
         }
         return -1;
     }
@@ -196,7 +199,7 @@ var commutator = (function () {
             if (!isOperator(sign)) {
                 stackOutput.push(sign);
             }
-            else if (operatorLevel(sign) === 4) {
+            else if (sign === "]") {
                 isMatch = false;
                 while (operatorStack.length > 0) {
                     operatorStackPop = operatorStack.pop();
@@ -262,6 +265,8 @@ var commutator = (function () {
                 return arrayToStr(array1.concat(array2, invert(array1)));
             case ",":
                 return arrayToStr(array1.concat(array2, invert(array1), invert(array2)));
+            case "/":
+                return arrayToStr(array1.concat(array2, invert(array1), invert(array1), invert(array2), array1));
             default:
                 return arrayToStr(array1.concat(array2));
         }
