@@ -1,6 +1,6 @@
 /*!
  * Commutator (https://github.com/nbwzx/commutator)
- * Copyright (c) 2022 Zixing Wang <zixingwang.cn@gmail.com>
+ * Copyright (c) 2022-2023 Zixing Wang <zixingwang.cn@gmail.com>
  * Licensed under MIT (https://github.com/nbwzx/commutator/blob/main/LICENSE)
  */
 "use strict";
@@ -109,6 +109,8 @@ var commutator = (function () {
         algorithm = algorithm.replace(/\)/gu, "");
         algorithm = algorithm.replace(/（/gu, "");
         algorithm = algorithm.replace(/）/gu, "");
+        algorithm = algorithm.replace(/\{/gu, "");
+        algorithm = algorithm.replace(/\}/gu, "");
         algorithm = algorithm.replace(/\s/gu, "");
         algorithm = algorithm.split("").join(" ");
         algorithm = algorithm.replace(/【/gu, "[");
