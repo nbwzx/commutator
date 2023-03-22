@@ -15,7 +15,7 @@ for (let orderInput = 0; orderInput <= 10; orderInput++) {
 }
 console.timeEnd("Test 1");
 console.time("Test 2");
-console.log("The expand of a b4 c b a' b2' c' b3' in different orders.");
+console.log("The expand of [a b,b3 c b2] in different orders.");
 for (let orderInput = 0; orderInput <= 10; orderInput++) {
   res2 = comm.expand({
     algorithm: "[a b,b3 c b2]",
