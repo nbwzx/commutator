@@ -380,10 +380,9 @@ var commutator = (function () {
         }
         for (var depth = 1; depth <= searchDepth; depth++) {
             for (var i = 0; i < commuteTotal; i++) {
-                var commutBinary = String(i.toString(2));
                 var commuteArr = arr.concat();
-                for (var j = 0; j < commutBinary.length; j++) {
-                    if (commutBinary[commutBinary.length - 1 - j] === "1") {
+                for (var j = 0; j < commuteCount; j++) {
+                    if ((i & (1 << j)) !== 0) {
                         commuteArr = swapArray(commuteArr, commuteIndex[j], commuteIndex[j] + 1);
                     }
                 }
@@ -470,10 +469,9 @@ var commutator = (function () {
         var commuteTotal = Math.pow(2, commuteCount);
         var commutatorResult = ["Not found."];
         for (var i = 0; i < commuteTotal; i++) {
-            var commutBinary = String(i.toString(2));
             var commuteArr = array.concat();
-            for (var j = 0; j < commutBinary.length; j++) {
-                if (commutBinary[commutBinary.length - 1 - j] === "1") {
+            for (var j = 0; j < commuteCount; j++) {
+                if ((i & (1 << j)) !== 0) {
                     commuteArr = swapArray(commuteArr, commuteIndex[j], commuteIndex[j] + 1);
                 }
             }
@@ -516,7 +514,7 @@ var commutator = (function () {
                 for (var i = 1; i <= arr.length / 2 - 1; i++) {
                     var minj = 0;
                     if (depth === 1) {
-                        minj = Math.max(1, Math.ceil(arr.length / 2 - i));
+                        minj = Math.max(1, Math.floor((arr.length + 1) / 2 - i));
                     }
                     else {
                         minj = 1;

@@ -445,10 +445,9 @@ const commutator = (function () {
     }
     for (let depth = 1; depth <= searchDepth; depth++) {
       for (let i = 0; i < commuteTotal; i++) {
-        const commutBinary = String(i.toString(2));
         let commuteArr = arr.concat();
-        for (let j = 0; j < commutBinary.length; j++) {
-          if (commutBinary[commutBinary.length - 1 - j] === "1") {
+        for (let j = 0; j < commuteCount; j++) {
+          if ((i & (1 << j)) !== 0) {
             commuteArr = swapArray(
               commuteArr,
               commuteIndex[j],
@@ -544,10 +543,9 @@ const commutator = (function () {
     const commuteTotal = 2 ** commuteCount;
     let commutatorResult = ["Not found."];
     for (let i = 0; i < commuteTotal; i++) {
-      const commutBinary = String(i.toString(2));
       let commuteArr = array.concat();
-      for (let j = 0; j < commutBinary.length; j++) {
-        if (commutBinary[commutBinary.length - 1 - j] === "1") {
+      for (let j = 0; j < commuteCount; j++) {
+        if ((i & (1 << j)) !== 0) {
           commuteArr = swapArray(
             commuteArr,
             commuteIndex[j],
@@ -604,7 +602,7 @@ const commutator = (function () {
         for (let i = 1; i <= arr.length / 2 - 1; i++) {
           let minj = 0;
           if (depth === 1) {
-            minj = Math.max(1, Math.ceil(arr.length / 2 - i));
+            minj = Math.max(1, Math.floor((arr.length + 1) / 2 - i));
           } else {
             minj = 1;
           }
