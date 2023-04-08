@@ -331,7 +331,19 @@ var commutator = (function () {
         if (algorithm === "") {
             return ["Empty input."];
         }
-        var arr = algToArray(algorithm);
+        var expandAlg = expand({
+            algorithm: algorithm,
+            order: order,
+            initialReplace: initialReplace,
+            finalReplace: finalReplace,
+            commute: commute
+        });
+        if (expandAlg == "Lack left parenthesis." ||
+            expandAlg == "Lack right parenthesis." ||
+            expandAlg == "Empty input.") {
+            return [expandAlg];
+        }
+        var arr = algToArray(expandAlg);
         if (order === 0) {
             isOrderZero = true;
             order = 2 * (maxAlgAmount + 2);
@@ -345,11 +357,7 @@ var commutator = (function () {
         // • order 3 → min -1 (e.g. Pyraminx)
         minAmount = Math.floor(order / 2) + 1 - order;
         maxAmount = Math.floor(order / 2);
-        arr = simplify(arr);
         var arrLen = arr.length;
-        if (arrLen === 0) {
-            return ["Empty input."];
-        }
         for (var i = 0; i < arrLen; i++) {
             var amountCount = 0;
             for (var j = 0; j < arrLen; j++) {
