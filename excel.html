@@ -126,9 +126,12 @@
       style="font-size:16px;padding:0;vertical-align: middle;color:#17a2b8" data-toggle="popover"
       data-placement="bottom" data-bs-html="true">help_outline</i>
     <br /><br />
-    <p>Import an excel file(*.xlsx, *.xls, *.csv), decompose all the algorithms in commutator notation.</p>
+    <p>Import an excel file(*.xlsx, *.xls, *.csv), decompose all the algorithms in commutator notation or expand commutator notation into regular ones.</p>
     <p>You can download the excel example <a href="assets/files/test.xlsx" target="blank">here</a> first.</p>
-    <input type="file" id="upfile" accept=".xlsx, .xls, .csv" />
+    <strong>Decompose:</strong> <input type="file" id="upfile1" accept=".xlsx, .xls, .csv" />
+    <br />
+    <br />
+    <strong>Expand:</strong> <input type="file" id="upfile2" accept=".xlsx, .xls, .csv" />
     <br />
     <br />
     <div id="out">
@@ -168,10 +171,32 @@
         });
       return outlist[0];
     }
-    const file = document.getElementById("upfile");
+
+    function expandclick(alg) {
+      const outlist = commutator
+        .expand({
+          "algorithm": alg,
+          "order": Number(document.getElementById("order").value !== "" ? document.getElementById("order").value : 4),
+          "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
+          "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
+          "commute": document.getElementById("settingsCommute").checked ? undefined : {}
+        });
+      return outlist;
+    }
+
+    const file1 = document.getElementById("upfile1");
+    const file2 = document.getElementById("upfile2");
     const out = document.getElementById("out");
 
-    function handleFile(ee) {
+    function handleCommutator(ee) {
+      return handleFile(ee, 0);
+    }
+
+    function handleExpand(ee) {
+      return handleFile(ee, 1);
+    }
+
+    function handleFile(ee, handleType) {
       const files = ee.target.files;
       for (let index = 0, f = files[index]; index !== files.length; ++index) {
         const reader = new FileReader();
@@ -210,7 +235,13 @@
                 if (algorithmResult.length >= 4) {
                   // console.time("Time");
                   console.log(`${i}:${algorithmResult}`);
-                  const commutatorResult = commutatorclick(algorithmResult)
+                  let commutatorResult = "";
+                  if (handleType == 0) {
+                    commutatorResult = commutatorclick(algorithmResult);
+                  }
+                  if (handleType == 1) {
+                    commutatorResult = expandclick(algorithmResult);
+                  }
                   excelResult += `<td>${commutatorResult}</td>`;
                   // console.timeEnd("Time");
                   arrOut[i - 1].push(commutatorResult);
@@ -252,9 +283,11 @@
         };
         reader.readAsBinaryString(f);
       }
-      document.getElementById("upfile").value = null;
+      document.getElementById("upfile1").value = null;
+      document.getElementById("upfile2").value = null;
     }
-    file.addEventListener("change", handleFile, false);
+    file1.addEventListener("change", handleCommutator, false);
+    file2.addEventListener("change", handleExpand, false);
   </script>
 </body>
 
