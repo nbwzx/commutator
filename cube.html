@@ -142,6 +142,18 @@
     });
   </script>
   <script>
+    function updateTextAreaRows() {
+      document.getElementById("out").rows = 1; 
+      const textarea = document.getElementById("out");
+      const computedStyle = window.getComputedStyle(textarea);
+      const lineHeight = parseInt(computedStyle.lineHeight);
+      const paddingTop = parseInt(computedStyle.paddingTop);
+      const paddingBottom = parseInt(computedStyle.paddingBottom);
+      const height = textarea.scrollHeight - paddingTop - paddingBottom;
+      let rows = Math.round(height / lineHeight);
+      textarea.rows = rows;
+    }
+
     function commutatorclick() {
       const outlist = commutator
         .search({
@@ -169,7 +181,7 @@
         }
       }
       document.getElementById("out").innerHTML = outstr;
-      document.getElementById("out").setAttribute("rows", outlist.length);
+      updateTextAreaRows();
     }
 
     function expandclick() {
@@ -181,7 +193,7 @@
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
           "commute": document.getElementById("settingsCommute").checked ? undefined : {}
         })
-      document.getElementById("out").setAttribute("rows", 1);
+      updateTextAreaRows();
     }
   </script>
 </body>
