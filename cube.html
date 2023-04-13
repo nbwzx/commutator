@@ -143,15 +143,14 @@
   </script>
   <script>
     function updateTextAreaRows() {
-      document.getElementById("out").rows = 1; 
       const textarea = document.getElementById("out");
+      textarea.rows = 1;
       const computedStyle = window.getComputedStyle(textarea);
       const lineHeight = parseInt(computedStyle.lineHeight);
       const paddingTop = parseInt(computedStyle.paddingTop);
       const paddingBottom = parseInt(computedStyle.paddingBottom);
       const height = textarea.scrollHeight - paddingTop - paddingBottom;
-      let rows = Math.round(height / lineHeight);
-      textarea.rows = rows;
+      textarea.rows = Math.round(height / lineHeight);
     }
 
     function commutatorclick() {
@@ -192,7 +191,7 @@
           "initialReplace": document.getElementById("settingsInitialReplace").checked ? undefined : {},
           "finalReplace": document.getElementById("settingsFinalReplace").checked ? undefined : {},
           "commute": document.getElementById("settingsCommute").checked ? undefined : {}
-        })
+        });
       updateTextAreaRows();
     }
   </script>
