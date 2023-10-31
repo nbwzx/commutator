@@ -338,9 +338,9 @@ var commutator = (function () {
             finalReplace: finalReplace,
             commute: commute
         });
-        if (expandAlg == "Lack left parenthesis." ||
-            expandAlg == "Lack right parenthesis." ||
-            expandAlg == "Empty input.") {
+        if (expandAlg === "Lack left parenthesis." ||
+            expandAlg === "Lack right parenthesis." ||
+            expandAlg === "Empty input.") {
             return [expandAlg];
         }
         var arr = algToArray(expandAlg);

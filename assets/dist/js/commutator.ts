@@ -405,9 +405,9 @@ const commutator = (function () {
       commute,
     });
     if (
-      expandAlg == "Lack left parenthesis." ||
-      expandAlg == "Lack right parenthesis." ||
-      expandAlg == "Empty input."
+      expandAlg === "Lack left parenthesis." ||
+      expandAlg === "Lack right parenthesis." ||
+      expandAlg === "Empty input."
     ) {
       return [expandAlg];
     }
