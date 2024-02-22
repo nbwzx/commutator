@@ -275,7 +275,7 @@
             ddate = ddate + suffix[2];
           }
           Sheet2 = XLSX.utils.aoa_to_sheet([
-            ["This file is post processed by https://zixingwang.cn/commutator"],
+            ["This file is post processed by https://zixingwang.com/commutator"],
             [`Latest update on ${ddate} ${monthArr[month - 1]} ${year}`]
           ]);
           XLSX.utils.book_append_sheet(wb, Sheet2, "Readme");
