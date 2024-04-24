@@ -1,6 +1,6 @@
 /*!
  * Commutator (https://github.com/nbwzx/commutator)
- * Copyright (c) 2022-2023 Zixing Wang <zixingwang.cn@gmail.com>
+ * Copyright (c) 2022-2024 Zixing Wang <zixingwang.cn@gmail.com>
  * Licensed under MIT (https://github.com/nbwzx/commutator/blob/main/LICENSE)
  */
 "use strict";
@@ -344,7 +344,7 @@ var commutator = (function () {
             return [expandAlg];
         }
         var arr = algToArray(expandAlg);
-        if (order === 0) {
+        if (order === 0 || isOrderZero) {
             isOrderZero = true;
             order = 2 * (maxAlgAmount + 2);
         }

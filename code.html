@@ -473,7 +473,7 @@
                    return [expandAlg];
                  }
                  const arr = algToArray(expandAlg);
-                 if (order === 0) {
+                 if (order === 0 || isOrderZero) {
                    isOrderZero = true;
                    order = 2 * (maxAlgAmount + 2);
                  } else {
