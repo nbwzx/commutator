@@ -10,6 +10,9 @@ for (let orderInput = 0; orderInput <= 10; orderInput++) {
     algorithm: "a b4 c b a' b2' c' b3'",
     order: orderInput,
     outerBracket: false,
+    initialReplace: {},
+    finalReplace: {},
+    commute: {},
   })[0];
   console.log("order = ", orderInput, ", commutator = ", res2);
 }

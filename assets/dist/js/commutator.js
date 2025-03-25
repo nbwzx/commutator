@@ -1,12 +1,13 @@
 /*!
  * Commutator (https://github.com/nbwzx/commutator)
- * Copyright (c) 2022-2024 Zixing Wang <zixingwang.cn@gmail.com>
+ * Copyright (c) 2022-2025 Zixing Wang <zixingwang.cn@gmail.com>
  * Licensed under MIT (https://github.com/nbwzx/commutator/blob/main/LICENSE)
  */
-"use strict";
+/* eslint-disable no-misleading-character-class */
+/* eslint-disable no-control-regex */
 var commutator = (function () {
     var MAX_INT = 4294967295;
-    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0, fastInit = false;
+    var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0, fastInit = false, slashNotationInit = false, noBracketsInit = false, spaceAfterColonInit = false, spaceAfterCommaInit = false, outerBracketsInit = false;
     var commuteInit = {
         U: { "class": 1, priority: 1 },
         u: { "class": 1, priority: 2 },
@@ -25,6 +26,24 @@ var commutator = (function () {
         b: { "class": 3, priority: 5 }
     };
     var initialReplaceInit = {
+        Rw2: "r2",
+        "Rw'": "r'",
+        Rw: "r",
+        Lw2: "l2",
+        "Lw'": "l'",
+        Lw: "l",
+        Fw2: "f2",
+        "Fw'": "f'",
+        Fw: "f",
+        Bw2: "b2",
+        "Bw'": "b'",
+        Bw: "b",
+        Uw2: "u2",
+        "Uw'": "u'",
+        Uw: "u",
+        Dw2: "d2",
+        "Dw'": "d'",
+        Dw: "d",
         r2: "R2 M2",
         "r'": "R' M",
         r: "R M'",
@@ -94,37 +113,97 @@ var commutator = (function () {
         "E2 U": "U' u2",
         "E2 U'": "U u2"
     };
-    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit, fast = false;
+    var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit, fast = fastInit, slashNotation = slashNotationInit, noBrackets = noBracketsInit, spaceAfterColon = spaceAfterColonInit, spaceAfterComma = spaceAfterCommaInit, outerBrackets = outerBracketsInit;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
+    function clean(input) {
+        // Implements the internationalized string preparation algorithm from RFC 4518
+        var string = input;
+        string = string.replace(/[\u00ad\u1806\u034f\u180b-\u180d\ufe0f-\uff00\ufffc]+/gu, "");
+        string = string.replace(/[\u0009\u000a\u000b\u000c\u000d\u0085]/gu, " ");
+        string = string.replace(/[\u0000-\u0008\u000e-\u001f\u007f-\u0084\u0086-\u009f\u06dd\u070f\u180e\u200c-\u200f\u202a-\u202e\u2060-\u2063\u206a-\u206f\ufeff\ufff9-\ufffb]+/gu, "");
+        string = string.replace(/\u200b/gu, "");
+        string = string.replace(/[\u00a0\u1680\u2000-\u200a\u2028-\u2029\u202f\u205f\u3000]/gu, " ");
+        string = string.replace(/[\u061c\u115f\u1160\u17b4\u17b5\u2064\u2800\u3164\uffa0]/gu, " ");
+        // Specifically for this project
+        string = string.replace(/[!！]/gu, " ");
+        string = string.replace(/\s+/gu, " ");
+        string = string.trim();
+        var non_standard_characters = {
+            "'": "｀΄＇ˈˊᑊˋꞌᛌ‘’՚‛՝`′׳´ʹ˴ߴ‵ߵʻʼ᾽ʽ῾ʾ᾿ʿ",
+            ",": "¸ꓹ‚؍٫，",
+            "/": "⁄Ⳇ⟋ノ╱〳∕⧸",
+            ":": "︰∶:᛬⁚܃：ꓽ׃։ː꞉܄˸;",
+            "(": "（{",
+            ")": "）}",
+            "[": "【",
+            "]": "】",
+            "+": "𐊛+᛭",
+            "*": "×"
+        };
+        for (var standard_char in non_standard_characters) {
+            var chars = non_standard_characters[standard_char];
+            for (var i = 0; i < chars.length; i++) {
+                var char = chars[i];
+                string = string.replace(char, standard_char);
+            }
+        }
+        return string;
+    }
     function expand(input) {
         var _a, _b, _c, _d;
-        var algorithm = input.algorithm;
         order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         initialReplace = (_b = input.initialReplace) !== null && _b !== void 0 ? _b : initialReplaceInit;
         finalReplace = (_c = input.finalReplace) !== null && _c !== void 0 ? _c : finalReplaceInit;
         commute = (_d = input.commute) !== null && _d !== void 0 ? _d : commuteInit;
-        algorithm = algorithm.replace(/[‘]/gu, "'");
-        algorithm = algorithm.replace(/[’]/gu, "'");
+        var algorithm = clean(input.algorithm);
+        algorithm = algorithm
+            .replace(/\*\s/gu, "*")
+            .replace(/\s\*/gu, "*")
+            .replace(/:\s/gu, ":")
+            .replace(/\s:/gu, ":")
+            .replace(/\[\s/gu, "[")
+            .replace(/\s\[/gu, "[")
+            .replace(/\]\s/gu, "]")
+            .replace(/\s\]/gu, "]")
+            .replace(/,\s/gu, ",")
+            .replace(/\s,/gu, ",")
+            .replace(/\+\s/gu, "+")
+            .replace(/\s\+/gu, "+")
+            .replace(/\*2/gu, "2");
+        for (var i = algorithm.length - 1; i > 1; i--) {
+            if (algorithm[i] === "2" && algorithm[i - 1] === ")") {
+                var j = i - 1;
+                while (algorithm[j] !== "(" && j >= 0) {
+                    j--;
+                }
+                if (j >= 0) {
+                    algorithm =
+                        algorithm.slice(0, j) +
+                            algorithm.slice(j + 1, i - 1) +
+                            algorithm.slice(j + 1, i - 1) +
+                            algorithm.slice(i + 1);
+                    break;
+                }
+            }
+        }
+        for (var i = algorithm.length - 1; i > 1; i--) {
+            if (algorithm[i] === "2" && algorithm[i - 1] === "]") {
+                var j = i - 1;
+                while (algorithm[j] !== "[" && j >= 0) {
+                    j--;
+                }
+                if (j >= 0) {
+                    algorithm =
+                        algorithm.slice(0, j) +
+                            algorithm.slice(j + 1, i - 1) +
+                            algorithm.slice(j + 1, i - 1) +
+                            algorithm.slice(i + 1);
+                    break;
+                }
+            }
+        }
         algorithm = algorithm.replace(/\(/gu, "");
         algorithm = algorithm.replace(/\)/gu, "");
-        algorithm = algorithm.replace(/（/gu, "");
-        algorithm = algorithm.replace(/）/gu, "");
-        algorithm = algorithm.replace(/\{/gu, "");
-        algorithm = algorithm.replace(/\}/gu, "");
-        algorithm = algorithm.replace(/\s/gu, "");
-        algorithm = algorithm.split("").join(" ");
-        algorithm = algorithm.replace(/【/gu, "[");
-        algorithm = algorithm.replace(/】/gu, "]");
-        algorithm = algorithm.replace(/：/gu, ":");
-        algorithm = algorithm.replace(/，/gu, ",");
-        algorithm = algorithm.replace(/: /gu, ":");
-        algorithm = algorithm.replace(/, /gu, ",");
-        algorithm = algorithm.replace(/\[ /gu, "[");
-        algorithm = algorithm.replace(/\] /gu, "]");
-        algorithm = algorithm.replace(/ :/gu, ":");
-        algorithm = algorithm.replace(/ ,/gu, ",");
-        algorithm = algorithm.replace(/ \[/gu, "[");
-        algorithm = algorithm.replace(/ \]/gu, "]");
         algorithm = "[".concat(algorithm.replace(/\+/gu, "]+["), "]");
         algorithm = algorithm.replace(/\]\[/gu, "]+[");
         if (order === 0) {
@@ -147,11 +226,11 @@ var commutator = (function () {
         }
         var calcTemp = calc(rpnStack);
         if (calcTemp === "") {
-            return "Empty input.";
+            return "";
         }
         var expandOutput = arrayToStr(algToArray(calcTemp));
         if (expandOutput === "") {
-            return "Empty input.";
+            return "";
         }
         return expandOutput;
     }
@@ -315,7 +394,7 @@ var commutator = (function () {
         return score(algorithm1) - score(algorithm2);
     }
     function search(input) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         var algorithm = input.algorithm;
         order = (_a = input.order) !== null && _a !== void 0 ? _a : orderInit;
         outerBracket = (_b = input.outerBracket) !== null && _b !== void 0 ? _b : outerBracketInit;
@@ -326,10 +405,15 @@ var commutator = (function () {
         finalReplace = (_g = input.finalReplace) !== null && _g !== void 0 ? _g : finalReplaceInit;
         commute = (_h = input.commute) !== null && _h !== void 0 ? _h : commuteInit;
         fast = (_j = input.fast) !== null && _j !== void 0 ? _j : fastInit;
-        var maxDepth = (_k = input.maxDepth) !== null && _k !== void 0 ? _k : maxDepthInit, limit = (_l = input.limit) !== null && _l !== void 0 ? _l : limitInit;
+        slashNotation = (_k = input.slashNotation) !== null && _k !== void 0 ? _k : slashNotationInit;
+        noBrackets = (_l = input.noBrackets) !== null && _l !== void 0 ? _l : noBracketsInit;
+        spaceAfterColon = (_m = input.spaceAfterColon) !== null && _m !== void 0 ? _m : spaceAfterColonInit;
+        spaceAfterComma = (_o = input.spaceAfterComma) !== null && _o !== void 0 ? _o : spaceAfterCommaInit;
+        outerBrackets = (_p = input.outerBrackets) !== null && _p !== void 0 ? _p : outerBracketsInit;
+        var maxDepth = (_q = input.maxDepth) !== null && _q !== void 0 ? _q : maxDepthInit, limit = (_r = input.limit) !== null && _r !== void 0 ? _r : limitInit;
         result = [];
         if (algorithm === "") {
-            return ["Empty input."];
+            return [""];
         }
         var expandAlg = expand({
             algorithm: algorithm,
@@ -340,7 +424,7 @@ var commutator = (function () {
         });
         if (expandAlg === "Lack left parenthesis." ||
             expandAlg === "Lack right parenthesis." ||
-            expandAlg === "Empty input.") {
+            expandAlg === "") {
             return [expandAlg];
         }
         var arr = algToArray(expandAlg);
@@ -404,6 +488,9 @@ var commutator = (function () {
             }
             if (isFind && (depth === maxDepth || maxDepth === 0)) {
                 result.sort(sortRule);
+                result = result.map(function (alg) {
+                    return commutatorPost(alg, slashNotation, noBrackets, spaceAfterColon, spaceAfterComma, outerBrackets);
+                });
                 if (limit === 0) {
                     return result;
                 }
@@ -412,18 +499,81 @@ var commutator = (function () {
         }
         return ["Not found."];
     }
+    function commutatorPost(algorithm, slashNotation1, noBrackets1, spaceAfterColon1, spaceAfterComma1, outerBrackets1) {
+        var alg = algorithm;
+        if (alg.includes(".")) {
+            return alg;
+        }
+        if (slashNotation1) {
+            alg = applySlash(alg);
+        }
+        if (noBrackets1) {
+            alg = alg.replace("[", "").replace("]", "");
+        }
+        if (spaceAfterColon1) {
+            alg = alg.replace(":", ": ");
+        }
+        if (spaceAfterComma1) {
+            alg = alg.replace(",", ", ");
+        }
+        if (outerBrackets1) {
+            if (alg[0] !== "[") {
+                alg = "[".concat(alg, "]");
+            }
+        }
+        return alg;
+    }
+    function applySlash(algorithm) {
+        if (!algorithm.includes("[")) {
+            return algorithm;
+        }
+        var part0Output = "";
+        if (algorithm.includes(":")) {
+            part0Output = algorithm.split(":")[0];
+        }
+        var part1Output = algorithm.split("[")[1].split(",")[0];
+        var part2Output = algorithm.split(",")[1].split("]")[0];
+        var part0 = simplify(algToArray(part0Output));
+        var part2 = simplify(algToArray(part2Output));
+        if (part1Output === "" || part2Output === "") {
+            return "";
+        }
+        if (part0Output === "") {
+            return "[".concat(part1Output, ",").concat(part2Output, "]");
+        }
+        if (part2.length === 1) {
+            for (var _i = 0, _a = [-2, 2]; _i < _a.length; _i++) {
+                var i = _a[_i];
+                if ((part2[0].amount + i) % order === 0) {
+                    var halfPart2 = [
+                        {
+                            base: part2[0].base,
+                            amount: -i / 2
+                        },
+                    ];
+                    var part0New = simplify(part0.concat(halfPart2));
+                    var part0NewOutput = arrayToStr(part0New);
+                    var part1NewOutput = arrayToStr(invert(halfPart2));
+                    if (part0New.length < part0.length) {
+                        if (part0NewOutput === "") {
+                            return "[".concat(part1NewOutput, "/").concat(part1Output, "]");
+                        }
+                        return "".concat(part0NewOutput, ":[").concat(part1NewOutput, "/").concat(part1Output, "]");
+                    }
+                }
+            }
+        }
+        return algorithm;
+    }
     function algToArray(algorithm) {
-        var algTemp = algorithm;
+        var algTemp = clean(algorithm);
+        for (var s in initialReplace) {
+            var re = new RegExp(s, "gu");
+            algTemp = algTemp.replace(re, initialReplace[s]);
+        }
         algTemp = algTemp.replace(/\s+/giu, "");
-        algTemp = algTemp.replace(/[‘]/gu, "'");
-        algTemp = algTemp.replace(/[’]/gu, "'");
         if (algTemp === "") {
             return [];
-        }
-        if (Object.keys(initialReplace).length > 0) {
-            algTemp = algTemp.replace(/[A-Z]w/gu, function (match) {
-                return match.charAt(0).toLowerCase();
-            });
         }
         var alg = "";
         for (var i = 0; i < algTemp.length; i++) {
@@ -433,16 +583,6 @@ var commutator = (function () {
             }
             else {
                 alg = alg + algTemp[i];
-            }
-        }
-        for (var i in initialReplace) {
-            var re = new RegExp(i, "gu");
-            var testStr = initialReplace[i].replace(/[^a-zA-Z]/gu, "").split("");
-            for (var _i = 0, testStr_1 = testStr; _i < testStr_1.length; _i++) {
-                var testChar = testStr_1[_i];
-                if (alg.indexOf(testChar) > -1) {
-                    alg = alg.replace(re, initialReplace[i]);
-                }
             }
         }
         var algSplit = alg.split(" ");
@@ -810,7 +950,8 @@ var commutator = (function () {
     }
     return {
         search: search,
-        expand: expand
+        expand: expand,
+        commutatorPost: commutatorPost
     };
 })();
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {

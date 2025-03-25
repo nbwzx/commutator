@@ -1,9 +1,10 @@
 /*!
  * Commutator (https://github.com/nbwzx/commutator)
- * Copyright (c) 2022-2024 Zixing Wang <zixingwang.cn@gmail.com>
+ * Copyright (c) 2022-2025 Zixing Wang <zixingwang.cn@gmail.com>
  * Licensed under MIT (https://github.com/nbwzx/commutator/blob/main/LICENSE)
  */
-"use strict";
+/* eslint-disable no-misleading-character-class */
+/* eslint-disable no-control-regex */
 
 const commutator = (function () {
   const MAX_INT = 4294967295;
@@ -14,7 +15,12 @@ const commutator = (function () {
     addScoreInit = 1,
     maxDepthInit = 0,
     limitInit = 0,
-    fastInit = false;
+    fastInit = false,
+    slashNotationInit = false,
+    noBracketsInit = false,
+    spaceAfterColonInit = false,
+    spaceAfterCommaInit = false,
+    outerBracketsInit = false;
   const commuteInit: { [id: string]: { class: number; priority: number } } = {
     U: { class: 1, priority: 1 },
     u: { class: 1, priority: 2 },
@@ -33,6 +39,24 @@ const commutator = (function () {
     b: { class: 3, priority: 5 },
   };
   const initialReplaceInit: { [id: string]: string } = {
+    Rw2: "r2",
+    "Rw'": "r'",
+    Rw: "r",
+    Lw2: "l2",
+    "Lw'": "l'",
+    Lw: "l",
+    Fw2: "f2",
+    "Fw'": "f'",
+    Fw: "f",
+    Bw2: "b2",
+    "Bw'": "b'",
+    Bw: "b",
+    Uw2: "u2",
+    "Uw'": "u'",
+    Uw: "u",
+    Dw2: "d2",
+    "Dw'": "d'",
+    Dw: "d",
     r2: "R2 M2",
     "r'": "R' M",
     r: "R M'",
@@ -113,10 +137,67 @@ const commutator = (function () {
     abMaxScore = abMaxScoreInit,
     abMinScore = abMinScoreInit,
     addScore = addScoreInit,
-    fast = false;
+    fast = fastInit,
+    slashNotation = slashNotationInit,
+    noBrackets = noBracketsInit,
+    spaceAfterColon = spaceAfterColonInit,
+    spaceAfterComma = spaceAfterCommaInit,
+    outerBrackets = outerBracketsInit;
   let commute = commuteInit,
     initialReplace = initialReplaceInit,
     finalReplace = finalReplaceInit;
+
+  function clean(input: string): string {
+    // Implements the internationalized string preparation algorithm from RFC 4518
+    let string = input;
+
+    string = string.replace(
+      /[\u00ad\u1806\u034f\u180b-\u180d\ufe0f-\uff00\ufffc]+/gu,
+      ""
+    );
+    string = string.replace(/[\u0009\u000a\u000b\u000c\u000d\u0085]/gu, " ");
+    string = string.replace(
+      /[\u0000-\u0008\u000e-\u001f\u007f-\u0084\u0086-\u009f\u06dd\u070f\u180e\u200c-\u200f\u202a-\u202e\u2060-\u2063\u206a-\u206f\ufeff\ufff9-\ufffb]+/gu,
+      ""
+    );
+    string = string.replace(/\u200b/gu, "");
+    string = string.replace(
+      /[\u00a0\u1680\u2000-\u200a\u2028-\u2029\u202f\u205f\u3000]/gu,
+      " "
+    );
+    string = string.replace(
+      /[\u061c\u115f\u1160\u17b4\u17b5\u2064\u2800\u3164\uffa0]/gu,
+      " "
+    );
+
+    // Specifically for this project
+    string = string.replace(/[!！]/gu, " ");
+    string = string.replace(/\s+/gu, " ");
+    string = string.trim();
+
+    const non_standard_characters: { [key: string]: string } = {
+      "'": "｀΄＇ˈˊᑊˋꞌᛌ‘’՚‛՝`′׳´ʹ˴ߴ‵ߵʻʼ᾽ʽ῾ʾ᾿ʿ",
+      ",": "¸ꓹ‚؍٫，",
+      "/": "⁄Ⳇ⟋ノ╱〳∕⧸",
+      ":": "︰∶:᛬⁚܃：ꓽ׃։ː꞉܄˸;",
+      "(": "（{",
+      ")": "）}",
+      "[": "【",
+      "]": "】",
+      "+": "𐊛+᛭",
+      "*": "×",
+    };
+
+    for (const standard_char in non_standard_characters) {
+      const chars = non_standard_characters[standard_char];
+      for (let i = 0; i < chars.length; i++) {
+        const char = chars[i];
+        string = string.replace(char, standard_char);
+      }
+    }
+
+    return string;
+  }
 
   function expand(input: {
     algorithm: string;
@@ -125,33 +206,59 @@ const commutator = (function () {
     finalReplace?: { [id: string]: string };
     commute?: { [id: string]: { class: number; priority: number } };
   }): string {
-    let algorithm = input.algorithm;
     order = input.order ?? orderInit;
     initialReplace = input.initialReplace ?? initialReplaceInit;
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
-    algorithm = algorithm.replace(/[‘]/gu, "'");
-    algorithm = algorithm.replace(/[’]/gu, "'");
+    let algorithm = clean(input.algorithm);
+    algorithm = algorithm
+      .replace(/\*\s/gu, "*")
+      .replace(/\s\*/gu, "*")
+      .replace(/:\s/gu, ":")
+      .replace(/\s:/gu, ":")
+      .replace(/\[\s/gu, "[")
+      .replace(/\s\[/gu, "[")
+      .replace(/\]\s/gu, "]")
+      .replace(/\s\]/gu, "]")
+      .replace(/,\s/gu, ",")
+      .replace(/\s,/gu, ",")
+      .replace(/\+\s/gu, "+")
+      .replace(/\s\+/gu, "+")
+      .replace(/\*2/gu, "2");
+    for (let i = algorithm.length - 1; i > 1; i--) {
+      if (algorithm[i] === "2" && algorithm[i - 1] === ")") {
+        let j = i - 1;
+        while (algorithm[j] !== "(" && j >= 0) {
+          j--;
+        }
+        if (j >= 0) {
+          algorithm =
+            algorithm.slice(0, j) +
+            algorithm.slice(j + 1, i - 1) +
+            algorithm.slice(j + 1, i - 1) +
+            algorithm.slice(i + 1);
+          break;
+        }
+      }
+    }
+    for (let i = algorithm.length - 1; i > 1; i--) {
+      if (algorithm[i] === "2" && algorithm[i - 1] === "]") {
+        let j = i - 1;
+        while (algorithm[j] !== "[" && j >= 0) {
+          j--;
+        }
+        if (j >= 0) {
+          algorithm =
+            algorithm.slice(0, j) +
+            algorithm.slice(j + 1, i - 1) +
+            algorithm.slice(j + 1, i - 1) +
+            algorithm.slice(i + 1);
+          break;
+        }
+      }
+    }
     algorithm = algorithm.replace(/\(/gu, "");
     algorithm = algorithm.replace(/\)/gu, "");
-    algorithm = algorithm.replace(/（/gu, "");
-    algorithm = algorithm.replace(/）/gu, "");
-    algorithm = algorithm.replace(/\{/gu, "");
-    algorithm = algorithm.replace(/\}/gu, "");
-    algorithm = algorithm.replace(/\s/gu, "");
-    algorithm = algorithm.split("").join(" ");
-    algorithm = algorithm.replace(/【/gu, "[");
-    algorithm = algorithm.replace(/】/gu, "]");
-    algorithm = algorithm.replace(/：/gu, ":");
-    algorithm = algorithm.replace(/，/gu, ",");
-    algorithm = algorithm.replace(/: /gu, ":");
-    algorithm = algorithm.replace(/, /gu, ",");
-    algorithm = algorithm.replace(/\[ /gu, "[");
-    algorithm = algorithm.replace(/\] /gu, "]");
-    algorithm = algorithm.replace(/ :/gu, ":");
-    algorithm = algorithm.replace(/ ,/gu, ",");
-    algorithm = algorithm.replace(/ \[/gu, "[");
-    algorithm = algorithm.replace(/ \]/gu, "]");
     algorithm = `[${algorithm.replace(/\+/gu, "]+[")}]`;
     algorithm = algorithm.replace(/\]\[/gu, "]+[");
     if (order === 0) {
@@ -175,11 +282,11 @@ const commutator = (function () {
     }
     const calcTemp = calc(rpnStack);
     if (calcTemp === "") {
-      return "Empty input.";
+      return "";
     }
     const expandOutput = arrayToStr(algToArray(calcTemp));
     if (expandOutput === "") {
-      return "Empty input.";
+      return "";
     }
     return expandOutput;
   }
@@ -380,6 +487,11 @@ const commutator = (function () {
     maxDepth?: number;
     limit?: number;
     fast?: boolean;
+    slashNotation?: boolean;
+    noBrackets?: boolean;
+    spaceAfterColon?: boolean;
+    spaceAfterComma?: boolean;
+    outerBrackets?: boolean;
   }): string[] {
     const algorithm = input.algorithm;
     order = input.order ?? orderInit;
@@ -391,11 +503,16 @@ const commutator = (function () {
     finalReplace = input.finalReplace ?? finalReplaceInit;
     commute = input.commute ?? commuteInit;
     fast = input.fast ?? fastInit;
+    slashNotation = input.slashNotation ?? slashNotationInit;
+    noBrackets = input.noBrackets ?? noBracketsInit;
+    spaceAfterColon = input.spaceAfterColon ?? spaceAfterColonInit;
+    spaceAfterComma = input.spaceAfterComma ?? spaceAfterCommaInit;
+    outerBrackets = input.outerBrackets ?? outerBracketsInit;
     const maxDepth = input.maxDepth ?? maxDepthInit,
       limit = input.limit ?? limitInit;
     result = [];
     if (algorithm === "") {
-      return ["Empty input."];
+      return [""];
     }
     const expandAlg = expand({
       algorithm,
@@ -407,7 +524,7 @@ const commutator = (function () {
     if (
       expandAlg === "Lack left parenthesis." ||
       expandAlg === "Lack right parenthesis." ||
-      expandAlg === "Empty input."
+      expandAlg === ""
     ) {
       return [expandAlg];
     }
@@ -475,6 +592,16 @@ const commutator = (function () {
       }
       if (isFind && (depth === maxDepth || maxDepth === 0)) {
         result.sort(sortRule);
+        result = result.map((alg) =>
+          commutatorPost(
+            alg,
+            slashNotation,
+            noBrackets,
+            spaceAfterColon,
+            spaceAfterComma,
+            outerBrackets
+          )
+        );
         if (limit === 0) {
           return result;
         }
@@ -484,18 +611,89 @@ const commutator = (function () {
     return ["Not found."];
   }
 
+  function commutatorPost(
+    algorithm: string,
+    slashNotation1: boolean,
+    noBrackets1: boolean,
+    spaceAfterColon1: boolean,
+    spaceAfterComma1: boolean,
+    outerBrackets1: boolean
+  ): string {
+    let alg = algorithm;
+    if (alg.includes(".")) {
+      return alg;
+    }
+    if (slashNotation1) {
+      alg = applySlash(alg);
+    }
+    if (noBrackets1) {
+      alg = alg.replace("[", "").replace("]", "");
+    }
+    if (spaceAfterColon1) {
+      alg = alg.replace(":", ": ");
+    }
+    if (spaceAfterComma1) {
+      alg = alg.replace(",", ", ");
+    }
+    if (outerBrackets1) {
+      if (alg[0] !== "[") {
+        alg = `[${alg}]`;
+      }
+    }
+    return alg;
+  }
+
+  function applySlash(algorithm: string): string {
+    if (!algorithm.includes("[")) {
+      return algorithm;
+    }
+    let part0Output = "";
+    if (algorithm.includes(":")) {
+      part0Output = algorithm.split(":")[0];
+    }
+    const part1Output = algorithm.split("[")[1].split(",")[0];
+    const part2Output = algorithm.split(",")[1].split("]")[0];
+    const part0 = simplify(algToArray(part0Output));
+    const part2 = simplify(algToArray(part2Output));
+    if (part1Output === "" || part2Output === "") {
+      return "";
+    }
+    if (part0Output === "") {
+      return `[${part1Output},${part2Output}]`;
+    }
+    if (part2.length === 1) {
+      for (const i of [-2, 2]) {
+        if ((part2[0].amount + i) % order === 0) {
+          const halfPart2: Move[] = [
+            {
+              base: part2[0].base,
+              amount: -i / 2,
+            },
+          ];
+          const part0New = simplify(part0.concat(halfPart2));
+          const part0NewOutput = arrayToStr(part0New);
+          const part1NewOutput = arrayToStr(invert(halfPart2));
+          if (part0New.length < part0.length) {
+            if (part0NewOutput === "") {
+              return `[${part1NewOutput}/${part1Output}]`;
+            }
+            return `${part0NewOutput}:[${part1NewOutput}/${part1Output}]`;
+          }
+        }
+      }
+    }
+    return algorithm;
+  }
+
   function algToArray(algorithm: string): Move[] {
-    let algTemp = algorithm;
+    let algTemp = clean(algorithm);
+    for (const s in initialReplace) {
+      const re = new RegExp(s, "gu");
+      algTemp = algTemp.replace(re, initialReplace[s]);
+    }
     algTemp = algTemp.replace(/\s+/giu, "");
-    algTemp = algTemp.replace(/[‘]/gu, "'");
-    algTemp = algTemp.replace(/[’]/gu, "'");
     if (algTemp === "") {
       return [];
-    }
-    if (Object.keys(initialReplace).length > 0) {
-      algTemp = algTemp.replace(/[A-Z]w/gu, (match) =>
-        match.charAt(0).toLowerCase()
-      );
     }
     let alg = "";
     for (let i = 0; i < algTemp.length; i++) {
@@ -506,15 +704,6 @@ const commutator = (function () {
         alg = `${alg + algTemp[i]} `;
       } else {
         alg = alg + algTemp[i];
-      }
-    }
-    for (const i in initialReplace) {
-      const re = new RegExp(i, "gu");
-      const testStr = initialReplace[i].replace(/[^a-zA-Z]/gu, "").split("");
-      for (const testChar of testStr) {
-        if (alg.indexOf(testChar) > -1) {
-          alg = alg.replace(re, initialReplace[i]);
-        }
       }
     }
     const algSplit = alg.split(" ");
@@ -937,6 +1126,7 @@ const commutator = (function () {
   return {
     search,
     expand,
+    commutatorPost,
   };
 })();
 
