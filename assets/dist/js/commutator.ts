@@ -184,15 +184,16 @@ const commutator = (function () {
       ")": "）}",
       "[": "【",
       "]": "】",
-      "+": "𐊛+᛭",
+      "+": "𐊛᛭",
       "*": "×",
     };
 
     for (const standard_char in non_standard_characters) {
       const chars = non_standard_characters[standard_char];
       for (let i = 0; i < chars.length; i++) {
-        const char = chars[i];
-        string = string.replace(char, standard_char);
+        const escaped_char = chars[i].replace(/[{}]/gu, "\\$&");
+        const re = new RegExp(escaped_char, "gu");
+        string = string.replace(re, standard_char);
       }
     }
 
@@ -627,13 +628,13 @@ const commutator = (function () {
       alg = applySlash(alg);
     }
     if (noBrackets1) {
-      alg = alg.replace("[", "").replace("]", "");
+      alg = alg.replace(/\[/gu, "").replace(/\]/gu, "");
     }
     if (spaceAfterColon1) {
-      alg = alg.replace(":", ": ");
+      alg = alg.replace(/:/gu, ": ");
     }
     if (spaceAfterComma1) {
-      alg = alg.replace(",", ", ");
+      alg = alg.replace(/,/gu, ", ");
     }
     if (outerBrackets1) {
       if (alg[0] !== "[") {

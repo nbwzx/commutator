@@ -9,21 +9,21 @@ var commutator = (function () {
     var MAX_INT = 4294967295;
     var orderInit = 4, outerBracketInit = false, abMaxScoreInit = 2.5, abMinScoreInit = 5, addScoreInit = 1, maxDepthInit = 0, limitInit = 0, fastInit = false, slashNotationInit = false, noBracketsInit = false, spaceAfterColonInit = false, spaceAfterCommaInit = false, outerBracketsInit = false;
     var commuteInit = {
-        U: { "class": 1, priority: 1 },
-        u: { "class": 1, priority: 2 },
-        E: { "class": 1, priority: 3 },
-        D: { "class": 1, priority: 4 },
-        d: { "class": 1, priority: 5 },
-        R: { "class": 2, priority: 1 },
-        r: { "class": 2, priority: 2 },
-        M: { "class": 2, priority: 3 },
-        L: { "class": 2, priority: 4 },
-        l: { "class": 2, priority: 5 },
-        F: { "class": 3, priority: 1 },
-        f: { "class": 3, priority: 2 },
-        S: { "class": 3, priority: 3 },
-        B: { "class": 3, priority: 4 },
-        b: { "class": 3, priority: 5 }
+        U: { class: 1, priority: 1 },
+        u: { class: 1, priority: 2 },
+        E: { class: 1, priority: 3 },
+        D: { class: 1, priority: 4 },
+        d: { class: 1, priority: 5 },
+        R: { class: 2, priority: 1 },
+        r: { class: 2, priority: 2 },
+        M: { class: 2, priority: 3 },
+        L: { class: 2, priority: 4 },
+        l: { class: 2, priority: 5 },
+        F: { class: 3, priority: 1 },
+        f: { class: 3, priority: 2 },
+        S: { class: 3, priority: 3 },
+        B: { class: 3, priority: 4 },
+        b: { class: 3, priority: 5 },
     };
     var initialReplaceInit = {
         Rw2: "r2",
@@ -61,7 +61,7 @@ var commutator = (function () {
         u: "U E'",
         d2: "E2 D2",
         "d'": "E' D'",
-        d: "E D"
+        d: "E D",
     };
     var finalReplaceInit = {
         "R2 M2": "r2",
@@ -111,7 +111,7 @@ var commutator = (function () {
         "U E2": "U' u2",
         "U' E2": "U u2",
         "E2 U": "U' u2",
-        "E2 U'": "U u2"
+        "E2 U'": "U u2",
     };
     var result = [], order = orderInit, minAmount = Math.floor(orderInit / 2) + 1 - orderInit, maxAmount = Math.floor(orderInit / 2), maxAlgAmount = 0, isOrderZero = false, outerBracket = outerBracketInit, abMaxScore = abMaxScoreInit, abMinScore = abMinScoreInit, addScore = addScoreInit, fast = fastInit, slashNotation = slashNotationInit, noBrackets = noBracketsInit, spaceAfterColon = spaceAfterColonInit, spaceAfterComma = spaceAfterCommaInit, outerBrackets = outerBracketsInit;
     var commute = commuteInit, initialReplace = initialReplaceInit, finalReplace = finalReplaceInit;
@@ -137,14 +137,15 @@ var commutator = (function () {
             ")": "）}",
             "[": "【",
             "]": "】",
-            "+": "𐊛+᛭",
-            "*": "×"
+            "+": "𐊛᛭",
+            "*": "×",
         };
         for (var standard_char in non_standard_characters) {
             var chars = non_standard_characters[standard_char];
             for (var i = 0; i < chars.length; i++) {
-                var char = chars[i];
-                string = string.replace(char, standard_char);
+                var escaped_char = chars[i].replace(/[{}]/gu, "\\$&");
+                var re = new RegExp(escaped_char, "gu");
+                string = string.replace(re, standard_char);
             }
         }
         return string;
@@ -420,7 +421,7 @@ var commutator = (function () {
             order: order,
             initialReplace: initialReplace,
             finalReplace: finalReplace,
-            commute: commute
+            commute: commute,
         });
         if (expandAlg === "Lack left parenthesis." ||
             expandAlg === "Lack right parenthesis." ||
@@ -508,13 +509,13 @@ var commutator = (function () {
             alg = applySlash(alg);
         }
         if (noBrackets1) {
-            alg = alg.replace("[", "").replace("]", "");
+            alg = alg.replace(/\[/gu, "").replace(/\]/gu, "");
         }
         if (spaceAfterColon1) {
-            alg = alg.replace(":", ": ");
+            alg = alg.replace(/:/gu, ": ");
         }
         if (spaceAfterComma1) {
-            alg = alg.replace(",", ", ");
+            alg = alg.replace(/,/gu, ", ");
         }
         if (outerBrackets1) {
             if (alg[0] !== "[") {
@@ -548,7 +549,7 @@ var commutator = (function () {
                     var halfPart2 = [
                         {
                             base: part2[0].base,
-                            amount: -i / 2
+                            amount: -i / 2,
                         },
                     ];
                     var part0New = simplify(part0.concat(halfPart2));
@@ -883,7 +884,7 @@ var commutator = (function () {
         for (var i = 0; i < array.length; i++) {
             var arrayAdd = {
                 base: array[i].base,
-                amount: normalize(array[i].amount)
+                amount: normalize(array[i].amount),
             }, arrLen = arr.length;
             if (normalize(arrayAdd.amount) === 0) {
                 continue;
@@ -910,7 +911,7 @@ var commutator = (function () {
                         if (canCommute) {
                             var moveAdd = {
                                 base: arr[arrLen - j].base,
-                                amount: normalize(arr[arrLen - j].amount + arrayAdd.amount)
+                                amount: normalize(arr[arrLen - j].amount + arrayAdd.amount),
                             };
                             if (moveAdd.amount === 0) {
                                 arr.splice(-j, 1);
@@ -932,7 +933,7 @@ var commutator = (function () {
     }
     function isSameClass(move1, move2) {
         if (move1.base in commute && move2.base in commute) {
-            if (commute[move1.base]["class"] === commute[move2.base]["class"]) {
+            if (commute[move1.base].class === commute[move2.base].class) {
                 return true;
             }
         }
@@ -951,7 +952,7 @@ var commutator = (function () {
     return {
         search: search,
         expand: expand,
-        commutatorPost: commutatorPost
+        commutatorPost: commutatorPost,
     };
 })();
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
