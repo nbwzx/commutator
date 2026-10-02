@@ -67,3 +67,8 @@ entry; the navigation bar and the settings panels are built in `src/ui/`.
 
 The old `*.html` URLs keep working and redirect to the clean paths, e.g.
 `/cube.html` → `/cube/`.
+
+## Deployment
+
+Pushing to `main` runs `npm run build` and publishes `dist/` to GitHub Pages,
+see `.github/workflows/deploy.yml`.
