@@ -1,6 +1,5 @@
-"use strict";
+import comm from "../src/core/commutator.ts";
 
-const comm = require("../assets/dist/js/commutator.ts");
 let res1: string[] = [],
   res2 = "";
 console.time("Test 1");
@@ -47,10 +46,13 @@ console.log(
   "The combination of commutators of R U' S U2 S R' S2 R U' R' in order 4."
 );
 res1 = comm.search({
-  algorithm: "R U' S U2 S R' S2 R U' R'",
+  algorithm: "abcdefga'b'c'd'e'f'g'",
   order: 4,
   outerBracket: true,
   limit: 3,
+  initialReplace: {},
+  finalReplace: {},
+  commute: {},
 });
 console.log(res1);
 console.timeEnd("Test 4");

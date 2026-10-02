@@ -1,13 +1,14 @@
 /*!
  * Commutator (https://github.com/nbwzx/commutator)
- * Copyright (c) 2022-2025 Zixing Wang <zixingwang.cn@gmail.com>
+ * Copyright (c) 2022-2026 Zixing Wang <zixingwang.cn@gmail.com>
  * Licensed under MIT (https://github.com/nbwzx/commutator/blob/main/LICENSE)
  */
-/* eslint-disable no-misleading-character-class */
-/* eslint-disable no-control-regex */
 
 const commutator = (function () {
   const MAX_INT = 4294967295;
+  const escapeRegExp = (value: string): string =>
+    value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const scoreCache: Map<string, number> = new Map();
   const orderInit = 4,
     outerBracketInit = false,
     abMaxScoreInit = 2.5,
@@ -150,7 +151,7 @@ const commutator = (function () {
   function clean(input: string): string {
     // Implements the internationalized string preparation algorithm from RFC 4518
     let string = input;
-
+  
     string = string.replace(
       /[\u00ad\u1806\u034f\u180b-\u180d\ufe0f-\uff00\ufffc]+/gu,
       ""
@@ -169,12 +170,12 @@ const commutator = (function () {
       /[\u061c\u115f\u1160\u17b4\u17b5\u2064\u2800\u3164\uffa0]/gu,
       " "
     );
-
+  
     // Specifically for this project
     string = string.replace(/[!！]/gu, " ");
     string = string.replace(/\s+/gu, " ");
     string = string.trim();
-
+  
     const non_standard_characters: { [key: string]: string } = {
       "'": "｀΄＇ˈˊᑊˋꞌᛌ‘’՚‛՝`′׳´ʹ˴ߴ‵ߵʻʼ᾽ʽ῾ʾ᾿ʿ",
       ",": "¸ꓹ‚؍٫，",
@@ -187,7 +188,7 @@ const commutator = (function () {
       "+": "𐊛᛭",
       "*": "×",
     };
-
+  
     for (const standard_char in non_standard_characters) {
       const chars = non_standard_characters[standard_char];
       for (let i = 0; i < chars.length; i++) {
@@ -196,9 +197,113 @@ const commutator = (function () {
         string = string.replace(re, standard_char);
       }
     }
-
+  
     return string;
   }
+
+  type BracketGroup = {
+    start: number;
+    end: number;
+    inner: string;
+    exponent: string;
+    inverseMark: string;
+  };
+
+  const splitTopLevel = (input: string, separator: string): string[] => {
+    const parts: string[] = [];
+    let depth = 0,
+      current = "";
+    for (const char of input) {
+      if (char === "[" || char === "(") {
+        depth++;
+      } else if (char === "]" || char === ")") {
+        depth--;
+      }
+      if (char === separator && depth === 0) {
+        parts.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    parts.push(current);
+    return parts;
+  };
+
+  const invertNotation = (input: string): string => {
+    const plusParts = splitTopLevel(input, "+");
+    if (plusParts.length > 1) {
+      return plusParts
+        .reverse()
+        .map((part) => invertNotation(part))
+        .join("+");
+    }
+    const colonParts = splitTopLevel(input, ":");
+    if (colonParts.length > 1) {
+      return `${colonParts[0]}:${invertNotation(colonParts.slice(1).join(":"))}`;
+    }
+    if (input.startsWith("[") && input.endsWith("]")) {
+      const commaParts = splitTopLevel(input.slice(1, -1), ",");
+      if (commaParts.length === 2) {
+        return `[${commaParts[1]},${commaParts[0]}]`;
+      }
+    }
+    return arrayToStr(invert(algToArray(input)));
+  };
+
+  const invertCommutator = (inner: string): string => {
+    const commaParts = splitTopLevel(inner, ",");
+    if (commaParts.length === 2) {
+      return `${commaParts[1]},${commaParts[0]}`;
+    }
+    return invertNotation(inner);
+  };
+
+  const findBracketGroup = (algorithm: string): BracketGroup | null => {
+    for (let i = 0; i < algorithm.length; i++) {
+      if (algorithm[i] !== "[") {
+        continue;
+      }
+      let depth = 0,
+        close = -1;
+      for (let j = i; j < algorithm.length; j++) {
+        if (algorithm[j] === "[") {
+          depth++;
+        } else if (algorithm[j] === "]") {
+          depth--;
+          if (depth === 0) {
+            close = j;
+            break;
+          }
+        }
+      }
+      if (close === -1) {
+        continue;
+      }
+      let cursor = close + 1;
+      let exponent = "";
+      while (
+        cursor < algorithm.length &&
+        algorithm[cursor] >= "0" &&
+        algorithm[cursor] <= "9"
+      ) {
+        exponent += algorithm[cursor];
+        cursor++;
+      }
+      if (exponent === "") {
+        continue;
+      }
+      const inverseMark = algorithm[cursor] === "'" ? "'" : "";
+      return {
+        start: i,
+        end: cursor + inverseMark.length,
+        inner: algorithm.slice(i + 1, close),
+        exponent,
+        inverseMark,
+      };
+    }
+    return null;
+  };
 
   function expand(input: {
     algorithm: string;
@@ -226,42 +331,6 @@ const commutator = (function () {
       .replace(/\+\s/gu, "+")
       .replace(/\s\+/gu, "+")
       .replace(/\*2/gu, "2");
-    for (let i = algorithm.length - 1; i > 1; i--) {
-      if (algorithm[i] === "2" && algorithm[i - 1] === ")") {
-        let j = i - 1;
-        while (algorithm[j] !== "(" && j >= 0) {
-          j--;
-        }
-        if (j >= 0) {
-          algorithm =
-            algorithm.slice(0, j) +
-            algorithm.slice(j + 1, i - 1) +
-            algorithm.slice(j + 1, i - 1) +
-            algorithm.slice(i + 1);
-          break;
-        }
-      }
-    }
-    for (let i = algorithm.length - 1; i > 1; i--) {
-      if (algorithm[i] === "2" && algorithm[i - 1] === "]") {
-        let j = i - 1;
-        while (algorithm[j] !== "[" && j >= 0) {
-          j--;
-        }
-        if (j >= 0) {
-          algorithm =
-            algorithm.slice(0, j) +
-            algorithm.slice(j + 1, i - 1) +
-            algorithm.slice(j + 1, i - 1) +
-            algorithm.slice(i + 1);
-          break;
-        }
-      }
-    }
-    algorithm = algorithm.replace(/\(/gu, "");
-    algorithm = algorithm.replace(/\)/gu, "");
-    algorithm = `[${algorithm.replace(/\+/gu, "]+[")}]`;
-    algorithm = algorithm.replace(/\]\[/gu, "]+[");
     if (order === 0) {
       isOrderZero = true;
       order = MAX_INT;
@@ -274,6 +343,36 @@ const commutator = (function () {
     // • order 3 → min -1 (e.g. Pyraminx)
     minAmount = Math.floor(order / 2) + 1 - order;
     maxAmount = Math.floor(order / 2);
+    const groupBody = (inner: string, inverseMark: string): string =>
+      inverseMark === "'" ? invertNotation(inner) : inner;
+    let isGroupChanged = true;
+    while (isGroupChanged) {
+      isGroupChanged = false;
+      algorithm = algorithm.replace(
+        /\(([^()]*)\)(\d*)('?)/gu,
+        (_match, inner: string, exponent: string, inverseMark: string) => {
+          isGroupChanged = true;
+          const times = exponent === "" ? 1 : Number(exponent);
+          return groupBody(inner, inverseMark).repeat(times);
+        },
+      );
+      const bracketGroup = findBracketGroup(algorithm);
+      if (bracketGroup !== null) {
+        isGroupChanged = true;
+        const body =
+          bracketGroup.inverseMark === "'"
+            ? invertCommutator(bracketGroup.inner)
+            : bracketGroup.inner;
+        algorithm =
+          algorithm.slice(0, bracketGroup.start) +
+          `[${body}]`.repeat(Number(bracketGroup.exponent)) +
+          algorithm.slice(bracketGroup.end);
+      }
+    }
+    algorithm = algorithm.replace(/\(/gu, "");
+    algorithm = algorithm.replace(/\)/gu, "");
+    algorithm = `[${algorithm.replace(/\+/gu, "]+[")}]`;
+    algorithm = algorithm.replace(/\]\[/gu, "]+[");
     const rpnStack = rpn(initStack(algorithm));
     if (
       rpnStack[0] === "Lack left parenthesis." ||
@@ -293,14 +392,13 @@ const commutator = (function () {
   }
 
   function isOperator(sign: string): boolean {
-    const operatorString = "+:,/[]";
-    return operatorString.indexOf(sign) > -1;
+    return operatorLevelInit[sign] !== undefined;
   }
 
   function initStack(algorithm: string): string[] {
     const stack: string[] = [algorithm[0]];
     for (let i = 1; i < algorithm.length; i++) {
-      if (isOperator(algorithm[i]) || isOperator(stack.slice(-1)[0])) {
+      if (isOperator(algorithm[i]) || isOperator(stack[stack.length - 1])) {
         stack.push(algorithm[i]);
       } else {
         stack.push(stack.pop() + algorithm[i]);
@@ -309,26 +407,17 @@ const commutator = (function () {
     return stack;
   }
 
+  const operatorLevelInit: { [id: string]: number } = {
+    ":": 0,
+    ",": 1,
+    "/": 2,
+    "+": 3,
+    "[": 4,
+    "]": 5,
+  };
+
   function operatorLevel(operator: string): number {
-    if (operator === ":") {
-      return 0;
-    }
-    if (operator === ",") {
-      return 1;
-    }
-    if (operator === "/") {
-      return 2;
-    }
-    if (operator === "+") {
-      return 3;
-    }
-    if (operator === "[") {
-      return 4;
-    }
-    if (operator === "]") {
-      return 5;
-    }
-    return -1;
+    return operatorLevelInit[operator] ?? -1;
   }
 
   function rpn(stackInput: string[]): string[] {
@@ -337,8 +426,8 @@ const commutator = (function () {
       operatorStack: string[] = [];
     let isMatch = false,
       operatorStackPop = "";
-    while (stackInput.length > 0) {
-      const sign = stackInput.shift() as string;
+    for (let index = 0; index < stackInput.length; index++) {
+      const sign = stackInput[index];
       if (!isOperator(sign)) {
         stackOutput.push(sign);
       } else if (sign === "]") {
@@ -358,8 +447,9 @@ const commutator = (function () {
       } else {
         while (
           operatorStack.length > 0 &&
-          operatorStack.slice(-1)[0] !== "[" &&
-          operatorLevel(sign) <= operatorLevel(operatorStack.slice(-1)[0])
+          operatorStack[operatorStack.length - 1] !== "[" &&
+          operatorLevel(sign) <=
+            operatorLevel(operatorStack[operatorStack.length - 1])
         ) {
           stackOutput.push(operatorStack.pop() as string);
         }
@@ -378,8 +468,8 @@ const commutator = (function () {
 
   function calc(stack: string[]): string {
     const calcOutput: string[] = [];
-    while (stack.length > 0) {
-      const sign = stack.shift() as string;
+    for (let index = 0; index < stack.length; index++) {
+      const sign = stack[index];
       if (isOperator(sign)) {
         if (calcOutput.length >= 2) {
           const calcPop2 = calcOutput.pop() as string;
@@ -398,7 +488,7 @@ const commutator = (function () {
   function calcTwo(
     algorithm1: string,
     algorithm2: string,
-    sign: string
+    sign: string,
   ): string {
     let array1: Move[] = [],
       array2: Move[] = [];
@@ -411,7 +501,7 @@ const commutator = (function () {
         return arrayToStr(array1.concat(array2, invert(array1)));
       case ",":
         return arrayToStr(
-          array1.concat(array2, invert(array1), invert(array2))
+          array1.concat(array2, invert(array1), invert(array2)),
         );
       case "/":
         return arrayToStr(
@@ -420,8 +510,8 @@ const commutator = (function () {
             invert(array1),
             invert(array1),
             invert(array2),
-            array1
-          )
+            array1,
+          ),
         );
       default:
         return arrayToStr(array1.concat(array2));
@@ -429,13 +519,17 @@ const commutator = (function () {
   }
 
   function score(algorithm: string): number {
+    const cached = scoreCache.get(algorithm);
+    if (cached !== undefined) {
+      return cached;
+    }
     let alg = algorithm;
     alg = `[${alg.replace(/\+/gu, "]+[")}]`;
     alg = alg.replace(/\]\[/gu, "]+[");
     const rpnStack = rpn(initStack(alg)),
       scoreOutput: string[] = [];
-    while (rpnStack.length > 0) {
-      const sign = rpnStack.shift() as string;
+    for (let scoreIndex = 0; scoreIndex < rpnStack.length; scoreIndex++) {
+      const sign = rpnStack[scoreIndex];
       if (isOperator(sign)) {
         const scorePop2 = scoreOutput.pop() as string;
         const scorePop1 = scoreOutput.pop() as string;
@@ -452,7 +546,16 @@ const commutator = (function () {
         scoreOutput.push(sign);
       }
     }
-    return Number(scoreOutput[0]);
+    // Prefer U l:[E',L' U' L] to U M:[L E' L',U']
+    const algRemoveSign = alg
+      .replace(/[[\],:]/gu, " ")
+      .replace(/\s+/gu, " ")
+      .trim();
+    const moveDelta =
+      algRemoveSign.split(" ").length - algToArray(algRemoveSign).length;
+    const scoreValue = Number(scoreOutput[0]) + moveDelta * 0.001;
+    scoreCache.set(algorithm, scoreValue);
+    return scoreValue;
   }
 
   function scoreTwo(score1: number, score2: number, sign: string): number {
@@ -512,6 +615,7 @@ const commutator = (function () {
     const maxDepth = input.maxDepth ?? maxDepthInit,
       limit = input.limit ?? limitInit;
     result = [];
+    scoreCache.clear();
     if (algorithm === "") {
       return [""];
     }
@@ -575,11 +679,11 @@ const commutator = (function () {
       for (let i = 0; i < commuteTotal; i++) {
         let commuteArr = arr.concat();
         for (let j = 0; j < commuteCount; j++) {
-          if ((i & (1 << j)) !== 0) {
+          if (((i >> j) & 1) !== 0) {
             commuteArr = swapArray(
               commuteArr,
               commuteIndex[j],
-              commuteIndex[j] + 1
+              commuteIndex[j] + 1,
             );
           }
         }
@@ -594,14 +698,19 @@ const commutator = (function () {
       if (isFind && (depth === maxDepth || maxDepth === 0)) {
         result.sort(sortRule);
         result = result.map((alg) =>
-          commutatorPost(
-            alg,
+          commutatorPost({
+            algorithm: alg,
             slashNotation,
             noBrackets,
             spaceAfterColon,
             spaceAfterComma,
-            outerBrackets
-          )
+            outerBrackets,
+            depth,
+            order,
+            initialReplace,
+            finalReplace,
+            commute,
+          }),
         );
         if (limit === 0) {
           return result;
@@ -612,31 +721,41 @@ const commutator = (function () {
     return ["Not found."];
   }
 
-  function commutatorPost(
-    algorithm: string,
-    slashNotation1: boolean,
-    noBrackets1: boolean,
-    spaceAfterColon1: boolean,
-    spaceAfterComma1: boolean,
-    outerBrackets1: boolean
-  ): string {
-    let alg = algorithm;
+  function commutatorPost(input: {
+    algorithm: string;
+    slashNotation: boolean;
+    noBrackets: boolean;
+    spaceAfterColon: boolean;
+    spaceAfterComma: boolean;
+    outerBrackets: boolean;
+    depth?: number;
+    order?: number;
+    initialReplace?: { [id: string]: string };
+    finalReplace?: { [id: string]: string };
+    commute?: { [id: string]: { class: number; priority: number } };
+  }): string {
+    let alg = input.algorithm;
     if (alg.includes(".")) {
       return alg;
     }
-    if (slashNotation1) {
+    order = input.order ?? orderInit;
+    initialReplace = input.initialReplace ?? initialReplaceInit;
+    finalReplace = input.finalReplace ?? finalReplaceInit;
+    commute = input.commute ?? commuteInit;
+    const depth = input.depth ?? 1;
+    if (depth === 1 && input.slashNotation) {
       alg = applySlash(alg);
     }
-    if (noBrackets1) {
+    if (depth === 1 && input.noBrackets) {
       alg = alg.replace(/\[/gu, "").replace(/\]/gu, "");
     }
-    if (spaceAfterColon1) {
+    if (input.spaceAfterColon) {
       alg = alg.replace(/:/gu, ": ");
     }
-    if (spaceAfterComma1) {
+    if (input.spaceAfterComma) {
       alg = alg.replace(/,/gu, ", ");
     }
-    if (outerBrackets1) {
+    if (depth === 1 && input.outerBrackets) {
       if (alg[0] !== "[") {
         alg = `[${alg}]`;
       }
@@ -687,10 +806,11 @@ const commutator = (function () {
   }
 
   function algToArray(algorithm: string): Move[] {
+    maxAlgAmount = 0;
     let algTemp = clean(algorithm);
-    for (const s in initialReplace) {
-      const re = new RegExp(s, "gu");
-      algTemp = algTemp.replace(re, initialReplace[s]);
+    for (const [s, replacement] of Object.entries(initialReplace)) {
+      const re = new RegExp(escapeRegExp(s), "gu");
+      algTemp = algTemp.replace(re, () => replacement);
     }
     algTemp = algTemp.replace(/\s+/giu, "");
     if (algTemp === "") {
@@ -730,10 +850,11 @@ const commutator = (function () {
   function commutatorPre(
     array: Move[],
     depth: number,
-    maxSubDepth: number
+    maxSubDepth: number,
   ): string[] {
     let commuteCount = 0;
     const commuteIndex: number[] = [];
+    let commutatorOutput = "";
     for (let i = 0; i < array.length - 1; i++) {
       if (isSameClass(array[i], array[i + 1])) {
         commuteIndex[commuteCount] = i;
@@ -745,18 +866,26 @@ const commutator = (function () {
     for (let i = 0; i < commuteTotal; i++) {
       let commuteArr = array.concat();
       for (let j = 0; j < commuteCount; j++) {
-        if ((i & (1 << j)) !== 0) {
+        if (((i >> j) & 1) !== 0) {
           commuteArr = swapArray(
             commuteArr,
             commuteIndex[j],
-            commuteIndex[j] + 1
+            commuteIndex[j] + 1,
           );
         }
       }
       commutatorResult = commutatorMain(commuteArr, depth, maxSubDepth);
       if (commutatorResult[0] !== "Not found.") {
-        return commutatorResult;
+        if (
+          score(commutatorResult[0]) < score(commutatorOutput) ||
+          commutatorOutput === ""
+        ) {
+          commutatorOutput = commutatorResult[0];
+        }
       }
+    }
+    if (commutatorOutput.length > 0) {
+      return [commutatorOutput];
     }
     return ["Not found."];
   }
@@ -764,16 +893,15 @@ const commutator = (function () {
   function commutatorMain(
     array: Move[],
     depth: number,
-    maxSubDepth: number
+    maxSubDepth: number,
   ): string[] {
-    let arr = simplify(array),
-      commutatorOutput = "";
-    const arrBak = arr.concat(),
+    let commutatorOutput = "";
+    const arr = simplify(array),
       arrLen = arr.length;
     if (arr.length < 3 * depth + 1) {
       return ["Not found."];
     }
-    for (let d = 0; d <= (arrLen + arr.length + 1) / 2 - 1; d++) {
+    for (let d = 0; d <= Math.floor(arrLen / 2); d++) {
       for (let drKey = 1; drKey < order; drKey++) {
         // 1, -1, 2, -2...
         const dr = ((drKey % 2) * 2 - 1) * Math.floor((drKey + 1) / 2);
@@ -782,59 +910,68 @@ const commutator = (function () {
             break;
           }
         } else {
-          if (Math.abs(dr) > Math.abs(arrBak[d - 1].amount)) {
+          if (Math.abs(dr) > Math.abs(arr[d - 1].amount)) {
             break;
           }
-          if (
-            order % 2 === 1 ||
-            arrBak[d - 1].amount !== Math.floor(order / 2)
-          ) {
+          if (order % 2 === 1 || arr[d - 1].amount !== Math.floor(order / 2)) {
             if (
-              (arrBak[d - 1].amount < 0 && dr > 0) ||
-              (arrBak[d - 1].amount > 0 && dr < 0)
+              (arr[d - 1].amount < 0 && dr > 0) ||
+              (arr[d - 1].amount > 0 && dr < 0)
             ) {
               continue;
             }
           }
         }
-        arr = displace(arrBak, d, dr);
+        let part0 = simplify(repeatEnd(arr.slice(0, d), dr));
         // For a b c b' a' d c' d' = a b:[c,b' a' d]
-        for (let i = 1; i <= arr.length / 2 - 1; i++) {
-          let minj = 0;
+        for (let i = d + 1; i <= d + Math.floor(arr.length / 2) - 1; i++) {
+          let minj = i + 1;
           if (depth === 1) {
-            minj = Math.max(1, Math.floor((arr.length + 1) / 2 - i));
-          } else {
-            minj = 1;
+            minj = Math.max(i + 1, Math.floor((arr.length + 1) / 2));
           }
-          for (let j = minj; j <= arr.length / 2 - 1; j++) {
+          for (
+            let j = minj;
+            j <= Math.min(i + Math.floor(arr.length / 2) - 1, arr.length - 1);
+            j++
+          ) {
             let part1x: Move[] = [],
               part2x: Move[] = [];
             const commuteAdd1: [Move[]] = [[]],
               commuteAdd2: [Move[]] = [[]];
-            if (arr[i - 1].base === arr[i + j - 1].base) {
+            if (arr[i - 1].base === arr[j - 1].base) {
               // For [a bx,by c bz]
               for (let ir = minAmount; ir <= maxAmount; ir++) {
                 if (ir === 0) {
                   continue;
                 }
-                const jr = normalize(arr[i + j - 1].amount + ir);
-                part1x = simplify(repeatEnd(arr.slice(0, i), ir));
+                const jr = normalize(arr[j - 1].amount + ir);
+                if (d > 0) {
+                  part1x = simplify(
+                    repeatEnd([arr[d - 1]], arr[d - 1].amount - dr).concat(
+                      repeatEnd(arr.slice(d, i), ir),
+                    ),
+                  );
+                } else {
+                  part1x = simplify(repeatEnd(arr.slice(d, i), ir));
+                }
                 commuteAdd1.push(part1x);
                 part2x = simplify(
-                  invert(part1x).concat(repeatEnd(arr.slice(0, i + j), jr))
+                  [
+                    {
+                      base: arr[i - 1].base,
+                      amount: arr[i - 1].amount - ir,
+                    } as Move,
+                  ].concat(repeatEnd(arr.slice(i, j), jr)),
                 );
                 commuteAdd2.push(part2x);
               }
             } else {
-              if (depth === 1 && arr[i].base !== arr[arr.length - 1].base) {
-                continue;
-              }
-              part1x = simplify(arr.slice(0, i));
+              part1x = simplify(arr.slice(d, i));
               commuteAdd1.push(part1x);
-              part2x = simplify(arr.slice(i, i + j));
+              part2x = simplify(arr.slice(i, j));
               commuteAdd2.push(part2x);
               let commuteCase: Move[] = [];
-              if (isSameClass(arr[i - 1], arr[i + j - 1])) {
+              if (isSameClass(arr[i - 1], arr[j - 1])) {
                 // For L a R b L' a' R' b' = [L a R,b L' R]
                 commuteAdd1.push(part1x);
                 commuteCase = simplify(part2x.concat([arr[i - 1]]));
@@ -848,22 +985,20 @@ const commutator = (function () {
                   }
                 }
               }
-              if (isSameClass(arr[i], arr[i + j])) {
+              if (isSameClass(arr[i], arr[j])) {
                 // For a R b L a' R' b' L' = [a R b R,R' L a'] = [a R L',L b R]
-                commuteCase = simplify(part1x.concat(invert([arr[i + j]])));
+                commuteCase = simplify(part1x.concat(invert([arr[j]])));
                 commuteAdd1.push(commuteCase);
-                commuteCase = simplify([arr[i + j]].concat(part2x));
+                commuteCase = simplify([arr[j]].concat(part2x));
                 commuteAdd2.push(commuteCase);
                 // For a R2 b R' L2 a' R' L' b' L' = [a R2 b L R,R2' L a'] = [a R2 L',L b R L]
-                if (arr.length >= i + j + 2) {
-                  if (isSameClass(arr[i + j], arr[i + j + 1])) {
+                if (arr.length >= j + 2) {
+                  if (isSameClass(arr[j], arr[j + 1])) {
                     commuteCase = simplify(
-                      part1x.concat(invert(arr.slice(i + j, i + j + 2)))
+                      part1x.concat(invert(arr.slice(j, j + 2))),
                     );
                     commuteAdd1.push(commuteCase);
-                    commuteCase = simplify(
-                      arr.slice(i + j, i + j + 2).concat(part2x)
-                    );
+                    commuteCase = simplify(arr.slice(j, j + 2).concat(part2x));
                     commuteAdd2.push(commuteCase);
                   }
                 }
@@ -877,8 +1012,16 @@ const commutator = (function () {
               part1x = commuteAdd1[commuteAddKey];
               part2x = commuteAdd2[commuteAddKey];
               const subArr = simplify(
-                part2x.concat(part1x, invert(part2x), invert(part1x), arr)
+                part2x.concat(
+                  part1x,
+                  invert(part0.concat(part1x, part2x)),
+                  arr,
+                  part0,
+                ),
               );
+              if (subArr.length > arr.length) {
+                continue;
+              }
               let subPart = "";
               if (depth > 1) {
                 subPart = commutatorPre(subArr, depth - 1, maxSubDepth)[0];
@@ -902,8 +1045,7 @@ const commutator = (function () {
                   }
                 }
                 // For a b c b' a' d c' d' = a b:[c,b' a' d] = d:[d' a b,c]
-                let part0 = simplify(repeatEnd(arrBak.slice(0, d), dr)),
-                  part1 = part1y,
+                let part1 = part1y,
                   part2 = part2y;
                 if (part0.length > 0 && maxSubDepth === 1) {
                   const partz = simplify(part0.concat(part2y));
@@ -913,6 +1055,22 @@ const commutator = (function () {
                     part1 = invert(part2y);
                     part2 = part1y;
                   }
+                }
+                // [L,R a]=R:[L,a]
+                if (areMovesSameClass(part1.concat(part2[0]))) {
+                  continue;
+                }
+                // [L,a R]=[L,a]
+                if (areMovesSameClass(part1.concat(part2[part2.length - 1]))) {
+                  continue;
+                }
+                // [R a,L]=R:[a,L]
+                if (areMovesSameClass(part2.concat(part1[0]))) {
+                  continue;
+                }
+                // [a R,L]=[a,L]
+                if (areMovesSameClass(part2.concat(part1[part1.length - 1]))) {
+                  continue;
                 }
                 const part1Output = arrayToStr(part1),
                   part2Output = arrayToStr(part2),
@@ -924,7 +1082,7 @@ const commutator = (function () {
                   part0Output,
                   part1Output,
                   part2Output,
-                  subPart
+                  subPart,
                 );
                 if (commutatorOutput === "") {
                   commutatorOutput = commutatorStr;
@@ -970,7 +1128,7 @@ const commutator = (function () {
     part0: string,
     part1: string,
     part2: string,
-    subPart: string
+    subPart: string,
   ): string {
     if (subPart === "") {
       if (!outerBracket) {
@@ -992,12 +1150,6 @@ const commutator = (function () {
       return `[${part1},${part2}]${subPart}`;
     }
     return `[${part0}:[${part1},${part2}]${subPart}]`;
-  }
-
-  function displace(array: Move[], d: number, dr: number): Move[] {
-    const arr = array.concat(),
-      arrEnd = repeatEnd(arr.slice(0, d), dr);
-    return simplify(invert(arrEnd).concat(arr, arrEnd));
   }
 
   function invert(array: Move[]): Move[] {
@@ -1039,9 +1191,9 @@ const commutator = (function () {
       }
     }
     let arrOutput = `${arrTemp.join(" ")} `;
-    for (const i in finalReplace) {
-      const re = new RegExp(`${i} `, "gu");
-      arrOutput = arrOutput.replace(re, `${finalReplace[i]} `);
+    for (const [key, replacement] of Object.entries(finalReplace)) {
+      const re = new RegExp(`${escapeRegExp(key)} `, "gu");
+      arrOutput = arrOutput.replace(re, () => `${replacement} `);
     }
     arrOutput = arrOutput.substring(0, arrOutput.length - 1);
     return arrOutput;
@@ -1112,6 +1264,19 @@ const commutator = (function () {
     return false;
   }
 
+  function areMovesSameClass(moves: Move[]): boolean {
+    if (moves.length === 0) {
+      return true;
+    }
+    const firstMove = moves[0];
+    for (let i = 1; i < moves.length; i++) {
+      if (!isSameClass(firstMove, moves[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   function swapArray(array: Move[], index1: number, index2: number): Move[] {
     array[index1] = array.splice(index2, 1, array[index1])[0];
     return array;
@@ -1124,13 +1289,16 @@ const commutator = (function () {
     return (((amount % order) + order - minAmount) % order) + minAmount;
   }
 
+  function inverse(input: string): string {
+    return arrayToStr(invert(algToArray(expand({ algorithm: input }))));
+  }
+
   return {
     search,
     expand,
     commutatorPost,
+    inverse,
   };
 })();
 
-if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-  module.exports = commutator;
-}
+export default commutator;

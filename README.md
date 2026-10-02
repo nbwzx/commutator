@@ -49,3 +49,20 @@ Output: "Not found."
 
 Constraints:
 - s consist of only English letters.
+
+## Development
+
+```sh
+npm install
+npm run dev      # Vite dev server
+npm run build    # tsc --noEmit + vite build, output in dist/
+npm test
+```
+
+The algorithm lives in `src/core/commutator.ts`, one entry point per page in
+`src/pages/`, and the static files (`logo`, `svg`, `test.xlsx`) are served from
+`public/assets/`. Each page is a bare HTML shell that only loads its TypeScript
+entry; the navigation bar and the settings panels are built in `src/ui/`.
+
+The old `*.html` URLs keep working and redirect to the clean paths, e.g.
+`/cube.html` → `/cube/`.

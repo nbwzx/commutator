@@ -1,0 +1,31 @@
+/* Show it is fixed to the top */
+body {
+  padding-top: 4.5rem;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+.help-icon {
+  font-size: 16px;
+  padding: 0;
+  vertical-align: middle;
+  color: #17a2b8;
+}
+
+.number-input {
+  text-align: center;
+  width: 2.5em;
+}
+
+.excel-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.excel-table tr td {
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  padding: 5px 10px;
+}

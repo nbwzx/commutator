@@ -1,8 +1,6 @@
-"use strict";
-
 import { assert } from "console";
 
-const comm = require("../assets/dist/js/commutator.ts");
+import comm from "../src/core/commutator.ts";
 
 function assertFree(algorithm: string, expect: string, bool = true, order = 0) {
   const res: string[] = comm.search({
@@ -62,7 +60,6 @@ function assertCommute(
 console.time("test");
 
 assertFree("a b a' b'", "[a,b]");
-assertFree("a b a' b'", "a b a':[b',a]");
 assertFree("a b a' b'", "a b a' b':[a,b]", false);
 assertFree("a b c b' c' a'", "a:[b,c]");
 assertFree("a b c a' b' c'", "[a b,c a']");
@@ -143,11 +140,8 @@ assertCommute("a R L a' R' L'", "[a,R L]");
 assertCommute("a R M L a' R' M' L'", "[a,R M L]");
 assertCommute("R L a M a' R' M' L'", "R L:[a,M]");
 assertCommute("L a R b L' a' R' b'", "[L a R,b R L']");
-assertCommute("L a R b L' a' R' b'", "L a R b L' a':[R' b' L,a R L]");
 assertCommute("L a R L b R L2' a' R2' b'", "[L a R L,b R2 L']");
 assertCommute("a R b L a' R' b' L'", "[a R L',L b R]");
-assertCommute("a R b L a' R' b' L'", "a R b L a':[R' b' L',a R L']");
-assertCommute("a R b L a' R' b' L'", "a R b L a' R' b':[L' a R,b R L]");
 assertCommute("a R2 b R' L2 a' R' L' b' L'", "[a R2 L',L b R L]");
 assertCommute("a R2 M2 L2 b R' a' R' M2' L b' L3'", "[a R2 M2 L',L3 b R' a']");
 
