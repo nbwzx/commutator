@@ -56,6 +56,7 @@ Constraints:
 npm install
 npm run dev      # Vite dev server
 npm run build    # tsc --noEmit + vite build, output in dist/
+npm run lint     # ESLint
 npm test
 ```
 
